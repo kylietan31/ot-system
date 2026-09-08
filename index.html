@@ -156,6 +156,7 @@
             gap: 15px;
             justify-content: center;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .btn-add-sheet {
@@ -190,7 +191,18 @@
             cursor: pointer;
         }
 
-        .btn-print {
+        .btn-save-pdf {
+            background-color: #0284c7;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-print-only {
             background-color: var(--primary-color);
             color: white;
             padding: 12px 24px;
@@ -216,6 +228,19 @@
             margin-top: 40px;
             padding-top: 5px;
         }
+
+        @media print {
+            .bottom-actions, .btn-delete-sheet, .btn-add-row, .btn-remove-row {
+                display: none !important;
+            }
+            .sheet-card {
+                page-break-after: always;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin-bottom: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -225,28 +250,89 @@
 </div>
 
 <div class="bottom-actions">
-    <button class="btn-add-sheet" onclick="addNewSheet()">📄 + Add New Blank Sheet</button>
+    <button class="btn-add-sheet" onclick="addNewSheet()">📄 + Add New Sheet</button>
     <button class="btn-copy-sheet" onclick="copyPreviousSheet()">📋 + Copy Previous Sheet</button>
-    <button class="btn-print" onclick="window.print()">🖨️ Print / Save All PDF</button>
+    <button class="btn-save-pdf" onclick="window.print()">💾 Save PDF</button>
+    <button class="btn-print-only" onclick="window.print()">🖨️ Print Form</button>
 </div>
 
 <script>
-// 员工数据库（可以随时在此添加/修改员工编号和姓名）
-const employeeList = [
-    { empNo: "101", name: "Tan Kyle" },
-    { empNo: "102", name: "Ali Ahmad" },
-    { empNo: "103", name: "Chong Wei" },
-    { empNo: "104", name: "Siti Nurhaliza" },
-    { empNo: "105", name: "Muthu Arumugam" }
-];
-
-// 部门与 HOD 关联数据库
+// 部门与 HOD 绑定表
 const hodDatabase = {
-    "Design & CAD": "CHAN KENG LEONG",
+    "ADMIN": "TAN KYLE",
+    "PURCHASING": "THILAGAH",
+    "CAD": "CHAN KENG LEONG",
     "CNC": "WONG KONG MING",
     "EDM": "TAN CHEE KEONG",
-    "QC": "LEONG KAM YEW",
-    "ADMIN": "TAN KYLE"
+    "PROJECT": "MD ZAINUL",
+    "POLISHING": "MD SHOPON",
+    "PRODUCTION": "MD SHAHABUDIN",
+    "MOULD MAKER": "LEE YOONG HON",
+    "QC": "TAN KAH CHYE"
+};
+
+// 员工数据库
+const employeeDatabase = {
+  "ADMIN": [
+    { "empNo": "316", "name": "KISTINNA ANAQIN" },
+    { "empNo": "328", "name": "TAN KYLE" }
+  ],
+  "PURCHASING": [
+    { "empNo": "212", "name": "THILAGAH" }
+  ],
+  "CAD": [
+    { "empNo": "2", "name": "CHAN KENG LEONG" },
+    { "empNo": "305", "name": "ADARSH" },
+    { "empNo": "274", "name": "SOH GIM BOON" },
+    { "empNo": "28", "name": "HAN AYE AYE" },
+    { "empNo": "60", "name": "MD KANCHAN" },
+    { "empNo": "269", "name": "KHAU LIANG YU" },
+    { "empNo": "300", "name": "NAY LIANG YU" },
+    { "empNo": "307", "name": "MA LIK CHAN" }
+  ],
+  "CNC": [
+    { "empNo": "27", "name": "SA MASAN BA" },
+    { "empNo": "290", "name": "BHARAT" },
+    { "empNo": "291", "name": "DHAN BAHADUR" },
+    { "empNo": "294", "name": "MILAN" },
+    { "empNo": "315", "name": "MANUPRASAD" },
+    { "empNo": "325", "name": "MD FADHIL NOOR" }
+  ],
+  "EDM": [
+    { "empNo": "3", "name": "CHONG FAT KEONG" },
+    { "empNo": "302", "name": "TEE NYEIN AUNG" },
+    { "empNo": "306", "name": "KAYW ZIN HEIN" },
+    { "empNo": "318", "name": "YUVANNESH" }
+  ],
+  "PROJECT": [
+    { "empNo": "257", "name": "MD ZAINUL" },
+    { "empNo": "262", "name": "NUR SYAHIRAH" }
+  ],
+  "POLISHING": [
+    { "empNo": "19", "name": "MD SHOPON" },
+    { "empNo": "299", "name": "MIN THU" }
+  ],
+  "PRODUCTION": [
+    { "empNo": "20", "name": "MD SHAHABUDIN" },
+    { "empNo": "68", "name": "MD ALAMGIR" },
+    { "empNo": "301", "name": "SHAING THU AUNG" }
+  ],
+  "MOULD MAKER": [
+    { "empNo": "69", "name": "MD JAHIR" },
+    { "empNo": "72", "name": "MD JAHANGIR" },
+    { "empNo": "272", "name": "LEE YOONG HON" },
+    { "empNo": "286", "name": "HING YONG HOW" },
+    { "empNo": "303", "name": "ZAW MYO HTIKE" },
+    { "empNo": "310", "name": "AMARNATH" },
+    { "empNo": "311", "name": "JAISON" },
+    { "empNo": "319", "name": "VIMALKUMAR" },
+    { "empNo": "322", "name": "SARATH" },
+    { "empNo": "326", "name": "GOH CHEE KUAN" }
+  ],
+  "QC": [
+    { "empNo": "266", "name": "TAN KAH CHYE" },
+    { "empNo": "323", "name": "NUR LIANA SOFIA" }
+  ]
 };
 
 let sheetCount = 0;
@@ -279,18 +365,23 @@ function createSheetData() {
         <div class="meta-grid">
             <div class="form-group">
                 <label>Department:</label>
-                <select class="dept-select" onchange="autoFillHOD(this)">
-                    <option value="">-- Select --</option>
-                    <option value="Design & CAD">Design & CAD</option>
+                <select class="dept-select" onchange="onDepartmentChange(this)">
+                    <option value="">-- Select Department --</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="PURCHASING">PURCHASING</option>
+                    <option value="CAD">CAD</option>
                     <option value="CNC">CNC</option>
                     <option value="EDM">EDM</option>
+                    <option value="PROJECT">PROJECT</option>
+                    <option value="POLISHING">POLISHING</option>
+                    <option value="PRODUCTION">PRODUCTION</option>
+                    <option value="MOULD MAKER">MOULD MAKER</option>
                     <option value="QC">QC</option>
-                    <option value="ADMIN">ADMIN</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>HOD Name:</label>
-                <input type="text" class="hod-input" placeholder="HOD Name">
+                <input type="text" class="hod-input" placeholder="Head of Dept" readonly style="background:#f1f5f9; font-weight:bold;">
             </div>
             <div class="form-group">
                 <label>OT Date:</label>
@@ -302,7 +393,7 @@ function createSheetData() {
             <thead>
                 <tr>
                     <th style="width: 5%;">No.</th>
-                    <th style="width: 25%;">Employee (Emp No. & Name)</th>
+                    <th style="width: 25%;">Employee</th>
                     <th style="width: 15%;">Start Time</th>
                     <th style="width: 15%;">End Time</th>
                     <th style="width: 10%;">Hours</th>
@@ -329,31 +420,42 @@ function createSheetData() {
     addRow(card.querySelector('.btn-add-row'));
 }
 
-function autoFillHOD(selectElem) {
+function onDepartmentChange(selectElem) {
     const card = selectElem.closest('.sheet-card');
     const hodInput = card.querySelector('.hod-input');
     const selectedDept = selectElem.value;
+
     hodInput.value = hodDatabase[selectedDept] || "";
+
+    const employeeSelects = card.querySelectorAll('.emp-select');
+    employeeSelects.forEach(select => {
+        updateEmpDropdownOptions(select, selectedDept);
+    });
 }
 
-function getEmployeeOptions() {
-    let options = `<option value="">-- Select Employee --</option>`;
-    employeeList.forEach(emp => {
-        options += `<option value="${emp.empNo}">${emp.empNo} - ${emp.name}</option>`;
-    });
-    return options;
+function updateEmpDropdownOptions(selectElem, dept) {
+    selectElem.innerHTML = `<option value="">-- Select Employee --</option>`;
+    if (dept && employeeDatabase[dept]) {
+        employeeDatabase[dept].forEach(emp => {
+            selectElem.innerHTML += `<option value="${emp.empNo}">${emp.empNo} - ${emp.name}</option>`;
+        });
+    } else {
+        selectElem.innerHTML = `<option value="">-- Select Department First --</option>`;
+    }
 }
 
 function addRow(btn) {
-    const tbody = btn.closest('.sheet-card').querySelector('.table-body');
+    const card = btn.closest('.sheet-card');
+    const tbody = card.querySelector('.table-body');
+    const selectedDept = card.querySelector('.dept-select').value;
     const rowCount = tbody.children.length + 1;
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
         <td>${rowCount}</td>
         <td>
-            <select>
-                ${getEmployeeOptions()}
+            <select class="emp-select">
+                <!-- Dynamic based on selected department -->
             </select>
         </td>
         <td><input type="time" onchange="calcHours(this)"></td>
@@ -361,15 +463,17 @@ function addRow(btn) {
         <td><input type="number" class="hours-val" value="0.0" readonly style="background:#e2e8f0;"></td>
         <td>
             <select>
-                <option value="Normal">Normal OT</option>
-                <option value="RestDay">Rest Day</option>
-                <option value="PH">Public Holiday</option>
+                <option value="Normal">Normal OT (1.5x)</option>
+                <option value="RestDay">Rest Day (2.0x)</option>
             </select>
         </td>
         <td><input type="text" placeholder="Reason / Project No."></td>
         <td><button class="btn-remove-row" onclick="removeRow(this)">X</button></td>
     `;
     tbody.appendChild(tr);
+
+    const newEmpSelect = tr.querySelector('.emp-select');
+    updateEmpDropdownOptions(newEmpSelect, selectedDept);
 }
 
 function removeRow(btn) {
@@ -421,9 +525,12 @@ function copyPreviousSheet() {
     createSheetData();
     const newSheet = container.lastElementChild;
     const lastDept = lastSheet.querySelector('.dept-select').value;
-    const lastHOD = lastSheet.querySelector('.hod-input').value;
-    newSheet.querySelector('.dept-select').value = lastDept;
-    newSheet.querySelector('.hod-input').value = lastHOD;
+
+    if (lastDept) {
+        const deptSelect = newSheet.querySelector('.dept-select');
+        deptSelect.value = lastDept;
+        onDepartmentChange(deptSelect);
+    }
 }
 
 window.onload = function() {
