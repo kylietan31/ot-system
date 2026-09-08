@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overtime Application Form / 表单 / Borang Permohonan OT</title>
+  <style>
+    :root {
+      --primary-color: #1e3a8a;
+      --secondary-color: #3b82f6;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #cbd5e1;
+      --text-color: #0f172a;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; font-size: 13px; }
+    .container { max-width: 1100px; margin: 0 auto; background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+
+    .status-bar { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; padding: 8px 12px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; font-weight: 500; }
+    .header-title { text-align: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 20px; }
+    .header-title h2 { margin: 0; color: var(--primary-color); font-size: 20px; }
+    .header-title p { margin: 4px 0 0; color: #64748b; font-size: 12px; }
+
+    .top-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: #f1f5f9; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-weight: 600; color: #334155; }
+    .form-group select, .form-group input { padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; outline: none; }
+
+    .filter-section { background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .filter-section label { font-weight: 700; color: #1e40af; }
+    .btn-quick { background-color: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .btn-quick:hover { background-color: #1d4ed8; }
+
+    .table-container { overflow-x: auto; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+    th { background-color: var(--primary-color); color: white; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+    td input, td select, td textarea { width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
+    td textarea { resize: vertical; height: 38px; }
+
+    .copy-btn, .del-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .del-btn { color: #dc2626; border-color: #fca5a5; }
+    .add-row-btn { background-color: #16a34a; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; margin-bottom: 20px; }
+
+    .signatures-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0; }
+    .signature-box { border: 1px dashed var(--border-color); padding: 15px; border-radius: 6px; text-align: center; background: #fafafa; }
+    .signature-box h4 { margin: 0 0 10px 0; color: var(--primary-color); font-size: 13px; }
+    .signature-line { margin-top: 50px; border-top: 1px solid #000; padding-top: 5px; font-weight: 600; }
+
+    .actions-bar { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
+    .btn-print { background-color: #0f172a; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .btn-clear { background-color: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
+      .status-bar, .filter-section, .add-row-btn, .actions-bar, .copy-btn, .del-btn, .action-col { display: none !important; }
+      input, select, textarea { border: none !important; background: transparent !important; appearance: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="status-bar">
+    <span>💾 Auto-Saved / 自动保存 / Disimpan Automatik</span>
+    <span id="save-time">Last updated: Just now</span>
+  </div>
+
+  <div class="header-title">
+    <h2>OVERTIME AUTHORIZATION & REQUISITION FORM</h2>
+    <p>加班申请与批准表单 | Borang Permohonan & Kelulusan Kerja Lebih Masa</p>
+  </div>
+
+  <div class="top-meta">
+    <div class="form-group">
+      <label>Head of Department (HOD) 部门主管 / Ketua Jabatan:</label>
+      <input type="text" id="hod_name" placeholder="Enter HOD Name / 输入主管姓名">
+    </div>
+
+    <div class="form-group">
+      <label>Department 部门 / Jabatan:</label>
+      <select id="top_dept">
+        <option value="ALL">-- All Departments / 所有部门 --</option>
+        <option value="ADMIN">ADMIN (行政部 / Pentadbiran)</option>
+        <option value="PURCHASING">PURCHASING (采购部 / Pembelian)</option>
+        <option value="CAD">CAD (设计与CAD部 / Reka Bentuk & CAD)</option>
+        <option value="CNC">CNC (数控加工部 / Pemesinan CNC)</option>
+        <option value="EDM">EDM (电火花加工部 / Pemesinan EDM)</option>
+        <option value="PROJECT">PROJECT (项目部 / Projek)</option>
+        <option value="POLISHING">POLISHING (抛光部 / Penggilapan)</option>
+        <option value="PRODUCTION">PRODUCTION (生产部 / Pengeluaran)</option>
+        <option value="MOULD MAKER">MOULD MAKER (模具制造部 / Pembuat Acuan)</option>
+        <option value="QC">QC (质量控制部 / Kawalan Kualiti)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Submission Date 提交日期 / Tarikh Serahan:</label>
+      <input type="date" id="submission_date">
+    </div>
+
+    <div class="form-group">
+      <label>OT Date 加班日期 / Tarikh OT:</label>
+      <input type="date" id="ot_date">
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <label>⚡ One-Click Load Team / 一键加载部门全员 / Muat Ahli:</label>
+    <button class="btn-quick" onclick="loadDepartmentEmployees()">Load Employees / 加载人员 / Muat Pekerja</button>
+    <small style="color: #475569;">选择上方部门后按此按键，将自动添加该部门所有员工到表格中。</small>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 20%;">Employee / 员工</th>
+          <th style="width: 10%;">Emp No. / 编号</th>
+          <th style="width: 12%;">Department / 部门</th>
+          <th style="width: 11%;">Clock In / 上班</th>
+          <th style="width: 11%;">Clock Out / 下班</th>
+          <th style="width: 8%;">Hours / 小时</th>
+          <th style="width: 13%;">Purpose / 原因</th>
+          <th style="width: 11%;">Actions / 措施</th>
+          <th style="width: 4%;" class="action-col"></th>
+        </tr>
+      </thead>
+      <tbody id="ot_tbody"></tbody>
+    </table>
+  </div>
+
+  <button class="add-row-btn" onclick="addRow()">+ Add Employee Row / 添加单人 / Tambah Baris</button>
+
+  <div class="signatures-grid">
+    <div class="signature-box">
+      <h4>APPLICANT / 申请人 / PEMOHON</h4>
+      <p style="font-size: 11px; color: #64748b;">Prepared by / 填表人</p>
+      <div class="signature-line">Signature & Date</div>
+    </div>
+
+    <div class="signature-box">
+      <h4>HOD APPROVAL / 主管批准 / KELULUSAN HOD</h4>
+      <p style="font-size: 11px; color: #64748b;">Verified & Recommended</p>
+      <div class="signature-line">Signature & Date</div>
+    </div>
+
+    <div class="signature-box">
+      <h4>HR APPROVAL / 人力资源批复 / KELULUSAN HR</h4>
+      <p style="font-size: 11px; color: #64748b;">Final Check & Processing</p>
+      <div class="signature-line">Signature & Date</div>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn-clear" onclick="clearForm()">Clear Form / 重置表单 / Padam Form</button>
+    <button class="btn-print" onclick="window.print()">Print / Save PDF (打印/存PDF)</button>
+  </div>
+</div>
+
+<script>
+  const employeeDB = [
+    { no: 316, name: "KISTINNA ANAQIN", dept: "ADMIN" },
+    { no: 328, name: "TAN KYLE", dept: "ADMIN" },
+    { no: 212, name: "THILAGAH", dept: "PURCHASING" },
+    { no: 2, name: "CHAN KENG LEONG", dept: "CAD" },
+    { no: 28, name: "HAN AYE AYE", dept: "CAD" },
+    { no: 60, name: "MD KANCHAN", dept: "CAD" },
+    { no: 269, name: "KHAU LIANG YU", dept: "CAD" },
+    { no: 274, name: "SOH GIM BOON", dept: "CAD" },
+    { no: 300, name: "NAY LIANG YU", dept: "CAD" },
+    { no: 305, name: "ADARSH", dept: "CAD" },
+    { no: 307, name: "MA LIK CHAN", dept: "CAD" },
+    { no: 27, name: "SA MASAN BA", dept: "CNC" },
+    { no: 290, name: "BHARAT", dept: "CNC" },
+    { no: 291, name: "DHAN BAHADUR", dept: "CNC" },
+    { no: 294, name: "MILAN", dept: "CNC" },
+    { no: 315, name: "MANUPRASAD", dept: "CNC" },
+    { no: 325, name: "MD FADHIL NOOR", dept: "CNC" },
+    { no: 3, name: "CHONG FAT KEONG", dept: "EDM" },
+    { no: 302, name: "TEE NYEIN AUNG", dept: "EDM" },
+    { no: 306, name: "KAYW ZIN HEIN", dept: "EDM" },
+    { no: 318, name: "YUVANNESH", dept: "EDM" },
+    { no: 257, name: "MD ZAINUL", dept: "PROJECT" },
+    { no: 262, name: "NUR SYAHIRAH", dept: "PROJECT" },
+    { no: 19, name: "MD SHOPON", dept: "POLISHING" },
+    { no: 299, name: "MIN THU", dept: "POLISHING" },
+    { no: 20, name: "MD SHAHABUDIN", dept: "PRODUCTION" },
+    { no: 68, name: "MD ALAMGIR", dept: "PRODUCTION" },
+    { no: 301, name: "SHAING THU AUNG", dept: "PRODUCTION" },
+    { no: 69, name: "MD JAHIR", dept: "MOULD MAKER" },
+    { no: 72, name: "MD JAHANGIR", dept: "MOULD MAKER" },
+    { no: 272, name: "LEE YOONG HON", dept: "MOULD MAKER" },
+    { no: 286, name: "HING YONG HOW", dept: "MOULD MAKER" },
+    { no: 303, name: "ZAW MYO HTIKE", dept: "MOULD MAKER" },
+    { no: 310, name: "AMARNATH", dept: "MOULD MAKER" },
+    { no: 311, name: "JAISON", dept: "MOULD MAKER" },
+    { no: 319, name: "VIMALKUMAR", dept: "MOULD MAKER" },
+    { no: 322, name: "SARATH", dept: "MOULD MAKER" },
+    { no: 326, name: "GOH CHEE KUAN", dept: "MOULD MAKER" },
+    { no: 266, name: "TAN KAH CHYE", dept: "QC" },
+    { no: 323, name: "NUR LIANA SOFIA", dept: "QC" }
+  ];
+
+  document.getElementById('submission_date').valueAsDate = new Date();
+  document.getElementById('ot_date').valueAsDate = new Date();
+
+  window.onload = function() {
+    loadSavedData();
+    if (document.querySelectorAll('#ot_tbody tr').length === 0) addRow();
+  };
+
+  function addRow(data = {}) {
+    const tbody = document.getElementById('ot_tbody');
+    const tr = document.createElement('tr');
+
+    let empOptions = '<option value="">-- Select Employee --</option>';
+    employeeDB.forEach(e => {
+      const selected = data.empNo == e.no ? 'selected' : '';
+      empOptions += `<option value="${e.no}" ${selected}>[${e.no}] ${e.name}</option>`;
+    });
+
+    tr.innerHTML = `
+      <td><select onchange="onEmpSelect(this)">${empOptions}</select></td>
+      <td><input type="text" class="emp-no" value="${data.empNo || ''}" readonly style="background:#f1f5f9;"></td>
+      <td><input type="text" class="emp-dept" value="${data.dept || ''}" readonly style="background:#f1f5f9;"></td>
+      <td>
+        <div style="display:flex; gap:2px;">
+          <input type="time" class="time-in" value="${data.timeIn || '18:00'}" onchange="calcHours(this)">
+          <button class="copy-btn" title="复制上一行" onclick="copyTimeAbove(this, 'time-in')">📋</button>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex; gap:2px;">
+          <input type="time" class="time-out" value="${data.timeOut || '20:00'}" onchange="calcHours(this)">
+          <button class="copy-btn" title="复制上一行" onclick="copyTimeAbove(this, 'time-out')">📋</button>
+        </div>
+      </td>
+      <td><input type="number" class="hours" value="${data.hours || '2.0'}" step="0.5" readonly style="background:#f1f5f9; font-weight:bold;"></td>
+      <td><textarea class="purpose" placeholder="Overtime Purpose / 加班原因">${data.purpose || ''}</textarea></td>
+      <td><textarea class="actions" placeholder="Actions / 安排措施">${data.actions || ''}</textarea></td>
+      <td class="action-col"><button class="del-btn" onclick="deleteRow(this)">✕</button></td>
+    `;
+
+    tbody.appendChild(tr);
+    calcHours(tr.querySelector('.time-in'));
+    saveData();
+  }
+
+  function onEmpSelect(selectElem) {
+    const tr = selectElem.closest('tr');
+    const emp = employeeDB.find(e => e.no == selectElem.value);
+    if (emp) {
+      tr.querySelector('.emp-no').value = emp.no;
+      tr.querySelector('.emp-dept').value = emp.dept;
+    } else {
+      tr.querySelector('.emp-no').value = '';
+      tr.querySelector('.emp-dept').value = '';
+    }
+    saveData();
+  }
+
+  function loadDepartmentEmployees() {
+    const selectedDept = document.getElementById('top_dept').value;
+    const tbody = document.getElementById('ot_tbody');
+    tbody.innerHTML = '';
+
+    let filtered = employeeDB;
+    if (selectedDept !== 'ALL') {
+      filtered = employeeDB.filter(e => e.dept === selectedDept);
+    }
+
+    filtered.forEach(e => {
+      addRow({ empNo: e.no, dept: e.dept, timeIn: '18:00', timeOut: '20:00', hours: '2.0' });
+    });
+    saveData();
+  }
+
+  function copyTimeAbove(btn, className) {
+    const tr = btn.closest('tr');
+    const prevTr = tr.previousElementSibling;
+    if (prevTr) {
+      tr.querySelector('.' + className).value = prevTr.querySelector('.' + className).value;
+      calcHours(btn);
+    }
+  }
+
+  function calcHours(elem) {
+    const tr = elem.closest('tr');
+    const timeIn = tr.querySelector('.time-in').value;
+    const timeOut = tr.querySelector('.time-out').value;
+
+    if (timeIn && timeOut) {
+      const [h1, m1] = timeIn.split(':').map(Number);
+      const [h2, m2] = timeOut.split(':').map(Number);
+      let d1 = new Date(2026, 0, 1, h1, m1);
+      let d2 = new Date(2026, 0, 1, h2, m2);
+      if (d2 < d1) d2.setDate(d2.getDate() + 1);
+      tr.querySelector('.hours').value = ((d2 - d1) / (1000 * 60 * 60)).toFixed(1);
+    }
+    saveData();
+  }
+
+  function deleteRow(btn) { btn.closest('tr').remove(); saveData(); }
+
+  function saveData() {
+    const rows = [];
+    document.querySelectorAll('#ot_tbody tr').forEach(tr => {
+      rows.push({
+        empNo: tr.querySelector('.emp-no').value,
+        dept: tr.querySelector('.emp-dept').value,
+        timeIn: tr.querySelector('.time-in').value,
+        timeOut: tr.querySelector('.time-out').value,
+        hours: tr.querySelector('.hours').value,
+        purpose: tr.querySelector('.purpose').value,
+        actions: tr.querySelector('.actions').value
+      });
+    });
+
+    const formData = {
+      hodName: document.getElementById('hod_name').value,
+      topDept: document.getElementById('top_dept').value,
+      subDate: document.getElementById('submission_date').value,
+      otDate: document.getElementById('ot_date').value,
+      rows: rows
+    };
+
+    localStorage.setItem('ot_form_complete_data', JSON.stringify(formData));
+    document.getElementById('save-time').innerText = 'Last saved: ' + new Date().toLocaleTimeString();
+  }
+
+  function loadSavedData() {
+    const saved = localStorage.getItem('ot_form_complete_data');
+    if (!saved) return;
+    try {
+      const data = JSON.parse(saved);
+      if (data.hodName) document.getElementById('hod_name').value = data.hodName;
+      if (data.topDept) document.getElementById('top_dept').value = data.topDept;
+      if (data.subDate) document.getElementById('submission_date').value = data.subDate;
+      if (data.otDate) document.getElementById('ot_date').value = data.otDate;
+      if (data.rows && data.rows.length > 0) {
+        document.getElementById('ot_tbody').innerHTML = '';
+        data.rows.forEach(r => addRow(r));
+      }
+    } catch(e) {}
+  }
+
+  function clearForm() {
+    if (confirm("Are you sure you want to clear the entire form? / 确定要重置表单吗？")) {
+      localStorage.removeItem('ot_form_complete_data');
+      location.reload();
+    }
+  }
+
+  document.querySelectorAll('.top-meta input, .top-meta select').forEach(e => e.addEventListener('change', saveData));
+</script>
+
+</body>
+</html>
