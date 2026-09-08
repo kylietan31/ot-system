@@ -349,7 +349,7 @@
 </div>
 
 <script>
-// 1. 部门与 HOD 绑定表 (已修正 PURCHASING 为 KALAISELVI)
+// 1. 部门与 HOD 绑定表
 const hodDatabase = {
     "ADMIN": "KALAISELVI",
     "PURCHASING": "KALAISELVI",
@@ -364,7 +364,7 @@ const hodDatabase = {
     "QC": "266 - TAN KAH CHYE"
 };
 
-// 2. 员工数据库 (已精准对齐 CAD 与 CAM 成员)
+// 2. 员工数据库 (已全面加入 002 CHAN KENG LEONG 及 003 CHONG FAT KEONG)
 const employeeDatabase = {
   "ADMIN": [
     { "empNo": "316", "name": "KISTINNA ANAQIN" },
@@ -374,10 +374,12 @@ const employeeDatabase = {
     { "empNo": "212", "name": "THILAGAH" }
   ],
   "CAD": [
+    { "empNo": "002", "name": "CHAN KENG LEONG" },
     { "empNo": "305", "name": "ADARSH" },
     { "empNo": "274", "name": "SOH GIM BOON" }
   ],
   "CAM": [
+    { "empNo": "002", "name": "CHAN KENG LEONG" },
     { "empNo": "028", "name": "HAN AYE - LEADER" },
     { "empNo": "060", "name": "MD KANCHAN" },
     { "empNo": "269", "name": "KHAU LIANG YU" },
@@ -385,6 +387,7 @@ const employeeDatabase = {
     { "empNo": "307", "name": "MA LIK CHAN" }
   ],
   "CNC": [
+    { "empNo": "002", "name": "CHAN KENG LEONG" },
     { "empNo": "027", "name": "SA MASAN BA" },
     { "empNo": "290", "name": "BHARAT" },
     { "empNo": "291", "name": "DHAN BAHADUR" },
@@ -399,14 +402,17 @@ const employeeDatabase = {
     { "empNo": "318", "name": "YUVANNESH" }
   ],
   "PROJECT": [
+    { "empNo": "003", "name": "CHONG FAT KEONG" },
     { "empNo": "257", "name": "MD ZAINUL" },
     { "empNo": "262", "name": "NUR SYAHIRAH" }
   ],
   "POLISHING": [
+    { "empNo": "003", "name": "CHONG FAT KEONG" },
     { "empNo": "019", "name": "MD SHOPON" },
     { "empNo": "299", "name": "MIN THU" }
   ],
   "PRODUCTION": [
+    { "empNo": "003", "name": "CHONG FAT KEONG" },
     { "empNo": "020", "name": "MD SHAHABUDIN" },
     { "empNo": "068", "name": "MD ALAMGIR" },
     { "empNo": "301", "name": "SHAING THU AUNG" }
