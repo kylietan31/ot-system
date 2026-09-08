@@ -22,7 +22,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1150px;
             margin: 0 auto;
         }
 
@@ -132,6 +132,7 @@
             padding: 6px;
             border: 1px solid #cbd5e1;
             text-align: center;
+            vertical-align: top;
         }
 
         td input, td select {
@@ -139,6 +140,22 @@
             padding: 4px;
             border: 1px solid #cbd5e1;
             border-radius: 3px;
+        }
+
+        .img-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+            justify-content: center;
+        }
+
+        .img-preview-container img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
         }
 
         .btn-remove-row {
@@ -230,7 +247,7 @@
         }
 
         @media print {
-            .bottom-actions, .btn-delete-sheet, .btn-add-row, .btn-remove-row {
+            .bottom-actions, .btn-delete-sheet, .btn-add-row, .btn-remove-row, input[type="file"] {
                 display: none !important;
             }
             .sheet-card {
@@ -257,18 +274,18 @@
 </div>
 
 <script>
-// 部门与 HOD 绑定表
+// 部门与 HOD 绑定表（包含 Emp No. + 名字）
 const hodDatabase = {
-    "ADMIN": "TAN KYLE",
-    "PURCHASING": "THILAGAH",
-    "CAD": "CHAN KENG LEONG",
-    "CNC": "WONG KONG MING",
-    "EDM": "TAN CHEE KEONG",
-    "PROJECT": "MD ZAINUL",
-    "POLISHING": "MD SHOPON",
-    "PRODUCTION": "MD SHAHABUDIN",
-    "MOULD MAKER": "LEE YOONG HON",
-    "QC": "TAN KAH CHYE"
+    "ADMIN": "328 - TAN KYLE",
+    "PURCHASING": "212 - THILAGAH",
+    "CAD (NO DESIGN)": "2 - CHAN KENG LEONG",
+    "CNC": "2 - CHAN KENG LEONG",
+    "EDM": "3 - CHONG FAT KEONG",
+    "PROJECT": "3 - CHONG FAT KEONG",
+    "POLISHING": "3 - CHONG FAT KEONG",
+    "PRODUCTION": "3 - CHONG FAT KEONG",
+    "MOULD MAKER": "272 - LEE YOONG HON",
+    "QC": "266 - TAN KAH CHYE"
 };
 
 // 员工数据库
@@ -280,7 +297,7 @@ const employeeDatabase = {
   "PURCHASING": [
     { "empNo": "212", "name": "THILAGAH" }
   ],
-  "CAD": [
+  "CAD (NO DESIGN)": [
     { "empNo": "2", "name": "CHAN KENG LEONG" },
     { "empNo": "305", "name": "ADARSH" },
     { "empNo": "274", "name": "SOH GIM BOON" },
@@ -369,7 +386,7 @@ function createSheetData() {
                     <option value="">-- Select Department --</option>
                     <option value="ADMIN">ADMIN</option>
                     <option value="PURCHASING">PURCHASING</option>
-                    <option value="CAD">CAD</option>
+                    <option value="CAD (NO DESIGN)">CAD (NO DESIGN)</option>
                     <option value="CNC">CNC</option>
                     <option value="EDM">EDM</option>
                     <option value="PROJECT">PROJECT</option>
@@ -385,20 +402,21 @@ function createSheetData() {
             </div>
             <div class="form-group">
                 <label>OT Date:</label>
-                <input type="date" value="${today}">
+                <input type="date" value="${today}" min="${today}" max="${today}" readonly style="background:#f1f5f9; font-weight:bold;">
             </div>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th style="width: 5%;">No.</th>
-                    <th style="width: 25%;">Employee</th>
-                    <th style="width: 15%;">Start Time</th>
-                    <th style="width: 15%;">End Time</th>
-                    <th style="width: 10%;">Hours</th>
-                    <th style="width: 13%;">OT Category</th>
-                    <th style="width: 12%;">Purpose / Reason</th>
+                    <th style="width: 4%;">No.</th>
+                    <th style="width: 22%;">Employee</th>
+                    <th style="width: 12%;">Start Time</th>
+                    <th style="width: 12%;">End Time</th>
+                    <th style="width: 8%;">Hours</th>
+                    <th style="width: 12%;">OT Category</th>
+                    <th style="width: 13%;">Purpose / Reason</th>
+                    <th style="width: 12%;">Attach Pictures</th>
                     <th style="width: 5%;">Action</th>
                 </tr>
             </thead>
@@ -468,12 +486,32 @@ function addRow(btn) {
             </select>
         </td>
         <td><input type="text" placeholder="Reason / Project No."></td>
+        <td>
+            <input type="file" accept="image/*" multiple onchange="previewImages(this)">
+            <div class="img-preview-container"></div>
+        </td>
         <td><button class="btn-remove-row" onclick="removeRow(this)">X</button></td>
     `;
     tbody.appendChild(tr);
 
     const newEmpSelect = tr.querySelector('.emp-select');
     updateEmpDropdownOptions(newEmpSelect, selectedDept);
+}
+
+function previewImages(inputElem) {
+    const container = inputElem.parentElement.querySelector('.img-preview-container');
+    container.innerHTML = '';
+    if (inputElem.files) {
+        Array.from(inputElem.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                container.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 }
 
 function removeRow(btn) {
