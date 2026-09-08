@@ -151,24 +151,6 @@
             font-weight: bold;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-add-row { background-color: var(--success-color); color: white; }
-        .btn-save { background-color: var(--secondary-color); color: white; }
-        .btn-print { background-color: var(--primary-color); color: white; }
-
         .bottom-actions {
             display: flex;
             gap: 15px;
@@ -198,6 +180,27 @@
             cursor: pointer;
         }
 
+        .btn-add-row {
+            background-color: var(--success-color);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .signatures {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -218,17 +221,26 @@
 <body>
 
 <div class="container" id="sheetsContainer">
-    <!-- Sheets will be generated dynamically -->
+    <!-- Sheets dynamically generated -->
 </div>
 
 <div class="bottom-actions">
     <button class="btn-add-sheet" onclick="addNewSheet()">📄 + Add New Blank Sheet</button>
     <button class="btn-copy-sheet" onclick="copyPreviousSheet()">📋 + Copy Previous Sheet</button>
-    <button class="btn btn-print" onclick="window.print()">🖨️ Print / Save All PDF</button>
+    <button class="btn-print" onclick="window.print()">🖨️ Print / Save All PDF</button>
 </div>
 
 <script>
-// 部门与 HOD 自动匹配关联表
+// 员工数据库（可以随时在此添加/修改员工编号和姓名）
+const employeeList = [
+    { empNo: "101", name: "Tan Kyle" },
+    { empNo: "102", name: "Ali Ahmad" },
+    { empNo: "103", name: "Chong Wei" },
+    { empNo: "104", name: "Siti Nurhaliza" },
+    { empNo: "105", name: "Muthu Arumugam" }
+];
+
+// 部门与 HOD 关联数据库
 const hodDatabase = {
     "Design & CAD": "CHAN KENG LEONG",
     "CNC": "WONG KONG MING",
@@ -290,12 +302,12 @@ function createSheetData() {
             <thead>
                 <tr>
                     <th style="width: 5%;">No.</th>
-                    <th style="width: 20%;">Employee</th>
+                    <th style="width: 25%;">Employee (Emp No. & Name)</th>
                     <th style="width: 15%;">Start Time</th>
                     <th style="width: 15%;">End Time</th>
                     <th style="width: 10%;">Hours</th>
-                    <th style="width: 15%;">OT Category</th>
-                    <th style="width: 15%;">Purpose / Reason</th>
+                    <th style="width: 13%;">OT Category</th>
+                    <th style="width: 12%;">Purpose / Reason</th>
                     <th style="width: 5%;">Action</th>
                 </tr>
             </thead>
@@ -304,7 +316,7 @@ function createSheetData() {
             </tbody>
         </table>
 
-        <button class="btn btn-add-row" onclick="addRow(this)">+ Add Row</button>
+        <button class="btn-add-row" onclick="addRow(this)">+ Add Row</button>
 
         <div class="signatures">
             <div class="sig-line">Applicant Signature</div>
@@ -314,23 +326,24 @@ function createSheetData() {
     `;
 
     document.getElementById('sheetsContainer').appendChild(card);
-    addRow(card.querySelector('.btn-add-row')); // 默认添加第一行
+    addRow(card.querySelector('.btn-add-row'));
 }
 
-// 自动填充 HOD 名字
 function autoFillHOD(selectElem) {
     const card = selectElem.closest('.sheet-card');
     const hodInput = card.querySelector('.hod-input');
     const selectedDept = selectElem.value;
-    
-    if (hodDatabase[selectedDept]) {
-        hodInput.value = hodDatabase[selectedDept];
-    } else {
-        hodInput.value = "";
-    }
+    hodInput.value = hodDatabase[selectedDept] || "";
 }
 
-// 增加行
+function getEmployeeOptions() {
+    let options = `<option value="">-- Select Employee --</option>`;
+    employeeList.forEach(emp => {
+        options += `<option value="${emp.empNo}">${emp.empNo} - ${emp.name}</option>`;
+    });
+    return options;
+}
+
 function addRow(btn) {
     const tbody = btn.closest('.sheet-card').querySelector('.table-body');
     const rowCount = tbody.children.length + 1;
@@ -338,7 +351,11 @@ function addRow(btn) {
 
     tr.innerHTML = `
         <td>${rowCount}</td>
-        <td><input type="text" placeholder="Employee Name"></td>
+        <td>
+            <select>
+                ${getEmployeeOptions()}
+            </select>
+        </td>
         <td><input type="time" onchange="calcHours(this)"></td>
         <td><input type="time" onchange="calcHours(this)"></td>
         <td><input type="number" class="hours-val" value="0.0" readonly style="background:#e2e8f0;"></td>
@@ -355,7 +372,15 @@ function addRow(btn) {
     tbody.appendChild(tr);
 }
 
-// 计算时间
+function removeRow(btn) {
+    const row = btn.closest('tr');
+    const tbody = row.closest('tbody');
+    row.remove();
+    Array.from(tbody.children).forEach((tr, index) => {
+        tr.children[0].textContent = index + 1;
+    });
+}
+
 function calcHours(inputElem) {
     const tr = inputElem.closest('tr');
     const inputs = tr.querySelectorAll('input[type="time"]');
@@ -372,7 +397,6 @@ function calcHours(inputElem) {
     }
 }
 
-// 删除整页 Sheet
 function deleteSheet(sheetId) {
     const sheet = document.getElementById(sheetId);
     if (document.querySelectorAll('.sheet-card').length > 1) {
@@ -382,16 +406,13 @@ function deleteSheet(sheetId) {
     }
 }
 
-// 新增空白页
 function addNewSheet() {
     createSheetData();
 }
 
-// 复制上一页 Sheet
 function copyPreviousSheet() {
     const container = document.getElementById('sheetsContainer');
     const lastSheet = container.lastElementChild;
-    
     if (!lastSheet) {
         addNewSheet();
         return;
@@ -399,15 +420,12 @@ function copyPreviousSheet() {
 
     createSheetData();
     const newSheet = container.lastElementChild;
-
-    // 复制部门与 HOD
     const lastDept = lastSheet.querySelector('.dept-select').value;
     const lastHOD = lastSheet.querySelector('.hod-input').value;
     newSheet.querySelector('.dept-select').value = lastDept;
     newSheet.querySelector('.hod-input').value = lastHOD;
 }
 
-// 页面初始化
 window.onload = function() {
     createSheetData();
 };
