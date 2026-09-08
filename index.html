@@ -274,11 +274,11 @@
 </div>
 
 <script>
-// 部门与 HOD 绑定表（包含 Emp No. + 名字）
+// 部门与 HOD 绑定表（管理员已更新为 KALAISELVI）
 const hodDatabase = {
-    "ADMIN": "328 - TAN KYLE",
+    "ADMIN": "KALAISELVI",
     "PURCHASING": "212 - THILAGAH",
-    "CAD (NO DESIGN)": "2 - CHAN KENG LEONG",
+    "CAD": "2 - CHAN KENG LEONG",
     "CNC": "2 - CHAN KENG LEONG",
     "EDM": "3 - CHONG FAT KEONG",
     "PROJECT": "3 - CHONG FAT KEONG",
@@ -288,7 +288,7 @@ const hodDatabase = {
     "QC": "266 - TAN KAH CHYE"
 };
 
-// 员工数据库
+// 员工数据库（已将 CAD (NO DESIGN) 改为 CAD）
 const employeeDatabase = {
   "ADMIN": [
     { "empNo": "316", "name": "KISTINNA ANAQIN" },
@@ -297,7 +297,7 @@ const employeeDatabase = {
   "PURCHASING": [
     { "empNo": "212", "name": "THILAGAH" }
   ],
-  "CAD (NO DESIGN)": [
+  "CAD": [
     { "empNo": "2", "name": "CHAN KENG LEONG" },
     { "empNo": "305", "name": "ADARSH" },
     { "empNo": "274", "name": "SOH GIM BOON" },
@@ -386,7 +386,7 @@ function createSheetData() {
                     <option value="">-- Select Department --</option>
                     <option value="ADMIN">ADMIN</option>
                     <option value="PURCHASING">PURCHASING</option>
-                    <option value="CAD (NO DESIGN)">CAD (NO DESIGN)</option>
+                    <option value="CAD">CAD</option>
                     <option value="CNC">CNC</option>
                     <option value="EDM">EDM</option>
                     <option value="PROJECT">PROJECT</option>
