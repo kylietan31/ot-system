@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Overtime Form</title>
+    <title>Kaizen OT Management Portal</title>
     <style>
         :root {
-            --primary-color: #1e3a8a;
-            --secondary-color: #0284c7;
-            --bg-color: #f1f5f9;
+            --primary-color: #0f172a;
+            --accent-color: #0284c7;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --danger-color: #dc2626;
-            --success-color: #16a34a;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
         }
 
         body {
@@ -19,101 +20,136 @@
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
+            color: #334155;
         }
 
         .container {
-            max-width: 1150px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .sheet-card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            padding: 25px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .sheet-header-bar {
+        /* Top Bar & Navigation */
+        .top-nav {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .sheet-title {
-            font-size: 1.25rem;
+        .nav-title {
+            font-size: 1.3rem;
             font-weight: bold;
             color: var(--primary-color);
-        }
-
-        .btn-delete-sheet {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 10px;
+        }
+
+        .dept-switcher {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .dept-switcher select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .save-badge {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #e2e8f0;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .save-badge.saved {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        /* Tab Controls */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
 
         .company-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        .company-info h3 {
-            margin: 0;
-            color: #0f172a;
-        }
-
-        .company-info p {
-            margin: 2px 0;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .form-title {
-            text-align: right;
-            color: var(--primary-color);
-        }
-
-        .form-title h2 { margin: 0; }
-        .form-title span { font-size: 0.75rem; color: #dc2626; font-weight: bold; }
+        .company-info h3 { margin: 0; color: #0f172a; }
+        .company-info p { margin: 2px 0; font-size: 0.8rem; color: #64748b; }
 
         .meta-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             background: #f8fafc;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .form-group {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 5px;
             font-size: 0.85rem;
             font-weight: bold;
         }
 
-        .form-group label { white-space: nowrap; }
         .form-group input, .form-group select {
-            width: 100%;
-            padding: 6px;
+            padding: 8px;
             border: 1px solid #cbd5e1;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
+        /* Table Design */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -123,162 +159,218 @@
         th {
             background-color: var(--primary-color);
             color: white;
-            padding: 8px;
+            padding: 10px;
             font-size: 0.85rem;
             border: 1px solid #cbd5e1;
         }
 
         td {
-            padding: 6px;
+            padding: 8px;
             border: 1px solid #cbd5e1;
             text-align: center;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         td input, td select {
             width: 95%;
-            padding: 4px;
+            padding: 6px;
             border: 1px solid #cbd5e1;
-            border-radius: 3px;
-        }
-
-        .img-preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 5px;
-            justify-content: center;
-        }
-
-        .img-preview-container img {
-            width: 45px;
-            height: 45px;
-            object-fit: cover;
             border-radius: 4px;
-            border: 1px solid #cbd5e1;
         }
 
-        .btn-remove-row {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .bottom-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn-add-sheet {
-            background-color: #0d9488;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            border: none;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-copy-sheet {
-            background-color: #7c3aed;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            border: none;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-add-row {
-            background-color: var(--success-color);
-            color: white;
+        /* Buttons */
+        .btn {
             padding: 8px 16px;
             border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-save-pdf {
-            background-color: #0284c7;
-            color: white;
-            padding: 12px 24px;
             border-radius: 6px;
-            border: none;
-            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        .btn-print-only {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            border: none;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .btn-add { background: var(--success-color); color: white; }
+        .btn-remove { background: var(--danger-color); color: white; padding: 4px 8px; }
+        .btn-export { background: #15803d; color: white; }
+        .btn-print { background: var(--accent-color); color: white; }
 
-        .signatures {
+        /* Dashboard Stats */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: bold;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        .sig-line {
-            border-top: 1px solid #000;
-            margin-top: 40px;
-            padding-top: 5px;
+        .stat-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
         }
 
+        .stat-card h4 { margin: 0; font-size: 0.85rem; color: #64748b; }
+        .stat-card div { font-size: 1.5rem; font-weight: bold; color: #0f172a; margin-top: 5px; }
+
+        /* Hide during Print */
         @media print {
-            .bottom-actions, .btn-delete-sheet, .btn-add-row, .btn-remove-row, input[type="file"] {
+            .top-nav, .tab-buttons, .btn, input[type="file"], th:last-child, td:last-child {
                 display: none !important;
             }
-            .sheet-card {
-                page-break-after: always;
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                margin-bottom: 0;
-            }
+            body { background: white; padding: 0; }
+            .card { box-shadow: none; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="sheetsContainer">
-    <!-- Sheets dynamically generated -->
-</div>
+<div class="container">
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <div class="nav-title">
+            🏢 Kaizen OT Management Portal
+            <span id="saveBadge" class="save-badge">Auto-Saved</span>
+        </div>
 
-<div class="bottom-actions">
-    <button class="btn-add-sheet" onclick="addNewSheet()">📄 + Add New Sheet</button>
-    <button class="btn-copy-sheet" onclick="copyPreviousSheet()">📋 + Copy Previous Sheet</button>
-    <button class="btn-save-pdf" onclick="window.print()">💾 Save PDF</button>
-    <button class="btn-print-only" onclick="window.print()">🖨️ Print Form</button>
+        <div class="dept-switcher">
+            <label><b>当前部门 / Entrance:</b></label>
+            <select id="currentDeptSelect" onchange="changeDepartment(this.value)">
+                <option value="ALL">🌐 HR Master View (全公司)</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="PURCHASING">PURCHASING</option>
+                <option value="CAD">CAD</option>
+                <option value="CAM">CAM</option>
+                <option value="CNC">CNC</option>
+                <option value="EDM">EDM</option>
+                <option value="PROJECT">PROJECT</option>
+                <option value="POLISHING">POLISHING</option>
+                <option value="PRODUCTION">PRODUCTION</option>
+                <option value="MOULD MAKER">MOULD MAKER</option>
+                <option value="QC">QC</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('entry')">📝 每日加班申报 (Entry Form)</button>
+        <button class="tab-btn" onclick="switchTab('dashboard')">📊 月度数据汇总 & HR 系统 (Monthly HR Records)</button>
+    </div>
+
+    <!-- TAB 1: ENTRY FORM -->
+    <div id="tab-entry" class="tab-content">
+        <div class="card">
+            <div class="company-header">
+                <div class="company-info">
+                    <h3>Kaizen Mould Technology Sdn. Bhd. <small>(890951-A)</small></h3>
+                    <p>24, Jalan Seruling 58, Taman Klang Jaya Industrial Park, 41200 Klang, Selangor.</p>
+                </div>
+                <div>
+                    <h2 style="margin:0; color:var(--accent-color);">Daily Overtime Form</h2>
+                    <small style="color:var(--danger-color); font-weight:bold;">Auto-Saved to System</small>
+                </div>
+            </div>
+
+            <div class="meta-grid">
+                <div class="form-group">
+                    <label>Department:</label>
+                    <input type="text" id="formDept" readonly style="background:#e2e8f0; font-weight:bold;">
+                </div>
+                <div class="form-group">
+                    <label>HOD Name:</label>
+                    <input type="text" id="formHod" readonly style="background:#e2e8f0; font-weight:bold;">
+                </div>
+                <div class="form-group">
+                    <label>OT Date:</label>
+                    <input type="date" id="formDate" onchange="onDateOrDataChange()">
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 4%;">No.</th>
+                        <th style="width: 25%;">Employee</th>
+                        <th style="width: 12%;">Start Time</th>
+                        <th style="width: 12%;">End Time</th>
+                        <th style="width: 8%;">Hours</th>
+                        <th style="width: 15%;">OT Category</th>
+                        <th style="width: 19%;">Reason / Project No.</th>
+                        <th style="width: 5%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="entryTableBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button class="btn btn-add" onclick="addNewRow()">+ Add Employee</button>
+                <button class="btn btn-print" onclick="window.print()">🖨️ Print Form</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: HR DASHBOARD & MONTHLY RECORDS -->
+    <div id="tab-dashboard" class="tab-content" style="display:none;">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">📊 月度数据统计与历史归档 (Monthly HR Records)</h3>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <label><b>选择月份:</b></label>
+                    <input type="month" id="filterMonth" onchange="renderDashboard()">
+                    <button class="btn btn-export" onclick="exportExcel()">📊 Export Excel (CSV)</button>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>本月申报记录数</h4>
+                    <div id="statTotalRows">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>本月总加班时数 (Total Hours)</h4>
+                    <div id="statTotalHours">0.0 hrs</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Normal OT (1.5x)</h4>
+                    <div id="statNormalHours">0.0 hrs</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Rest Day OT (2.0x)</h4>
+                    <div id="statRestHours">0.0 hrs</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Dept</th>
+                        <th>HOD</th>
+                        <th>Emp No</th>
+                        <th>Emp Name</th>
+                        <th>Start - End</th>
+                        <th>Hours</th>
+                        <th>Category</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardTableBody">
+                    <!-- Rendered Monthly Records -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
-// 部门与 HOD 绑定表（管理员已更新为 KALAISELVI）
+// 1. Database Definitions
 const hodDatabase = {
     "ADMIN": "KALAISELVI",
     "PURCHASING": "212 - THILAGAH",
     "CAD": "2 - CHAN KENG LEONG",
+    "CAM": "2 - CHAN KENG LEONG",
     "CNC": "2 - CHAN KENG LEONG",
     "EDM": "3 - CHONG FAT KEONG",
     "PROJECT": "3 - CHONG FAT KEONG",
@@ -288,293 +380,284 @@ const hodDatabase = {
     "QC": "266 - TAN KAH CHYE"
 };
 
-// 员工数据库（已将 CAD (NO DESIGN) 改为 CAD）
 const employeeDatabase = {
-  "ADMIN": [
-    { "empNo": "316", "name": "KISTINNA ANAQIN" },
-    { "empNo": "328", "name": "TAN KYLE" }
-  ],
-  "PURCHASING": [
-    { "empNo": "212", "name": "THILAGAH" }
-  ],
-  "CAD": [
-    { "empNo": "2", "name": "CHAN KENG LEONG" },
-    { "empNo": "305", "name": "ADARSH" },
-    { "empNo": "274", "name": "SOH GIM BOON" },
-    { "empNo": "28", "name": "HAN AYE AYE" },
-    { "empNo": "60", "name": "MD KANCHAN" },
-    { "empNo": "269", "name": "KHAU LIANG YU" },
-    { "empNo": "300", "name": "NAY LIANG YU" },
-    { "empNo": "307", "name": "MA LIK CHAN" }
-  ],
-  "CNC": [
-    { "empNo": "27", "name": "SA MASAN BA" },
-    { "empNo": "290", "name": "BHARAT" },
-    { "empNo": "291", "name": "DHAN BAHADUR" },
-    { "empNo": "294", "name": "MILAN" },
-    { "empNo": "315", "name": "MANUPRASAD" },
-    { "empNo": "325", "name": "MD FADHIL NOOR" }
-  ],
-  "EDM": [
-    { "empNo": "3", "name": "CHONG FAT KEONG" },
-    { "empNo": "302", "name": "TEE NYEIN AUNG" },
-    { "empNo": "306", "name": "KAYW ZIN HEIN" },
-    { "empNo": "318", "name": "YUVANNESH" }
-  ],
-  "PROJECT": [
-    { "empNo": "257", "name": "MD ZAINUL" },
-    { "empNo": "262", "name": "NUR SYAHIRAH" }
-  ],
-  "POLISHING": [
-    { "empNo": "19", "name": "MD SHOPON" },
-    { "empNo": "299", "name": "MIN THU" }
-  ],
-  "PRODUCTION": [
-    { "empNo": "20", "name": "MD SHAHABUDIN" },
-    { "empNo": "68", "name": "MD ALAMGIR" },
-    { "empNo": "301", "name": "SHAING THU AUNG" }
-  ],
-  "MOULD MAKER": [
-    { "empNo": "69", "name": "MD JAHIR" },
-    { "empNo": "72", "name": "MD JAHANGIR" },
-    { "empNo": "272", "name": "LEE YOONG HON" },
-    { "empNo": "286", "name": "HING YONG HOW" },
-    { "empNo": "303", "name": "ZAW MYO HTIKE" },
-    { "empNo": "310", "name": "AMARNATH" },
-    { "empNo": "311", "name": "JAISON" },
-    { "empNo": "319", "name": "VIMALKUMAR" },
-    { "empNo": "322", "name": "SARATH" },
-    { "empNo": "326", "name": "GOH CHEE KUAN" }
-  ],
-  "QC": [
-    { "empNo": "266", "name": "TAN KAH CHYE" },
-    { "empNo": "323", "name": "NUR LIANA SOFIA" }
-  ]
+  "ADMIN": [{ "empNo": "316", "name": "KISTINNA ANAQIN" }, { "empNo": "328", "name": "TAN KYLE" }],
+  "PURCHASING": [{ "empNo": "212", "name": "THILAGAH" }],
+  "CAD": [{ "empNo": "305", "name": "ADARSH" }, { "empNo": "274", "name": "SOH GIM BOON" }, { "empNo": "60", "name": "MD KANCHAN" }, { "empNo": "269", "name": "KHAU LIANG YU" }, { "empNo": "300", "name": "NAY LIANG YU" }, { "empNo": "307", "name": "MA LIK CHAN" }],
+  "CAM": [{ "empNo": "28", "name": "HAN AYE" }],
+  "CNC": [{ "empNo": "27", "name": "SA MASAN BA" }, { "empNo": "290", "name": "BHARAT" }, { "empNo": "291", "name": "DHAN BAHADUR" }, { "empNo": "294", "name": "MILAN" }, { "empNo": "315", "name": "MANUPRASAD" }, { "empNo": "325", "name": "MD FADHIL NOOR" }],
+  "EDM": [{ "empNo": "3", "name": "CHONG FAT KEONG" }, { "empNo": "302", "name": "TEE NYEIN AUNG" }, { "empNo": "306", "name": "KAYW ZIN HEIN" }, { "empNo": "318", "name": "YUVANNESH" }],
+  "PROJECT": [{ "empNo": "257", "name": "MD ZAINUL" }, { "empNo": "262", "name": "NUR SYAHIRAH" }],
+  "POLISHING": [{ "empNo": "19", "name": "MD SHOPON" }, { "empNo": "299", "name": "MIN THU" }],
+  "PRODUCTION": [{ "empNo": "20", "name": "MD SHAHABUDIN" }, { "empNo": "68", "name": "MD ALAMGIR" }, { "empNo": "301", "name": "SHAING THU AUNG" }],
+  "MOULD MAKER": [{ "empNo": "69", "name": "MD JAHIR" }, { "empNo": "72", "name": "MD JAHANGIR" }, { "empNo": "272", "name": "LEE YOONG HON" }, { "empNo": "286", "name": "HING YONG HOW" }, { "empNo": "303", "name": "ZAW MYO HTIKE" }, { "empNo": "310", "name": "AMARNATH" }, { "empNo": "311", "name": "JAISON" }, { "empNo": "319", "name": "VIMALKUMAR" }, { "empNo": "322", "name": "SARATH" }, { "empNo": "326", "name": "GOH CHEE KUAN" }],
+  "QC": [{ "empNo": "266", "name": "TAN KAH CHYE" }, { "empNo": "323", "name": "NUR LIANA SOFIA" }]
 };
 
-let sheetCount = 0;
+// 2. Global State & System Initializer
+let currentDept = "CAM"; // Default department
+let systemRecords = JSON.parse(localStorage.getItem("kaizen_ot_master_db") || "[]");
 
-function createSheetData() {
-    sheetCount++;
-    const today = new Date().toISOString().split('T')[0];
-    
-    const card = document.createElement('div');
-    card.className = 'sheet-card';
-    card.id = `sheet-${sheetCount}`;
-
-    card.innerHTML = `
-        <div class="sheet-header-bar">
-            <span class="sheet-title">Sheet #${sheetCount}</span>
-            <button class="btn-delete-sheet" onclick="deleteSheet('sheet-${sheetCount}')">🗑️ Delete Sheet</button>
-        </div>
-        <div class="company-header">
-            <div class="company-info">
-                <h3>Kaizen Mould Technology Sdn. Bhd. <small>(890951-A)</small></h3>
-                <p>24, Jalan Seruling 58, Taman Klang Jaya Industrial Park, 41200 Klang, Selangor.</p>
-                <p>Tel: 03-3325 9111 / 9555 | Fax: 03-3318 5797</p>
-            </div>
-            <div class="form-title">
-                <h2>Daily Overtime Form</h2>
-                <span>Submission Deadline: 16:30 (Following Working Day)</span>
-            </div>
-        </div>
-
-        <div class="meta-grid">
-            <div class="form-group">
-                <label>Department:</label>
-                <select class="dept-select" onchange="onDepartmentChange(this)">
-                    <option value="">-- Select Department --</option>
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="PURCHASING">PURCHASING</option>
-                    <option value="CAD">CAD</option>
-                    <option value="CNC">CNC</option>
-                    <option value="EDM">EDM</option>
-                    <option value="PROJECT">PROJECT</option>
-                    <option value="POLISHING">POLISHING</option>
-                    <option value="PRODUCTION">PRODUCTION</option>
-                    <option value="MOULD MAKER">MOULD MAKER</option>
-                    <option value="QC">QC</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>HOD Name:</label>
-                <input type="text" class="hod-input" placeholder="Head of Dept" readonly style="background:#f1f5f9; font-weight:bold;">
-            </div>
-            <div class="form-group">
-                <label>OT Date:</label>
-                <input type="date" value="${today}" min="${today}" max="${today}" readonly style="background:#f1f5f9; font-weight:bold;">
-            </div>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 4%;">No.</th>
-                    <th style="width: 22%;">Employee</th>
-                    <th style="width: 12%;">Start Time</th>
-                    <th style="width: 12%;">End Time</th>
-                    <th style="width: 8%;">Hours</th>
-                    <th style="width: 12%;">OT Category</th>
-                    <th style="width: 13%;">Purpose / Reason</th>
-                    <th style="width: 12%;">Attach Pictures</th>
-                    <th style="width: 5%;">Action</th>
-                </tr>
-            </thead>
-            <tbody class="table-body">
-                <!-- Rows dynamically added -->
-            </tbody>
-        </table>
-
-        <button class="btn-add-row" onclick="addRow(this)">+ Add Row</button>
-
-        <div class="signatures">
-            <div class="sig-line">Applicant Signature</div>
-            <div class="sig-line">HOD Approval</div>
-            <div class="sig-line">HR Received</div>
-        </div>
-    `;
-
-    document.getElementById('sheetsContainer').appendChild(card);
-    addRow(card.querySelector('.btn-add-row'));
-}
-
-function onDepartmentChange(selectElem) {
-    const card = selectElem.closest('.sheet-card');
-    const hodInput = card.querySelector('.hod-input');
-    const selectedDept = selectElem.value;
-
-    hodInput.value = hodDatabase[selectedDept] || "";
-
-    const employeeSelects = card.querySelectorAll('.emp-select');
-    employeeSelects.forEach(select => {
-        updateEmpDropdownOptions(select, selectedDept);
-    });
-}
-
-function updateEmpDropdownOptions(selectElem, dept) {
-    selectElem.innerHTML = `<option value="">-- Select Employee --</option>`;
-    if (dept && employeeDatabase[dept]) {
-        employeeDatabase[dept].forEach(emp => {
-            selectElem.innerHTML += `<option value="${emp.empNo}">${emp.empNo} - ${emp.name}</option>`;
-        });
-    } else {
-        selectElem.innerHTML = `<option value="">-- Select Department First --</option>`;
+window.onload = function() {
+    // Check URL Parameters for Department Specific Link (e.g., ?dept=CAM)
+    const urlParams = new URLSearchParams(window.location.search);
+    const deptParam = urlParams.get('dept');
+    if (deptParam && hodDatabase[deptParam]) {
+        currentDept = deptParam;
     }
+
+    document.getElementById("currentDeptSelect").value = currentDept;
+    document.getElementById("formDate").value = new Date().toISOString().split('T')[0];
+    document.getElementById("filterMonth").value = new Date().toISOString().slice(0, 7);
+
+    loadDepartmentForm();
+    renderDashboard();
+};
+
+// 3. Department Entrance & Switcher
+function changeDepartment(dept) {
+    currentDept = dept;
+    // Update URL query string without reloading page
+    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + (dept !== 'ALL' ? '?dept=' + dept : '');
+    window.history.pushState({path: newUrl}, '', newUrl);
+
+    loadDepartmentForm();
+    renderDashboard();
 }
 
-function addRow(btn) {
-    const card = btn.closest('.sheet-card');
-    const tbody = card.querySelector('.table-body');
-    const selectedDept = card.querySelector('.dept-select').value;
+function loadDepartmentForm() {
+    const formDeptElem = document.getElementById("formDept");
+    const formHodElem = document.getElementById("formHod");
+    const tbody = document.getElementById("entryTableBody");
+
+    if (currentDept === "ALL") {
+        formDeptElem.value = "ALL DEPARTMENTS (HR VIEW)";
+        formHodElem.value = "ALL HODs";
+    } else {
+        formDeptElem.value = currentDept;
+        formHodElem.value = hodDatabase[currentDept] || "";
+    }
+
+    tbody.innerHTML = "";
+    loadSavedEntryForDate();
+}
+
+// 4. Entry Form Logic with Auto-Save
+function addNewRow(data = {}) {
+    if (currentDept === "ALL") {
+        alert("请先从右上角选择具体的【部门】后再添加加班记录！");
+        return;
+    }
+
+    const tbody = document.getElementById("entryTableBody");
     const rowCount = tbody.children.length + 1;
-    const tr = document.createElement('tr');
+    const tr = document.createElement("tr");
+
+    let empOptions = `<option value="">-- Select Employee --</option>`;
+    if (employeeDatabase[currentDept]) {
+        employeeDatabase[currentDept].forEach(emp => {
+            const selected = data.empNo === emp.empNo ? "selected" : "";
+            empOptions += `<option value="${emp.empNo}" ${selected}>${emp.empNo} - ${emp.name}</option>`;
+        });
+    }
 
     tr.innerHTML = `
         <td>${rowCount}</td>
+        <td><select class="emp-select" onchange="onDateOrDataChange()">${empOptions}</select></td>
+        <td><input type="time" class="start-time" value="${data.startTime || ''}" onchange="calcHours(this)"></td>
+        <td><input type="time" class="end-time" value="${data.endTime || ''}" onchange="calcHours(this)"></td>
+        <td><input type="number" class="hours-val" value="${data.hours || '0.0'}" readonly style="background:#f1f5f9; font-weight:bold;"></td>
         <td>
-            <select class="emp-select">
-                <!-- Dynamic based on selected department -->
+            <select class="ot-category" onchange="onDateOrDataChange()">
+                <option value="Normal" ${data.category === 'Normal' ? 'selected' : ''}>Normal OT (1.5x)</option>
+                <option value="RestDay" ${data.category === 'RestDay' ? 'selected' : ''}>Rest Day (2.0x)</option>
             </select>
         </td>
-        <td><input type="time" onchange="calcHours(this)"></td>
-        <td><input type="time" onchange="calcHours(this)"></td>
-        <td><input type="number" class="hours-val" value="0.0" readonly style="background:#e2e8f0;"></td>
-        <td>
-            <select>
-                <option value="Normal">Normal OT (1.5x)</option>
-                <option value="RestDay">Rest Day (2.0x)</option>
-            </select>
-        </td>
-        <td><input type="text" placeholder="Reason / Project No."></td>
-        <td>
-            <input type="file" accept="image/*" multiple onchange="previewImages(this)">
-            <div class="img-preview-container"></div>
-        </td>
-        <td><button class="btn-remove-row" onclick="removeRow(this)">X</button></td>
+        <td><input type="text" class="ot-reason" value="${data.reason || ''}" placeholder="Reason / Project No." oninput="onDateOrDataChange()"></td>
+        <td><button class="btn btn-remove" onclick="removeRow(this)">X</button></td>
     `;
     tbody.appendChild(tr);
-
-    const newEmpSelect = tr.querySelector('.emp-select');
-    updateEmpDropdownOptions(newEmpSelect, selectedDept);
-}
-
-function previewImages(inputElem) {
-    const container = inputElem.parentElement.querySelector('.img-preview-container');
-    container.innerHTML = '';
-    if (inputElem.files) {
-        Array.from(inputElem.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                container.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
+    onDateOrDataChange();
 }
 
 function removeRow(btn) {
-    const row = btn.closest('tr');
-    const tbody = row.closest('tbody');
-    row.remove();
-    Array.from(tbody.children).forEach((tr, index) => {
-        tr.children[0].textContent = index + 1;
-    });
+    btn.closest("tr").remove();
+    reindexRows();
+    onDateOrDataChange();
+}
+
+function reindexRows() {
+    const rows = document.querySelectorAll("#entryTableBody tr");
+    rows.forEach((tr, index) => tr.children[0].textContent = index + 1);
 }
 
 function calcHours(inputElem) {
-    const tr = inputElem.closest('tr');
-    const inputs = tr.querySelectorAll('input[type="time"]');
-    const start = inputs[0].value;
-    const end = inputs[1].value;
-    
+    const tr = inputElem.closest("tr");
+    const start = tr.querySelector(".start-time").value;
+    const end = tr.querySelector(".end-time").value;
+
     if (start && end) {
         const startDate = new Date(`1970-01-01T${start}:00`);
         let endDate = new Date(`1970-01-01T${end}:00`);
         if (endDate < startDate) endDate.setDate(endDate.getDate() + 1);
-        
+
         const diffHours = ((endDate - startDate) / (1000 * 60 * 60)).toFixed(1);
-        tr.querySelector('.hours-val').value = diffHours;
+        tr.querySelector(".hours-val").value = diffHours;
     }
+    onDateOrDataChange();
 }
 
-function deleteSheet(sheetId) {
-    const sheet = document.getElementById(sheetId);
-    if (document.querySelectorAll('.sheet-card').length > 1) {
-        sheet.remove();
+// 5. Auto Save Mechanism
+function onDateOrDataChange() {
+    if (currentDept === "ALL") return;
+
+    const otDate = document.getElementById("formDate").value;
+    if (!otDate) return;
+
+    // Remove existing entries for this dept & date to avoid duplication
+    systemRecords = systemRecords.filter(r => !(r.dept === currentDept && r.date === otDate));
+
+    const rows = document.querySelectorAll("#entryTableBody tr");
+    rows.forEach(tr => {
+        const empNo = tr.querySelector(".emp-select").value;
+        const startTime = tr.querySelector(".start-time").value;
+        const endTime = tr.querySelector(".end-time").value;
+        const hours = parseFloat(tr.querySelector(".hours-val").value) || 0;
+        const category = tr.querySelector(".ot-category").value;
+        const reason = tr.querySelector(".ot-reason").value;
+
+        if (empNo && hours > 0) {
+            const empObj = employeeDatabase[currentDept].find(e => e.empNo === empNo);
+            systemRecords.push({
+                id: Date.now() + Math.random(),
+                date: otDate,
+                dept: currentDept,
+                hod: hodDatabase[currentDept],
+                empNo: empNo,
+                empName: empObj ? empObj.name : "",
+                startTime: startTime,
+                endTime: endTime,
+                hours: hours,
+                category: category,
+                reason: reason
+            });
+        }
+    });
+
+    localStorage.setItem("kaizen_ot_master_db", JSON.stringify(systemRecords));
+    
+    // Auto-Save UI Trigger
+    const badge = document.getElementById("saveBadge");
+    badge.textContent = "Saved & Syncing...";
+    badge.classList.add("saved");
+    setTimeout(() => { badge.textContent = "Auto-Saved"; }, 1000);
+
+    renderDashboard();
+}
+
+function loadSavedEntryForDate() {
+    const otDate = document.getElementById("formDate").value;
+    const tbody = document.getElementById("entryTableBody");
+    tbody.innerHTML = "";
+
+    const savedForToday = systemRecords.filter(r => r.dept === currentDept && r.date === otDate);
+
+    if (savedForToday.length > 0) {
+        savedForToday.forEach(record => addNewRow(record));
     } else {
-        alert("至少需要保留一个 Sheet！");
+        addNewRow(); // Default blank row
     }
 }
 
-function addNewSheet() {
-    createSheetData();
+// 6. HR Dashboard & Monthly Filter
+function switchTab(tabName) {
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+
+    if (tabName === 'entry') {
+        document.querySelectorAll(".tab-btn")[0].classList.add("active");
+        document.getElementById("tab-entry").style.display = "block";
+    } else {
+        document.querySelectorAll(".tab-btn")[1].classList.add("active");
+        document.getElementById("tab-dashboard").style.display = "block";
+        renderDashboard();
+    }
 }
 
-function copyPreviousSheet() {
-    const container = document.getElementById('sheetsContainer');
-    const lastSheet = container.lastElementChild;
-    if (!lastSheet) {
-        addNewSheet();
+function renderDashboard() {
+    const selectedMonth = document.getElementById("filterMonth").value; // Format: YYYY-MM
+    const tbody = document.getElementById("dashboardTableBody");
+    tbody.innerHTML = "";
+
+    let filtered = systemRecords.filter(r => r.date.startsWith(selectedMonth));
+
+    if (currentDept !== "ALL") {
+        filtered = filtered.filter(r => r.dept === currentDept);
+    }
+
+    let totalHrs = 0;
+    let normalHrs = 0;
+    let restHrs = 0;
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="color:#94a3b8;">该月份暂无记录</td></tr>`;
+    } else {
+        filtered.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(r => {
+            totalHrs += r.hours;
+            if (r.category === 'Normal') normalHrs += r.hours;
+            if (r.category === 'RestDay') restHrs += r.hours;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><b>${r.date}</b></td>
+                <td><span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-weight:bold;">${r.dept}</span></td>
+                <td>${r.hod}</td>
+                <td>${r.empNo}</td>
+                <td>${r.empName}</td>
+                <td>${r.startTime} - ${r.endTime}</td>
+                <td><b>${r.hours.toFixed(1)} hrs</b></td>
+                <td>${r.category}</td>
+                <td>${r.reason || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("statTotalRows").textContent = filtered.length;
+    document.getElementById("statTotalHours").textContent = `${totalHrs.toFixed(1)} hrs`;
+    document.getElementById("statNormalHours").textContent = `${normalHrs.toFixed(1)} hrs`;
+    document.getElementById("statRestHours").textContent = `${restHrs.toFixed(1)} hrs`;
+}
+
+// 7. CSV / Excel Export
+function exportExcel() {
+    const selectedMonth = document.getElementById("filterMonth").value;
+    let filtered = systemRecords.filter(r => r.date.startsWith(selectedMonth));
+
+    if (currentDept !== "ALL") {
+        filtered = filtered.filter(r => r.dept === currentDept);
+    }
+
+    if (filtered.length === 0) {
+        alert("所选月份没有可导出的加班记录！");
         return;
     }
 
-    createSheetData();
-    const newSheet = container.lastElementChild;
-    const lastDept = lastSheet.querySelector('.dept-select').value;
+    let csv = "Date,Department,HOD,Emp No,Emp Name,Start Time,End Time,OT Hours,Category,Reason\n";
+    filtered.forEach(r => {
+        csv += `"${r.date}","${r.dept}","${r.hod}","${r.empNo}","${r.empName}","${r.startTime}","${r.endTime}","${r.hours}","${r.category}","${r.reason}"\n`;
+    });
 
-    if (lastDept) {
-        const deptSelect = newSheet.querySelector('.dept-select');
-        deptSelect.value = lastDept;
-        onDepartmentChange(deptSelect);
-    }
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `OT_Report_${currentDept}_${selectedMonth}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
-
-window.onload = function() {
-    createSheetData();
-};
 </script>
 
 </body>
 </html>
+
