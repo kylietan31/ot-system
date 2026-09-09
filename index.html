@@ -17,19 +17,8 @@
             --border-color: #e5e7eb;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 12px;
-            font-size: 14px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 12px; font-size: 14px; }
 
         .container {
             max-width: 1100px;
@@ -40,175 +29,55 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--border-color);
-        }
+        header { text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); }
+        h1 { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 6px; }
+        .subtitle { font-size: 0.85rem; color: #6b7280; }
 
-        h1 {
-            font-size: 1.6rem;
-            color: var(--primary-color);
-            margin-bottom: 6px;
-        }
-
-        .subtitle {
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-
-        .autosave-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-            border-radius: 20px;
-            margin-top: 8px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
-            overflow-x: auto;
-            padding-bottom: 2px;
-        }
-
-        .tab-btn {
-            padding: 10px 16px;
-            border: none;
-            background: #f3f4f6;
-            color: #4b5563;
-            font-weight: 600;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            font-size: 0.9rem;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: #ffffff;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            margin-bottom: 15px;
+        .dept-selector-card {
+            background: #eff6ff;
+            border: 2px solid #bfdbfe;
+            padding: 15px;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-            background: #ffffff;
-        }
-
-        th, td {
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-
-        .btn-group {
+            margin-bottom: 20px;
             display: flex;
-            gap: 10px;
             flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        .btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.88rem;
-            cursor: pointer;
-            display: inline-flex;
+            gap: 15px;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
+            justify-content: space-between;
         }
 
+        .dept-info span { font-weight: bold; color: var(--primary-color); }
+
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); overflow-x: auto; padding-bottom: 2px; }
+        .tab-btn { padding: 10px 16px; border: none; background: #f3f4f6; color: #4b5563; font-weight: 600; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; font-size: 0.9rem; }
+        .tab-btn.active { background: var(--primary-color); color: #ffffff; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; min-width: 750px; background: #ffffff; }
+        th, td { padding: 10px 12px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+        th { background-color: #f8fafc; color: var(--primary-color); font-weight: 700; font-size: 0.85rem; }
+
+        input, select { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
+        input:focus, select:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-add { background: #4b5563; color: white; }
         .btn-confirm { background: var(--success-color); color: white; }
         .btn-pending { background: var(--warning-color); color: #1f2937; }
         .btn-danger { background: var(--danger-color); color: white; }
         .btn-primary { background: var(--primary-color); color: white; }
 
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-block;
-        }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
         .badge-confirmed { background: #d1fae5; color: #065f46; }
         .badge-pending { background: #fef3c7; color: #92400e; }
 
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .filter-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-            min-width: 140px;
-        }
-
-        .filter-item label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #6b7280;
-        }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .filter-item { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+        .filter-item label { font-size: 0.75rem; font-weight: 600; color: #6b7280; }
 
         @media print {
             body { padding: 0; background: white; }
@@ -219,12 +88,6 @@
             #archive-tab, #myrecords-tab { display: block !important; }
             th, td { border: 1px solid #000 !important; font-size: 10pt; }
         }
-
-        @media (max-width: 640px) {
-            .btn { width: 100%; }
-            .btn-group { flex-direction: column; }
-            .tab-btn { flex: 1; text-align: center; font-size: 0.8rem; padding: 8px 10px; }
-        }
     </style>
 </head>
 <body>
@@ -233,47 +96,51 @@
     <header>
         <h1>Kaizen Daily OverTime System</h1>
         <div class="subtitle">Sistem Kerja Lebih Masa Harian Kaizen / Kaizen日常加班管理系统</div>
-        <div class="autosave-status">
-            <span>💾 Auto-Saved / Disimpan Automatik / 自动保存:</span>
-            <small id="autosaveTime">Ready</small>
-        </div>
     </header>
 
-    <!-- 自动跳出的历史记录选项列表 -->
-    <datalist id="history-names"></datalist>
-    <datalist id="history-ids"></datalist>
-    <datalist id="history-reasons"></datalist>
-
-    <!-- 导航标签栏 -->
-    <div class="nav-tabs no-print">
-        <button class="tab-btn active" onclick="switchTab('entry-tab')">
-            📝 Submit OT<br><small>Hantar OT / 加班上交</small>
-        </button>
-        <button class="tab-btn" onclick="switchTab('myrecords-tab')">
-            👤 My Records<br><small>Rekod Saya / 个人记录</small>
-        </button>
-        <button class="tab-btn" onclick="switchTab('archive-tab')">
-            📁 HR Archive & Monthly<br><small>Arkib HR / 月度归档</small>
-        </button>
-        <button class="tab-btn" onclick="switchTab('clear-tab')">
-            🗑️ Clear Records<br><small>Padam Rekod / 清除记录</small>
-        </button>
+    <!-- 部门选择器与 HOD 信息卡片 -->
+    <div class="dept-selector-card no-print">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">Select Department / 选择部门:</label>
+            <select id="mainDeptSelect" onchange="onDepartmentChange()">
+                <option value="ADMIN">ADMIN</option>
+                <option value="PURCHASING">PURCHASING</option>
+                <option value="CAD">CAD</option>
+                <option value="CAM">CAM</option>
+                <option value="CNC">CNC</option>
+                <option value="EDM">EDM</option>
+                <option value="PROJECT">PROJECT</option>
+                <option value="POLISHING">POLISHING</option>
+                <option value="PRODUCTION">PRODUCTION</option>
+                <option value="MOULD MAKER">MOULD MAKER</option>
+                <option value="QC">QC</option>
+            </select>
+        </div>
+        <div class="dept-info" style="flex: 1; min-width: 250px;">
+            <div>Current Department: <span id="displayDept">ADMIN</span></div>
+            <div>Head of Department (HOD): <span id="displayHOD">KALAISELVI</span></div>
+        </div>
     </div>
 
-    <!-- 1. 加班填写上交页面 -->
+    <!-- 导航标签 -->
+    <div class="nav-tabs no-print">
+        <button class="tab-btn active" onclick="switchTab('entry-tab')">📝 Submit OT / 登记上交</button>
+        <button class="tab-btn" onclick="switchTab('myrecords-tab')">👤 My Records / 个人记录</button>
+        <button class="tab-btn" onclick="switchTab('archive-tab')">📁 HR Archive / 月度归档</button>
+        <button class="tab-btn" onclick="switchTab('clear-tab')">🗑️ Clear Records / 清理记录</button>
+    </div>
+
+    <!-- 1. 加班登记页面 -->
     <div id="entry-tab" class="tab-content active">
-        <h2 style="font-size: 1.1rem; margin-bottom: 12px; color: var(--primary-color);">
-            New Overtime Request / Permohonan OT Baharu / 登记加班明细
-        </h2>
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>Name / Nama / 姓名</th>
-                        <th>Emp ID / No. Pekerja / 工号</th>
-                        <th>Date / Tarikh / 日期</th>
-                        <th>Time (Hours) / Masa / 时间</th>
-                        <th>Reason / Sebab / 原因</th>
+                        <th>Employee Name / 姓名</th>
+                        <th>Emp ID / 工号</th>
+                        <th>Date / 日期</th>
+                        <th>Time (Hours) / 时间</th>
+                        <th>Reason / 原因</th>
                         <th class="no-print">Action / 操作</th>
                     </tr>
                 </thead>
@@ -282,55 +149,30 @@
         </div>
 
         <div class="btn-group no-print">
-            <button type="button" class="btn btn-add" onclick="addRow()">
-                ➕ Add Row / Tambah Baris / 添加新行
-            </button>
-            <button type="button" class="btn btn-confirm" onclick="submitData('CONFIRMED')">
-                ✅ Confirm Submission / Pengesahan Hantar / 确认上交
-            </button>
-            <button type="button" class="btn btn-pending" onclick="submitData('PENDING')">
-                ⏳ Save as PENDING / Hantar PENDING / PENDING 上交
-            </button>
+            <button type="button" class="btn btn-add" onclick="addRow()">➕ Add Row / 添加新行</button>
+            <button type="button" class="btn btn-confirm" onclick="submitData('CONFIRMED')">✅ Confirm Submission / 确认上交</button>
+            <button type="button" class="btn btn-pending" onclick="submitData('PENDING')">⏳ Save as PENDING / PENDING 上交</button>
         </div>
     </div>
 
-    <!-- 2. 个人历史记录查看 & 打印页面 -->
+    <!-- 2. 个人查看/打印页面 -->
     <div id="myrecords-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-            <h2 style="font-size: 1.1rem; color: var(--primary-color);">
-                My History & Submissions / Rekod Saya / 个人历史提交记录
-            </h2>
-            <button type="button" class="btn btn-primary no-print" onclick="window.print()">
-                🖨️ Save PDF / Print / Cetak & Simpan / 保存与打印
-            </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+            <h2>My Submissions / 个人上交记录</h2>
+            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Print / 保存PDF</button>
         </div>
-
-        <div class="filter-bar no-print">
-            <div class="filter-item">
-                <label>Search Name or ID / 搜索姓名或工号:</label>
-                <input type="text" id="mySearchInput" placeholder="Enter Name / ID..." oninput="renderMyRecords()">
-            </div>
-            <div class="filter-item">
-                <label>Status / 状态:</label>
-                <select id="myStatusFilter" onchange="renderMyRecords()">
-                    <option value="ALL">All Status / 全部状态</option>
-                    <option value="CONFIRMED">CONFIRMED / 已确认</option>
-                    <option value="PENDING">PENDING / 待定</option>
-                </select>
-            </div>
-        </div>
-
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>Date / 日期</th>
+                        <th>Dept / 部门</th>
+                        <th>HOD / 部门主管</th>
                         <th>Name / 姓名</th>
                         <th>ID / 工号</th>
                         <th>Hours / 小时</th>
                         <th>Reason / 原因</th>
                         <th>Status / 状态</th>
-                        <th class="no-print">Quick Action / 快捷操作</th>
                     </tr>
                 </thead>
                 <tbody id="myRecordsTbody"></tbody>
@@ -338,51 +180,48 @@
         </div>
     </div>
 
-    <!-- 3. HR 月度归档系统 -->
+    <!-- 3. HR 归档页面 -->
     <div id="archive-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-            <h2 style="font-size: 1.1rem; color: var(--primary-color);">
-                HR Archive & Monthly Records / Arkib Rekod Bulanan HR / HR月度归档系统
-            </h2>
-            <button type="button" class="btn btn-primary no-print" onclick="window.print()">
-                🖨️ Print / Export PDF / 打印与导出 PDF
-            </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+            <h2>HR Monthly Archive / HR 月度归档</h2>
+            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Print / 导出PDF</button>
         </div>
-
         <div class="filter-bar no-print">
             <div class="filter-item">
-                <label>Filter Month / 月份筛选:</label>
-                <input type="month" id="hrMonthFilter" onchange="renderHRArchive()">
-            </div>
-            <div class="filter-item">
-                <label>Filter Year / 年份筛选:</label>
-                <select id="hrYearFilter" onchange="renderHRArchive()"></select>
-            </div>
-            <div class="filter-item">
-                <label>Status / 状态:</label>
-                <select id="hrStatusFilter" onchange="renderHRArchive()">
-                    <option value="ALL">All Status / 所有状态</option>
-                    <option value="CONFIRMED">CONFIRMED / 已确认</option>
-                    <option value="PENDING">PENDING / 待定</option>
+                <label>Filter Dept / 部门:</label>
+                <select id="hrDeptFilter" onchange="renderHRArchive()">
+                    <option value="ALL">All Departments / 全部部门</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="PURCHASING">PURCHASING</option>
+                    <option value="CAD">CAD</option>
+                    <option value="CAM">CAM</option>
+                    <option value="CNC">CNC</option>
+                    <option value="EDM">EDM</option>
+                    <option value="PROJECT">PROJECT</option>
+                    <option value="POLISHING">POLISHING</option>
+                    <option value="PRODUCTION">PRODUCTION</option>
+                    <option value="MOULD MAKER">MOULD MAKER</option>
+                    <option value="QC">QC</option>
                 </select>
             </div>
             <div class="filter-item">
-                <label>Search / 搜索关键字:</label>
-                <input type="text" id="hrSearchInput" placeholder="Name/ID/Reason..." oninput="renderHRArchive()">
+                <label>Filter Month / 月份:</label>
+                <input type="month" id="hrMonthFilter" onchange="renderHRArchive()">
             </div>
         </div>
-
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>Date / 日期</th>
+                        <th>Dept / 部门</th>
+                        <th>HOD / 主管</th>
                         <th>Name / 姓名</th>
                         <th>ID / 工号</th>
                         <th>Hours / 小时</th>
                         <th>Reason / 原因</th>
                         <th>Status / 状态</th>
-                        <th class="no-print">HR Action / 操作追加</th>
+                        <th class="no-print">Action</th>
                     </tr>
                 </thead>
                 <tbody id="hrArchiveTbody"></tbody>
@@ -390,71 +229,89 @@
         </div>
     </div>
 
-    <!-- 4. 清除记录管理页面 -->
+    <!-- 4. 清理页面 -->
     <div id="clear-tab" class="tab-content">
-        <h2 style="font-size: 1.1rem; color: var(--danger-color); margin-bottom: 12px;">
-            Clear Records Management / 删除与清理记录管理
-        </h2>
-        <div style="display: flex; flex-direction: column; gap: 15px; max-width: 600px;">
-            <div style="background: #fff; border: 1px solid var(--border-color); padding: 16px; border-radius: 8px;">
-                <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--primary-color);">
-                    1. Delete By Specific Month / 按特定月份年份删除
-                </h3>
-                <div style="margin-bottom: 12px;">
-                    <label style="font-size: 0.8rem; font-weight: bold;">Select Month/Year / Pilih Bulan/Tahun:</label>
-                    <input type="month" id="deleteMonthInput">
-                </div>
-                <button type="button" class="btn btn-danger" onclick="deleteSelectiveRecords()">
-                    🗑️ Delete Selected Month / 删除所选月份记录
-                </button>
-            </div>
-
-            <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px;">
-                <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--danger-color);">
-                    2. Delete ALL Records / 清除全盘所有记录
-                </h3>
-                <p style="font-size: 0.85rem; color: #991b1b; margin-bottom: 12px;">
-                    ⚠️ Warning: This action cannot be undone. All OT records will be permanently erased.
-                </p>
-                <button type="button" class="btn btn-danger" onclick="deleteAllRecords()">
-                    🚨 Clear ALL Records Now / 立即删除全部记录
-                </button>
-            </div>
-        </div>
+        <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records / 清除记录</h2>
+        <button class="btn btn-danger" onclick="deleteAllRecords()">🚨 Delete ALL Records / 彻底清空所有记录</button>
     </div>
 </div>
 
 <script>
-    const STORAGE_RECORDS = 'KAIZEN_OT_RECORDS_V3';
-    const STORAGE_HISTORIES = 'KAIZEN_OT_HISTORIES_V3';
-    const STORAGE_DRAFT_FORM = 'KAIZEN_OT_DRAFT_FORM';
-
-    let histories = JSON.parse(localStorage.getItem(STORAGE_HISTORIES)) || {
-        names: [],
-        ids: [],
-        reasons: ["Machine Maintenance / 机器维修", "Emergency Order / 紧急订单", "Stock Take / 盘点", "Daily Production / 生产加时"]
+    // 部门主管 HOD 映射规则
+    const HOD_MAP = {
+        'ADMIN': 'KALAISELVI',
+        'PURCHASING': 'KALAISELVI',
+        'CAD': 'CHAN KENG LEONG ( 002 )',
+        'CAM': 'CHAN KENG LEONG ( 002 )',
+        'CNC': 'CHAN KENG LEONG ( 002 )',
+        'EDM': 'CHONG FAT KEONG ( 003 )',
+        'PROJECT': 'CHONG FAT KEONG ( 003 )',
+        'POLISHING': 'CHONG FAT KEONG ( 003 )',
+        'PRODUCTION': 'CHONG FAT KEONG ( 003 )',
+        'MOULD MAKER': 'LEE YOONG HON ( 272 )',
+        'QC': 'TAN KAH CHYE ( 266 )'
     };
 
+    // 员工完整数据库
+    const EMPLOYEES_DB = [
+        { dept: 'ADMIN', name: 'KISTINNA ANAQIN', id: '316' },
+        { dept: 'ADMIN', name: 'TAN KYLE', id: '328' },
+        { dept: 'PURCHASING', name: 'THILAGAH', id: '212' },
+        { dept: 'CAD', name: 'CHAN KENG LEONG', id: '2' },
+        { dept: 'CAD', name: 'ADARSH', id: '305' },
+        { dept: 'CAD', name: 'SOH GIM BOON', id: '274' },
+        { dept: 'CAM', name: 'CHAN KENG LEONG', id: '2' },
+        { dept: 'CAM', name: 'HAN AYE AYE', id: '28' },
+        { dept: 'CAM', name: 'MD KANCHAN', id: '60' },
+        { dept: 'CAM', name: 'KHAU LIANG YU', id: '269' },
+        { dept: 'CAM', name: 'NAY LIANG YU', id: '300' },
+        { dept: 'CAM', name: 'MA LIK CHAN', id: '307' },
+        { dept: 'CNC', name: 'CHAN KENG LEONG', id: '2' },
+        { dept: 'CNC', name: 'SA MASAN BA', id: '27' },
+        { dept: 'CNC', name: 'BHARAT', id: '290' },
+        { dept: 'CNC', name: 'DHAN BAHADUR', id: '291' },
+        { dept: 'CNC', name: 'MILAN', id: '294' },
+        { dept: 'CNC', name: 'MANUPRASAD', id: '315' },
+        { dept: 'CNC', name: 'MD FADHIL NOOR', id: '325' },
+        { dept: 'EDM', name: 'CHONG FAT KEONG', id: '3' },
+        { dept: 'EDM', name: 'TEE NYEIN AUNG', id: '302' },
+        { dept: 'EDM', name: 'KAYW ZIN HEIN', id: '306' },
+        { dept: 'EDM', name: 'YUVANNESH', id: '318' },
+        { dept: 'PROJECT', name: 'CHONG FAT KEONG', id: '3' },
+        { dept: 'PROJECT', name: 'MD ZAINUL', id: '257' },
+        { dept: 'PROJECT', name: 'NUR SYAHIRAH', id: '262' },
+        { dept: 'POLISHING', name: 'CHONG FAT KEONG', id: '3' },
+        { dept: 'POLISHING', name: 'MD SHOPON', id: '19' },
+        { dept: 'POLISHING', name: 'MIN THU', id: '299' },
+        { dept: 'PRODUCTION', name: 'CHONG FAT KEONG', id: '3' },
+        { dept: 'PRODUCTION', name: 'MD SHAHABUDIN', id: '20' },
+        { dept: 'PRODUCTION', name: 'MD ALAMGIR', id: '68' },
+        { dept: 'PRODUCTION', name: 'SHAING THU AUNG', id: '301' },
+        { dept: 'MOULD MAKER', name: 'MD JAHIR', id: '69' },
+        { dept: 'MOULD MAKER', name: 'MD JAHANGIR', id: '72' },
+        { dept: 'MOULD MAKER', name: 'LEE YOONG HON', id: '272' },
+        { dept: 'MOULD MAKER', name: 'HING YONG HOW', id: '286' },
+        { dept: 'MOULD MAKER', name: 'ZAW MYO HTIKE', id: '303' },
+        { dept: 'MOULD MAKER', name: 'AMARNATH', id: '310' },
+        { dept: 'MOULD MAKER', name: 'JAISON', id: '311' },
+        { dept: 'MOULD MAKER', name: 'VIMALKUMAR', id: '319' },
+        { dept: 'MOULD MAKER', name: 'SARATH', id: '322' },
+        { dept: 'MOULD MAKER', name: 'GOH CHEE KUAN', id: '326' },
+        { dept: 'QC', name: 'TAN KAH CHYE', id: '266' },
+        { dept: 'QC', name: 'NUR LIANA SOFIA', id: '323' }
+    ];
+
+    const STORAGE_RECORDS = 'KAIZEN_OT_RECORDS_V4';
+
     document.addEventListener('DOMContentLoaded', () => {
-        updateDatalists();
-        loadDraftOrInit();
-        populateYearFilter();
-
+        onDepartmentChange();
         const now = new Date();
-        const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        document.getElementById('hrMonthFilter').value = monthStr;
-        document.getElementById('deleteMonthInput').value = monthStr;
-
-        renderMyRecords();
-        renderHRArchive();
-
-        document.getElementById('entryTbody').addEventListener('input', autoSaveDraft);
+        document.getElementById('hrMonthFilter').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     });
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
 
@@ -462,182 +319,122 @@
         if(tabId === 'archive-tab') renderHRArchive();
     }
 
-    function addRow(data = {}) {
+    function onDepartmentChange() {
+        const dept = document.getElementById('mainDeptSelect').value;
+        document.getElementById('displayDept').innerText = dept;
+        document.getElementById('displayHOD').innerText = HOD_MAP[dept] || '-';
+        
+        // 重置表格为该部门
+        document.getElementById('entryTbody').innerHTML = '';
+        addRow();
+    }
+
+    function addRow() {
+        const currentDept = document.getElementById('mainDeptSelect').value;
+        const filteredEmp = EMPLOYEES_DB.filter(e => e.dept === currentDept);
         const tbody = document.getElementById('entryTbody');
         const tr = document.createElement('tr');
-        const todayStr = data.date || new Date().toISOString().split('T')[0];
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        let optionsHtml = `<option value="">-- Select Employee --</option>`;
+        filteredEmp.forEach(e => {
+            optionsHtml += `<option value="${e.name}" data-id="${e.id}">${e.name} (${e.id})</option>`;
+        });
 
         tr.innerHTML = `
             <td>
-                <input type="text" class="input-name" list="history-names" value="${data.name || ''}" placeholder="Name / 姓名" required>
+                <select class="input-name" onchange="autoFillEmpId(this)">
+                    ${optionsHtml}
+                </select>
             </td>
             <td>
-                <input type="text" class="input-id" list="history-ids" value="${data.empId || ''}" placeholder="ID / 工号" required>
+                <input type="text" class="input-id" readonly style="background: #f3f4f6;">
             </td>
             <td>
-                <input type="date" class="input-date" value="${todayStr}" required>
+                <input type="date" class="input-date" value="${todayStr}">
             </td>
             <td>
-                <input type="number" step="0.5" class="input-time" value="${data.hours || ''}" placeholder="Hours / 小时" required>
+                <input type="number" step="0.5" class="input-time" placeholder="Hours">
             </td>
             <td>
-                <input type="text" class="input-reason" list="history-reasons" value="${data.reason || ''}" placeholder="Reason / 原因">
+                <input type="text" class="input-reason" placeholder="Overtime Reason">
             </td>
             <td class="no-print">
-                <button type="button" class="btn btn-danger" style="padding: 6px 10px; font-size: 0.8rem;" onclick="removeRow(this)">🗑️ Remove</button>
+                <button type="button" class="btn btn-danger" style="padding: 4px 8px;" onclick="this.closest('tr').remove()">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
-        autoSaveDraft();
     }
 
-    function removeRow(btn) {
-        const tbody = document.getElementById('entryTbody');
-        if (tbody.children.length > 1) {
-            btn.closest('tr').remove();
-            autoSaveDraft();
-        } else {
-            alert('At least one row required! / 至少保留一行！');
-        }
-    }
-
-    function autoSaveDraft() {
-        const rows = document.querySelectorAll('#entryTbody tr');
-        const draftData = [];
-        rows.forEach(row => {
-            draftData.push({
-                name: row.querySelector('.input-name').value,
-                empId: row.querySelector('.input-id').value,
-                date: row.querySelector('.input-date').value,
-                hours: row.querySelector('.input-time').value,
-                reason: row.querySelector('.input-reason').value
-            });
-        });
-
-        localStorage.setItem(STORAGE_DRAFT_FORM, JSON.stringify(draftData));
-        document.getElementById('autosaveTime').innerText = new Date().toLocaleTimeString();
-    }
-
-    function loadDraftOrInit() {
-        const draft = JSON.parse(localStorage.getItem(STORAGE_DRAFT_FORM));
-        if (draft && draft.length > 0) {
-            document.getElementById('entryTbody').innerHTML = '';
-            draft.forEach(item => addRow(item));
-        } else {
-            addRow();
-        }
-    }
-
-    function updateDatalists() {
-        fillDatalist('history-names', histories.names);
-        fillDatalist('history-ids', histories.ids);
-        fillDatalist('history-reasons', histories.reasons);
-    }
-
-    function fillDatalist(elementId, items) {
-        const datalist = document.getElementById(elementId);
-        datalist.innerHTML = '';
-        [...new Set(items)].forEach(item => {
-            if (item) {
-                const opt = document.createElement('option');
-                opt.value = item;
-                datalist.appendChild(opt);
-            }
-        });
-    }
-
-    function saveHistoryTraces(name, empId, reason) {
-        if (name && !histories.names.includes(name)) histories.names.push(name);
-        if (empId && !histories.ids.includes(empId)) histories.ids.push(empId);
-        if (reason && !histories.reasons.includes(reason)) histories.reasons.push(reason);
-        localStorage.setItem(STORAGE_HISTORIES, JSON.stringify(histories));
-        updateDatalists();
+    function autoFillEmpId(selectEl) {
+        const selectedOpt = selectEl.options[selectEl.selectedIndex];
+        const empId = selectedOpt.getAttribute('data-id') || '';
+        const row = selectEl.closest('tr');
+        row.querySelector('.input-id').value = empId;
     }
 
     function submitData(status) {
+        const currentDept = document.getElementById('mainDeptSelect').value;
+        const hod = HOD_MAP[currentDept];
         const rows = document.querySelectorAll('#entryTbody tr');
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         let isValid = true;
         const newEntries = [];
 
         rows.forEach(row => {
-            const name = row.querySelector('.input-name').value.trim();
-            const empId = row.querySelector('.input-id').value.trim();
+            const name = row.querySelector('.input-name').value;
+            const empId = row.querySelector('.input-id').value;
             const date = row.querySelector('.input-date').value;
-            const hours = row.querySelector('.input-time').value.trim();
-            const reason = row.querySelector('.input-reason').value.trim();
+            const hours = row.querySelector('.input-time').value;
+            const reason = row.querySelector('.input-reason').value;
 
-            if (!name || !empId || !hours || !date) {
+            if (!name || !hours || !date) {
                 isValid = false;
                 return;
             }
 
             newEntries.push({
                 id: 'OT-' + Date.now() + '-' + Math.floor(Math.random()*1000),
+                dept: currentDept,
+                hod: hod,
                 date: date,
                 name: name,
                 empId: empId,
                 hours: hours,
                 reason: reason || '-',
-                status: status,
-                submittedAt: new Date().toISOString()
+                status: status
             });
-            saveHistoryTraces(name, empId, reason);
         });
 
         if (!isValid) {
-            alert('Please fill in all required fields! / 请完整填写必需项目！');
+            alert('Please fill all employee and hours fields! / 请把员工与时间填写完整！');
             return;
         }
 
         records = records.concat(newEntries);
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-
-        localStorage.removeItem(STORAGE_DRAFT_FORM);
+        
+        alert(`Successfully Submitted as [${status}]!`);
         document.getElementById('entryTbody').innerHTML = '';
         addRow();
-        populateYearFilter();
-
-        alert(`Saved as [${status}]! / 成功上交！`);
-        renderMyRecords();
-        renderHRArchive();
     }
 
     function renderMyRecords() {
         const tbody = document.getElementById('myRecordsTbody');
         tbody.innerHTML = '';
-
         const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        const searchVal = document.getElementById('mySearchInput').value.toLowerCase().trim();
-        const statusFilter = document.getElementById('myStatusFilter').value;
 
-        const filtered = records.filter(item => {
-            const matchSearch = item.name.toLowerCase().includes(searchVal) || item.empId.toLowerCase().includes(searchVal);
-            const matchStatus = statusFilter === 'ALL' || item.status === statusFilter;
-            return matchSearch && matchStatus;
-        });
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding: 20px;">No records found / 暂无记录</td></tr>`;
-            return;
-        }
-
-        filtered.reverse().forEach(item => {
+        records.reverse().forEach(item => {
             const tr = document.createElement('tr');
-            const badgeClass = item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending';
-
             tr.innerHTML = `
                 <td>${item.date}</td>
-                <td><strong>${escapeHtml(item.name)}</strong></td>
-                <td>${escapeHtml(item.empId)}</td>
+                <td>${item.dept}</td>
+                <td>${item.hod}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.empId}</td>
                 <td>${item.hours} hrs</td>
-                <td>${escapeHtml(item.reason)}</td>
-                <td><span class="badge ${badgeClass}">${item.status}</span></td>
-                <td class="no-print">
-                    <button type="button" class="btn btn-add" style="padding: 4px 8px; font-size: 0.78rem;" onclick="appendFromHistory('${escapeHtml(item.name)}', '${escapeHtml(item.empId)}')">
-                        ➕ Add Row / 追加行
-                    </button>
-                </td>
+                <td>${item.reason}</td>
+                <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
             `;
             tbody.appendChild(tr);
         });
@@ -646,127 +443,52 @@
     function renderHRArchive() {
         const tbody = document.getElementById('hrArchiveTbody');
         tbody.innerHTML = '';
-
         const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+        const deptFilter = document.getElementById('hrDeptFilter').value;
         const monthFilter = document.getElementById('hrMonthFilter').value;
-        const yearFilter = document.getElementById('hrYearFilter').value;
-        const statusFilter = document.getElementById('hrStatusFilter').value;
-        const searchVal = document.getElementById('hrSearchInput').value.toLowerCase().trim();
 
         const filtered = records.filter(item => {
+            const matchDept = deptFilter === 'ALL' || item.dept === deptFilter;
             const matchMonth = !monthFilter || item.date.startsWith(monthFilter);
-            const itemYear = item.date.split('-')[0];
-            const matchYear = yearFilter === 'ALL' || itemYear === yearFilter;
-            const matchStatus = statusFilter === 'ALL' || item.status === statusFilter;
-            const matchSearch = item.name.toLowerCase().includes(searchVal) || 
-                                item.empId.toLowerCase().includes(searchVal) || 
-                                item.reason.toLowerCase().includes(searchVal);
-
-            return matchMonth && matchYear && matchStatus && matchSearch;
+            return matchDept && matchMonth;
         });
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding: 20px;">No matching archive records / 无符合档案</td></tr>`;
-            return;
-        }
 
         filtered.reverse().forEach(item => {
             const tr = document.createElement('tr');
-            const badgeClass = item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending';
-
             tr.innerHTML = `
                 <td>${item.date}</td>
-                <td><strong>${escapeHtml(item.name)}</strong></td>
-                <td>${escapeHtml(item.empId)}</td>
+                <td>${item.dept}</td>
+                <td>${item.hod}</td>
+                <td><strong>${item.name}</strong></td>
+                <td>${item.empId}</td>
                 <td>${item.hours} hrs</td>
-                <td>${escapeHtml(item.reason)}</td>
-                <td><span class="badge ${badgeClass}">${item.status}</span></td>
-                <td class="no-print" style="display: flex; gap: 4px; flex-wrap: wrap;">
-                    ${item.status === 'PENDING' ? `
-                        <button type="button" class="btn btn-confirm" style="padding: 4px 8px; font-size: 0.75rem;" onclick="toggleRecordStatus('${item.id}', 'CONFIRMED')">
-                            Set CONFIRMED
-                        </button>
-                    ` : ''}
-                    <button type="button" class="btn btn-add" style="padding: 4px 8px; font-size: 0.75rem;" onclick="appendFromHistory('${escapeHtml(item.name)}', '${escapeHtml(item.empId)}')">
-                        ➕ Add Row
-                    </button>
+                <td>${item.reason}</td>
+                <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
+                <td class="no-print">
+                    ${item.status === 'PENDING' ? `<button class="btn btn-confirm" style="padding: 3px 6px; font-size: 0.75rem;" onclick="changeStatus('${item.id}', 'CONFIRMED')">Set CONFIRMED</button>` : ''}
                 </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    function appendFromHistory(name, empId) {
-        switchTab('entry-tab');
-        addRow({ name: name, empId: empId });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function toggleRecordStatus(id, newStatus) {
+    function changeStatus(id, newStatus) {
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        records = records.map(item => {
-            if (item.id === id) item.status = newStatus;
-            return item;
+        records = records.map(r => {
+            if(r.id === id) r.status = newStatus;
+            return r;
         });
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
         renderHRArchive();
-        renderMyRecords();
-    }
-
-    function populateYearFilter() {
-        const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        const years = new Set();
-        records.forEach(r => {
-            if (r.date) years.add(r.date.split('-')[0]);
-        });
-
-        const select = document.getElementById('hrYearFilter');
-        select.innerHTML = `<option value="ALL">All Years / 全部年份</option>`;
-        Array.from(years).sort().reverse().forEach(yr => {
-            const opt = document.createElement('option');
-            opt.value = yr;
-            opt.innerText = yr;
-            select.appendChild(opt);
-        });
-    }
-
-    function deleteSelectiveRecords() {
-        const selectedMonth = document.getElementById('deleteMonthInput').value;
-        if (!selectedMonth) {
-            alert('Please select a valid month! / 请选择月份！');
-            return;
-        }
-
-        if (confirm(`Delete all records for [${selectedMonth}]?\n确定删除 [${selectedMonth}] 的所有记录吗？`)) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            const initialCount = records.length;
-            records = records.filter(item => !item.date.startsWith(selectedMonth));
-            
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`Deleted ${initialCount - records.length} records. / 已清理记录。`);
-            populateYearFilter();
-            renderMyRecords();
-            renderHRArchive();
-        }
     }
 
     function deleteAllRecords() {
-        if (confirm("🚨 WARNING: Permanently erase ALL records?\n警告：确定要永久清空系统所有记录吗？")) {
+        if(confirm("🚨 Are you sure you want to delete ALL records?\n确定要永久清空记录吗？")) {
             localStorage.removeItem(STORAGE_RECORDS);
-            localStorage.removeItem(STORAGE_DRAFT_FORM);
-            alert("All records cleared! / 所有记录已成功清空！");
-            
-            populateYearFilter();
+            alert("All records cleared!");
             renderMyRecords();
             renderHRArchive();
-            document.getElementById('entryTbody').innerHTML = '';
-            addRow();
         }
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 </script>
 </body>
