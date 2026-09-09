@@ -1,6 +1,6 @@
-没问题！在完全保留所有现有架构与功能的基础上，我为你加入了 **智能员工记忆带入（Emp Smart Auto-Fill Time & Details）** 功能：
+明白你的需求了！你希望**连第一次都不用手动按**，只要一选或敲入员工名字，系统就**立刻自动带出默认的加班时间**（并且如果他以前填过，就自动带出他上一次用的时间）。
 
-只要你在输入框选择或填入员工姓名/工号，系统就会自动提取该员工**上一次填过的 Start Time（开始时间）、End Time（结束时间）、OT Hours（加班小时）以及 Purpose/Reason（加班原因）**，全自动直接带入输入框中！如果需要修改时间，你依然可以随时手动更改，且完全不影响其他行数据。
+我为你修改了代码：**现在只要选择或输入员工名字，系统就会直接自动填上默认时间（18:00 - 20:00，2.0 小时）**，你完全不需要再去点那个时间输入框！
 
 ---
 
@@ -258,7 +258,6 @@
     <div id="clear-tab" class="tab-content">
         <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records Management / 清理记录管理</h2>
         
-        <!-- 按日期范围/时间段删除 -->
         <div class="clear-box">
             <h3>1. Delete By Specific Date Range & Time / 按特定日期段与时间范围删除</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
@@ -274,7 +273,6 @@
             <button class="btn btn-danger" onclick="deleteByDateRange()">🗑️ Delete Range Records / 删除指定段记录</button>
         </div>
 
-        <!-- 按月份删除 -->
         <div class="clear-box">
             <h3>2. Delete By Specific Month / 按特定月份删除</h3>
             <div style="margin-bottom: 10px; max-width: 250px;">
@@ -284,7 +282,6 @@
             <button class="btn btn-danger" onclick="deleteByMonth()">🗑️ Delete Selected Month / 删除所选月份记录</button>
         </div>
 
-        <!-- 按年份删除 -->
         <div class="clear-box">
             <h3>3. Delete By Specific Year / 按特定年份删除</h3>
             <div style="margin-bottom: 10px; max-width: 250px;">
@@ -294,7 +291,6 @@
             <button class="btn btn-danger" onclick="deleteByYear()">🗑️ Delete Selected Year / 删除所选年份记录</button>
         </div>
 
-        <!-- 全盘清空 CLEAR ALL -->
         <div class="clear-box" style="background: #fef2f2; border-color: #fecaca;">
             <h3 style="color: var(--danger-color);">4. CLEAR ALL RECORDS / 彻底清空所有记录</h3>
             <p style="margin-bottom: 10px; color: #991b1b;">⚠️ Warning: All saved & auto-saved records will be permanently erased. / 警告：所有历史记录与自动保存将被永久删除。</p>
@@ -304,6 +300,11 @@
 </div>
 
 <script>
+    // 默认加班时间配置
+    const DEFAULT_START_TIME = "18:00";
+    const DEFAULT_END_TIME = "20:00";
+    const DEFAULT_HOURS = "2.0";
+
     const HOD_MAP = {
         'ADMIN': 'KALAISELVI',
         'PURCHASING': 'KALAISELVI',
@@ -406,10 +407,10 @@
 
         tr.innerHTML = `
             <td>
-                <input type="text" class="input-name" list="memory-names" placeholder="Type or Select Name" onchange="onNameChange(this); triggerAutoSave();">
+                <input type="text" class="input-name" list="memory-names" placeholder="Type or Select Name" oninput="onNameChange(this); triggerAutoSave();" onchange="onNameChange(this); triggerAutoSave();">
             </td>
             <td>
-                <input type="text" class="input-id" list="memory-ids" placeholder="ID" onchange="onIdChange(this); triggerAutoSave();">
+                <input type="text" class="input-id" list="memory-ids" placeholder="ID" oninput="onIdChange(this); triggerAutoSave();" onchange="onIdChange(this); triggerAutoSave();">
             </td>
             <td>
                 <input type="date" class="input-date" value="${todayStr}" onchange="triggerAutoSave()">
@@ -433,61 +434,59 @@
         tbody.appendChild(tr);
     }
 
-    // 智能联动处理：按姓名改变
+    // 按姓名改变或输入时触发表格智能联动
     function onNameChange(inputEl) {
         const nameVal = inputEl.value.trim();
         const row = inputEl.closest('tr');
         if (!nameVal) return;
 
-        // 1. 先从预设数据库配对 ID
+        // 1. 配对 ID
         const foundEmp = EMPLOYEES_DB.find(e => e.name.toLowerCase() === nameVal.toLowerCase());
         if (foundEmp) {
             row.querySelector('.input-id').value = foundEmp.id;
         }
 
-        // 2. 自动检索历史记忆：提取该员工上一次填过的 Start/End Time、Hours 与 Reason
-        fillPreviousHistoryForEmp(row, nameVal, null);
+        // 2. 直接自动出时间（历史优先，无历史则自动填默认时间）
+        fillTimeAndDetailsForEmp(row, nameVal, null);
     }
 
-    // 智能联动处理：按工号改变
+    // 按工号改变或输入时触发表格智能联动
     function onIdChange(inputEl) {
         const idVal = inputEl.value.trim();
         const row = inputEl.closest('tr');
         if (!idVal) return;
 
-        // 1. 先从预设数据库配对 Name
+        // 1. 配对 Name
         const foundEmp = EMPLOYEES_DB.find(e => e.id === idVal);
         if (foundEmp) {
             row.querySelector('.input-name').value = foundEmp.name;
         }
 
-        // 2. 自动检索历史记忆：提取该员工上一次填过的 Start/End Time、Hours 与 Reason
-        fillPreviousHistoryForEmp(row, null, idVal);
+        // 2. 直接自动出时间（历史优先，无历史则自动填默认时间）
+        fillTimeAndDetailsForEmp(row, null, idVal);
     }
 
-    // 自动寻找并填入该员工的历史数据记录
-    function fillPreviousHistoryForEmp(row, name, empId) {
+    // 核心自动填入逻辑：自动弹时间、小时与原因
+    function fillTimeAndDetailsForEmp(row, name, empId) {
         const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        // 倒序寻找最新的上一条填写记录
         const lastRecord = records.slice().reverse().find(r => {
             if (name && r.name && r.name.toLowerCase() === name.toLowerCase()) return true;
             if (empId && r.empId && r.empId === empId) return true;
             return false;
         });
 
+        // 如果有历史记录则取上一次的，如果没有，则直接填入系统默认的 18:00 - 20:00
         if (lastRecord) {
-            if (lastRecord.startTime && lastRecord.startTime !== '--:--') {
-                row.querySelector('.input-start').value = lastRecord.startTime;
-            }
-            if (lastRecord.endTime && lastRecord.endTime !== '--:--') {
-                row.querySelector('.input-end').value = lastRecord.endTime;
-            }
-            if (lastRecord.hours) {
-                row.querySelector('.input-hours').value = lastRecord.hours;
-            }
+            row.querySelector('.input-start').value = lastRecord.startTime || DEFAULT_START_TIME;
+            row.querySelector('.input-end').value = lastRecord.endTime || DEFAULT_END_TIME;
+            row.querySelector('.input-hours').value = lastRecord.hours || DEFAULT_HOURS;
             if (lastRecord.reason && lastRecord.reason !== '-') {
                 row.querySelector('.input-reason').value = lastRecord.reason;
             }
+        } else {
+            row.querySelector('.input-start').value = DEFAULT_START_TIME;
+            row.querySelector('.input-end').value = DEFAULT_END_TIME;
+            row.querySelector('.input-hours').value = DEFAULT_HOURS;
         }
     }
 
@@ -501,7 +500,7 @@
             let end = new Date(`1970-01-01T${endTime}:00`);
             
             if (end < start) {
-                end.setDate(end.getDate() + 1); // 跨夜计算
+                end.setDate(end.getDate() + 1);
             }
             
             const diffMs = end - start;
@@ -510,7 +509,6 @@
         }
     }
 
-    // 实时 Auto-Save 功能（独立系统保存）
     function triggerAutoSave() {
         const currentDept = document.getElementById('mainDeptSelect').value;
         const rows = document.querySelectorAll('#entryTbody tr');
@@ -539,12 +537,10 @@
             }
         });
 
-        // 限制 Auto-Save 系统展示最新 50 条
         if (autoSaveList.length > 50) autoSaveList = autoSaveList.slice(0, 50);
         localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(autoSaveList));
     }
 
-    // 更新历史记忆下拉框
     function updateMemoryDatalists() {
         const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         const namesSet = new Set(EMPLOYEES_DB.map(e => e.name));
@@ -562,7 +558,6 @@
         document.getElementById('memory-reasons').innerHTML = Array.from(reasonsSet).map(r => `<option value="${r}">`).join('');
     }
 
-    // 提交数据
     function submitData(status) {
         const currentDept = document.getElementById('mainDeptSelect').value;
         const hod = HOD_MAP[currentDept];
@@ -693,7 +688,6 @@
         renderHRArchive();
     }
 
-    // 精准删除：按时间段
     function deleteByDateRange() {
         const start = document.getElementById('clearStartDate').value;
         const end = document.getElementById('clearEndDate').value;
@@ -710,7 +704,6 @@
         }
     }
 
-    // 精准删除：按月份
     function deleteByMonth() {
         const selectedMonth = document.getElementById('clearMonthInput').value;
         if (!selectedMonth) {
@@ -726,7 +719,6 @@
         }
     }
 
-    // 精准删除：按年份
     function deleteByYear() {
         const selectedYear = document.getElementById('clearYearInput').value;
         if (!selectedYear) {
@@ -742,7 +734,6 @@
         }
     }
 
-    // 清空全盘 CLEAR ALL
     function deleteAllRecords() {
         if(confirm("🚨 CLEAR ALL RECORDS?\n警告：确定要永久清空系统所有记录与记忆吗？")) {
             localStorage.removeItem(STORAGE_RECORDS);
