@@ -1,3 +1,12 @@
+没问题！在完全保留所有现有架构与功能的基础上，我为你加入了 **智能员工记忆带入（Emp Smart Auto-Fill Time & Details）** 功能：
+
+只要你在输入框选择或填入员工姓名/工号，系统就会自动提取该员工**上一次填过的 Start Time（开始时间）、End Time（结束时间）、OT Hours（加班小时）以及 Purpose/Reason（加班原因）**，全自动直接带入输入框中！如果需要修改时间，你依然可以随时手动更改，且完全不影响其他行数据。
+
+---
+
+### 📄 更新后的完整 `index.html` 代码：
+
+```html
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -397,10 +406,10 @@
 
         tr.innerHTML = `
             <td>
-                <input type="text" class="input-name" list="memory-names" placeholder="Type or Select Name" onchange="autoMatchIdByName(this); triggerAutoSave();">
+                <input type="text" class="input-name" list="memory-names" placeholder="Type or Select Name" onchange="onNameChange(this); triggerAutoSave();">
             </td>
             <td>
-                <input type="text" class="input-id" list="memory-ids" placeholder="ID" onchange="autoMatchNameById(this); triggerAutoSave();">
+                <input type="text" class="input-id" list="memory-ids" placeholder="ID" onchange="onIdChange(this); triggerAutoSave();">
             </td>
             <td>
                 <input type="date" class="input-date" value="${todayStr}" onchange="triggerAutoSave()">
@@ -424,22 +433,61 @@
         tbody.appendChild(tr);
     }
 
-    // 智能数据匹配
-    function autoMatchIdByName(inputEl) {
-        const val = inputEl.value.trim();
-        const found = EMPLOYEES_DB.find(e => e.name.toLowerCase() === val.toLowerCase());
+    // 智能联动处理：按姓名改变
+    function onNameChange(inputEl) {
+        const nameVal = inputEl.value.trim();
         const row = inputEl.closest('tr');
-        if (found) {
-            row.querySelector('.input-id').value = found.id;
+        if (!nameVal) return;
+
+        // 1. 先从预设数据库配对 ID
+        const foundEmp = EMPLOYEES_DB.find(e => e.name.toLowerCase() === nameVal.toLowerCase());
+        if (foundEmp) {
+            row.querySelector('.input-id').value = foundEmp.id;
         }
+
+        // 2. 自动检索历史记忆：提取该员工上一次填过的 Start/End Time、Hours 与 Reason
+        fillPreviousHistoryForEmp(row, nameVal, null);
     }
 
-    function autoMatchNameById(inputEl) {
-        const val = inputEl.value.trim();
-        const found = EMPLOYEES_DB.find(e => e.id === val);
+    // 智能联动处理：按工号改变
+    function onIdChange(inputEl) {
+        const idVal = inputEl.value.trim();
         const row = inputEl.closest('tr');
-        if (found) {
-            row.querySelector('.input-name').value = found.name;
+        if (!idVal) return;
+
+        // 1. 先从预设数据库配对 Name
+        const foundEmp = EMPLOYEES_DB.find(e => e.id === idVal);
+        if (foundEmp) {
+            row.querySelector('.input-name').value = foundEmp.name;
+        }
+
+        // 2. 自动检索历史记忆：提取该员工上一次填过的 Start/End Time、Hours 与 Reason
+        fillPreviousHistoryForEmp(row, null, idVal);
+    }
+
+    // 自动寻找并填入该员工的历史数据记录
+    function fillPreviousHistoryForEmp(row, name, empId) {
+        const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+        // 倒序寻找最新的上一条填写记录
+        const lastRecord = records.slice().reverse().find(r => {
+            if (name && r.name && r.name.toLowerCase() === name.toLowerCase()) return true;
+            if (empId && r.empId && r.empId === empId) return true;
+            return false;
+        });
+
+        if (lastRecord) {
+            if (lastRecord.startTime && lastRecord.startTime !== '--:--') {
+                row.querySelector('.input-start').value = lastRecord.startTime;
+            }
+            if (lastRecord.endTime && lastRecord.endTime !== '--:--') {
+                row.querySelector('.input-end').value = lastRecord.endTime;
+            }
+            if (lastRecord.hours) {
+                row.querySelector('.input-hours').value = lastRecord.hours;
+            }
+            if (lastRecord.reason && lastRecord.reason !== '-') {
+                row.querySelector('.input-reason').value = lastRecord.reason;
+            }
         }
     }
 
@@ -696,13 +744,15 @@
 
     // 清空全盘 CLEAR ALL
     function deleteAllRecords() {
-        if(confirm("🚨 CLEAR ALL RECORDS?\n警告：确定要永久清空系统所有上交记录与自动保存备份吗？")) {
+        if(confirm("🚨 CLEAR ALL RECORDS?\n警告：确定要永久清空系统所有记录与记忆吗？")) {
             localStorage.removeItem(STORAGE_RECORDS);
             localStorage.removeItem(STORAGE_AUTOSAVE);
-            alert("All records & auto-save memory cleared! / 所有记录与记忆数据已彻底清空！");
+            alert("All records cleared! / 所有记录已成功清空！");
             updateMemoryDatalists();
         }
     }
 </script>
 </body>
 </html>
+
+```
