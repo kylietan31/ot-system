@@ -74,7 +74,6 @@
         .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
         .badge-confirmed { background: #d1fae5; color: #065f46; }
         .badge-pending { background: #fef3c7; color: #92400e; }
-        .badge-autosave { background: #e0e7ff; color: #3730a3; }
 
         .clear-box { background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .clear-box h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--primary-color); }
@@ -85,7 +84,7 @@
             .nav-tabs, .btn-group, .dept-selector-card, .no-print { display: none !important; }
             .tab-content { display: block !important; }
             #entry-tab, #clear-tab { display: none !important; }
-            #archive-tab, #myrecords-tab, #autosave-tab { display: block !important; }
+            #archive-tab, #myrecords-tab { display: block !important; }
             th, td { border: 1px solid #000 !important; font-size: 9pt; }
         }
     </style>
@@ -129,7 +128,6 @@
 
     <div class="nav-tabs no-print">
         <button class="tab-btn active" onclick="switchTab('entry-tab')">📝 Submit OT / Hantar OT / 登记上交</button>
-        <button class="tab-btn" onclick="switchTab('autosave-tab')">💾 Auto-Save System / 自动保存系统数据</button>
         <button class="tab-btn" onclick="switchTab('myrecords-tab')">👤 My Records / Rekod Saya / 个人记录</button>
         <button class="tab-btn" onclick="switchTab('archive-tab')">📁 HR Archive / Arkib HR / 月度归档</button>
         <button class="tab-btn" onclick="switchTab('clear-tab')">🗑️ Clear Records / Padam Rekod / 清理记录</button>
@@ -158,32 +156,6 @@
             <button type="button" class="btn btn-add" onclick="addRow()">➕ Add Row / Tambah / 添加新行</button>
             <button type="button" class="btn btn-confirm" onclick="submitData('CONFIRMED')">✅ Confirm Submission / 确认上交</button>
             <button type="button" class="btn btn-pending" onclick="submitData('PENDING')">⏳ Save PENDING / PENDING 上交</button>
-        </div>
-    </div>
-
-    <div id="autosave-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
-            <h2>💾 Auto-Saved Database System / 自动保存备份系统</h2>
-            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 导出与打印</button>
-        </div>
-        <p style="margin-bottom: 10px; color: #6b7280;">提交时自动备份数据记录（每人仅保留最新一条记录）。</p>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Saved Time / 自动保存时间</th>
-                        <th>Dept / 部门</th>
-                        <th>Name / 姓名</th>
-                        <th>ID / 工号</th>
-                        <th>Date / 日期</th>
-                        <th>Time Range / 时间</th>
-                        <th>Hours / 小时</th>
-                        <th>Reason / 原因</th>
-                        <th>Type / 类型</th>
-                    </tr>
-                </thead>
-                <tbody id="autoSaveTbody"></tbody>
-            </table>
         </div>
     </div>
 
@@ -241,7 +213,6 @@
     <div id="clear-tab" class="tab-content">
         <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records Management / 清理记录管理</h2>
         
-        <!-- 新增功能：按部门删除 -->
         <div class="clear-box" style="border-left: 4px solid var(--primary-color);">
             <h3>🏢 1. Delete By Specific Department / 按指定部门删除</h3>
             <div style="margin-bottom: 10px; max-width: 300px;">
@@ -263,7 +234,6 @@
             <button class="btn btn-danger" onclick="deleteByDepartment()">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
         </div>
 
-        <!-- 新增功能：按特定员工姓名/工号删除 -->
         <div class="clear-box" style="border-left: 4px solid #8b5cf6;">
             <h3>👤 2. Delete By Specific Employee / 按指定员工姓名或工号删除</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
@@ -310,7 +280,7 @@
 
         <div class="clear-box" style="background: #fef2f2; border-color: #fecaca;">
             <h3 style="color: var(--danger-color);">🚨 6. CLEAR ALL RECORDS / 彻底清空所有记录</h3>
-            <p style="margin-bottom: 10px; color: #991b1b;">⚠️ Warning: All saved & auto-saved records will be permanently erased.</p>
+            <p style="margin-bottom: 10px; color: #991b1b;">⚠️ Warning: All saved records will be permanently erased.</p>
             <button class="btn btn-danger" onclick="deleteAllRecords()">🚨 CLEAR ALL / 清空全盘数据</button>
         </div>
     </div>
@@ -384,7 +354,6 @@
     ];
 
     const STORAGE_RECORDS = 'KAIZEN_OT_SUBMISSIONS_V6';
-    const STORAGE_AUTOSAVE = 'KAIZEN_OT_AUTOSAVE_V6';
 
     document.addEventListener('DOMContentLoaded', () => {
         onDepartmentChange();
@@ -402,7 +371,6 @@
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
 
-        if(tabId === 'autosave-tab') renderAutoSaveData();
         if(tabId === 'myrecords-tab') renderMyRecords();
         if(tabId === 'archive-tab') renderHRArchive();
     }
@@ -519,37 +487,12 @@
         }
     }
 
-    function saveToAutoSaveSystem(newEntries) {
-        let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
-        let autoSaveMap = {};
-
-        autoSaveList.forEach(item => {
-            autoSaveMap[item.name] = item;
-        });
-
-        newEntries.forEach(item => {
-            autoSaveMap[item.name] = {
-                savedAt: new Date().toLocaleTimeString(),
-                dept: item.dept,
-                name: item.name,
-                empId: item.empId || '-',
-                date: item.date,
-                timeRange: `${item.startTime} - ${item.endTime}`,
-                hours: item.hours || '0',
-                reason: item.reason || '-'
-            };
-        });
-
-        localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(Object.values(autoSaveMap)));
-    }
-
     function submitData(status) {
         const currentDept = document.getElementById('mainDeptSelect').value;
         const hod = HOD_MAP[currentDept];
         const rows = document.querySelectorAll('#entryTbody tr');
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         let isValid = true;
-        let entriesToSave = [];
 
         rows.forEach(row => {
             const name = row.querySelector('.input-name').value.trim();
@@ -579,8 +522,6 @@
                 status: status
             };
 
-            entriesToSave.push(newEntry);
-
             const existingIndex = records.findIndex(r => r.date === date && r.name.toLowerCase() === name.toLowerCase());
             if (existingIndex !== -1) {
                 records[existingIndex] = newEntry;
@@ -595,33 +536,10 @@
         }
 
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-        saveToAutoSaveSystem(entriesToSave);
         
         alert(`Successfully Submitted as [${status}]! / 上交成功！`);
         document.getElementById('entryTbody').innerHTML = '';
         addRow();
-    }
-
-    function renderAutoSaveData() {
-        const tbody = document.getElementById('autoSaveTbody');
-        tbody.innerHTML = '';
-        const list = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
-
-        list.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${item.savedAt}</td>
-                <td>${item.dept}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.empId}</td>
-                <td>${item.date}</td>
-                <td>${item.timeRange}</td>
-                <td>${item.hours} hrs</td>
-                <td>${item.reason}</td>
-                <td><span class="badge badge-autosave">AUTO-SAVED</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
     }
 
     function renderMyRecords() {
@@ -691,98 +609,89 @@
         }
     }
 
-    /* 新增删除功能：按部门删除 */
+    /* 按部门删除 */
     function deleteByDepartment() {
         const dept = document.getElementById('clearDeptSelect').value;
         if (confirm(`Delete ALL records for department [${dept}]?\n确定要删除 [${dept}] 部门的所有记录吗？`)) {
             let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
-
-            records = records.filter(item => item.dept !== dept);
-            autoSaveList = autoSaveList.filter(item => item.dept !== dept);
-
+            records = records.filter(r => r.dept !== dept);
             localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(autoSaveList));
-
-            alert(`Department [${dept}] records successfully deleted! / [${dept}] 部门记录已全被删除！`);
+            alert(`All records for [${dept}] have been deleted!\n已成功删除 [${dept}] 部门的所有记录！`);
         }
     }
 
-    /* 新增删除功能：按员工姓名或工号删除 */
+    /* 按指定员工姓名或工号删除 */
     function deleteByEmployee() {
-        const keyword = document.getElementById('clearEmpInput').value.trim().toLowerCase();
-        if (!keyword) {
-            alert('Please enter Employee Name or ID! / 请输入员工姓名或工号！');
+        const inputVal = document.getElementById('clearEmpInput').value.trim().toLowerCase();
+        if (!inputVal) {
+            alert("Please enter an Employee Name or ID / 请输入员工姓名或工号！");
             return;
         }
 
-        if (confirm(`Delete all records for employee matching "${keyword}"?\n确定删除匹配 "${keyword}" 的员工所有记录吗？`)) {
+        if (confirm(`Delete ALL records for employee [${inputVal}]?\n确定要删除员工 [${inputVal}] 的所有记录吗？`)) {
             let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
-
-            records = records.filter(item => item.name.toLowerCase() !== keyword && item.empId.toLowerCase() !== keyword);
-            autoSaveList = autoSaveList.filter(item => item.name.toLowerCase() !== keyword && item.empId.toLowerCase() !== keyword);
-
+            records = records.filter(r => r.name.toLowerCase() !== inputVal && r.empId.toLowerCase() !== inputVal);
             localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(autoSaveList));
-
-            alert(`Records for "${keyword}" successfully deleted! / 指定员工记录已删除！`);
             document.getElementById('clearEmpInput').value = '';
+            alert(`Records for [${inputVal}] have been deleted!\n已成功删除员工 [${inputVal}] 的所有记录！`);
         }
     }
 
+    /* 按指定日期范围删除 */
     function deleteByDateRange() {
-        const start = document.getElementById('clearStartDate').value;
-        const end = document.getElementById('clearEndDate').value;
-        if (!start || !end) {
-            alert('Please select both Start and End Dates! / 请选择完整开始与结束日期！');
+        const startDate = document.getElementById('clearStartDate').value;
+        const endDate = document.getElementById('clearEndDate').value;
+
+        if (!startDate || !endDate) {
+            alert("Please select both Start and End dates / 请选择开始和结束日期！");
             return;
         }
 
-        if (confirm(`Delete records from ${start} to ${end}?\n确定删除从 ${start} 至 ${end} 的记录吗？`)) {
+        if (confirm(`Delete all records from ${startDate} to ${endDate}?\n确定要删除 ${startDate} 至 ${endDate} 期间的所有记录吗？`)) {
             let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(item => item.date < start || item.date > end);
+            records = records.filter(r => r.date < startDate || r.date > endDate);
             localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert('Records in date range successfully deleted. / 指定时间段记录已成功删除。');
+            alert(`Records between ${startDate} and ${endDate} have been deleted!\n已成功删除指定日期范围内的所有记录！`);
         }
     }
 
+    /* 按月份删除 */
     function deleteByMonth() {
-        const selectedMonth = document.getElementById('clearMonthInput').value;
-        if (!selectedMonth) {
-            alert('Please select a Month! / 请选择月份！');
+        const monthVal = document.getElementById('clearMonthInput').value; // YYYY-MM
+        if (!monthVal) {
+            alert("Please select a month / 请选择月份！");
             return;
         }
 
-        if (confirm(`Delete all records for [${selectedMonth}]?\n确定删除 [${selectedMonth}] 的所有记录吗？`)) {
+        if (confirm(`Delete ALL records for month [${monthVal}]?\n确定要删除 [${monthVal}] 月份的所有记录吗？`)) {
             let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(item => !item.date.startsWith(selectedMonth));
+            records = records.filter(r => !r.date.startsWith(monthVal));
             localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`Selected month records deleted. / [${selectedMonth}] 月份记录已成功删除。`);
+            alert(`Records for [${monthVal}] have been deleted!\n已成功删除 [${monthVal}] 月份的所有记录！`);
         }
     }
 
+    /* 按年份删除 */
     function deleteByYear() {
-        const selectedYear = document.getElementById('clearYearInput').value;
-        if (!selectedYear) {
-            alert('Please input a Year! / 请填写年份！');
+        const yearVal = document.getElementById('clearYearInput').value;
+        if (!yearVal) {
+            alert("Please enter a valid year / 请输入有效年份！");
             return;
         }
 
-        if (confirm(`Delete all records for Year [${selectedYear}]?\n确定删除 [${selectedYear}] 全年的所有记录吗？`)) {
+        if (confirm(`Delete ALL records for year [${yearVal}]?\n确定要删除 [${yearVal}] 年份的所有记录吗？`)) {
             let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(item => !item.date.startsWith(selectedYear));
+            records = records.filter(r => !r.date.startsWith(yearVal));
             localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`Year [${selectedYear}] records deleted. / [${selectedYear}] 年份记录已成功删除。`);
+            alert(`Records for year [${yearVal}] have been deleted!\n已成功删除 [${yearVal}] 年份的所有记录！`);
         }
     }
 
+    /* 彻底清空所有记录 */
     function deleteAllRecords() {
-        if(confirm("🚨 CLEAR ALL RECORDS?\n警告：确定要永久清空系统所有记录与记忆吗？")) {
+        if (confirm("🚨 WARNING: Are you sure you want to PERMANENTLY erase ALL records?\n🚨 警告：确定要彻底清空全盘所有记录吗？此操作无法撤销！")) {
             localStorage.removeItem(STORAGE_RECORDS);
-            localStorage.removeItem(STORAGE_AUTOSAVE);
-            alert("All records cleared! / 所有记录已成功清空！");
-            onDepartmentChange();
+            alert("All records have been completely wiped.\n全盘数据已彻底清空！");
         }
     }
 </script>
