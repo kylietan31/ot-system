@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Daily OverTime System</title>
+    <title>Kaizen Daily OverTime System / 加班管理系统</title>
     <style>
         :root {
             --primary-color: #1e3a8a;
@@ -58,7 +58,6 @@
             color: #6b7280;
         }
 
-        /* Auto-save notification pill */
         .autosave-status {
             display: inline-flex;
             align-items: center;
@@ -72,7 +71,6 @@
             margin-top: 8px;
         }
 
-        /* Nav Tabs */
         .nav-tabs {
             display: flex;
             gap: 8px;
@@ -108,7 +106,6 @@
             display: block;
         }
 
-        /* Forms & Inputs */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -138,13 +135,12 @@
             font-size: 0.85rem;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 8px 10px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             font-size: 0.9rem;
-            transition: border-color 0.2s;
         }
 
         input:focus, select:focus {
@@ -153,7 +149,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Buttons */
         .btn-group {
             display: flex;
             gap: 10px;
@@ -172,11 +167,6 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
         }
 
         .btn-add { background: #4b5563; color: white; }
@@ -184,9 +174,7 @@
         .btn-pending { background: var(--warning-color); color: #1f2937; }
         .btn-danger { background: var(--danger-color); color: white; }
         .btn-primary { background: var(--primary-color); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
 
-        /* Badges */
         .badge {
             padding: 4px 8px;
             border-radius: 4px;
@@ -197,42 +185,6 @@
         .badge-confirmed { background: #d1fae5; color: #065f46; }
         .badge-pending { background: #fef3c7; color: #92400e; }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 15px;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: var(--primary-color);
-        }
-
-        .modal-body {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Filter bar */
         .filter-bar {
             display: flex;
             gap: 10px;
@@ -242,7 +194,6 @@
             padding: 12px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            align-items: center;
         }
 
         .filter-item {
@@ -259,7 +210,6 @@
             color: #6b7280;
         }
 
-        /* Print media styles */
         @media print {
             body { padding: 0; background: white; }
             .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
@@ -268,15 +218,12 @@
             #entry-tab, #clear-tab { display: none !important; }
             #archive-tab, #myrecords-tab { display: block !important; }
             th, td { border: 1px solid #000 !important; font-size: 10pt; }
-            h1 { font-size: 14pt; }
         }
 
-        /* Responsive Mobile Layout */
         @media (max-width: 640px) {
             .btn { width: 100%; }
             .btn-group { flex-direction: column; }
             .tab-btn { flex: 1; text-align: center; font-size: 0.8rem; padding: 8px 10px; }
-            .filter-item { min-width: 100%; }
         }
     </style>
 </head>
@@ -287,17 +234,17 @@
         <h1>Kaizen Daily OverTime System</h1>
         <div class="subtitle">Sistem Kerja Lebih Masa Harian Kaizen / Kaizen日常加班管理系统</div>
         <div class="autosave-status">
-            <span>💾 Auto-Saved / Disimpan Automatik / 自动保存</span>
-            <small id="autosaveTime"></small>
+            <span>💾 Auto-Saved / Disimpan Automatik / 自动保存:</span>
+            <small id="autosaveTime">Ready</small>
         </div>
     </header>
 
-    <!-- Global Datalists for Auto-Complete Suggestions -->
+    <!-- 自动跳出的历史记录选项列表 -->
     <datalist id="history-names"></datalist>
     <datalist id="history-ids"></datalist>
     <datalist id="history-reasons"></datalist>
 
-    <!-- Navigation Tabs -->
+    <!-- 导航标签栏 -->
     <div class="nav-tabs no-print">
         <button class="tab-btn active" onclick="switchTab('entry-tab')">
             📝 Submit OT<br><small>Hantar OT / 加班上交</small>
@@ -313,13 +260,13 @@
         </button>
     </div>
 
-    <!-- 1. OT Entry Tab -->
+    <!-- 1. 加班填写上交页面 -->
     <div id="entry-tab" class="tab-content active">
         <h2 style="font-size: 1.1rem; margin-bottom: 12px; color: var(--primary-color);">
             New Overtime Request / Permohonan OT Baharu / 登记加班明细
         </h2>
         <div class="table-responsive">
-            <table id="entryTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Name / Nama / 姓名</th>
@@ -327,12 +274,10 @@
                         <th>Date / Tarikh / 日期</th>
                         <th>Time (Hours) / Masa / 时间</th>
                         <th>Reason / Sebab / 原因</th>
-                        <th class="no-print">Action / Tindakan / 操作</th>
+                        <th class="no-print">Action / 操作</th>
                     </tr>
                 </thead>
-                <tbody id="entryTbody">
-                    <!-- Dynamic Rows -->
-                </tbody>
+                <tbody id="entryTbody"></tbody>
             </table>
         </div>
 
@@ -349,30 +294,28 @@
         </div>
     </div>
 
-    <!-- 2. My Personal Records Tab (View, Add Row, Save & Print) -->
+    <!-- 2. 个人历史记录查看 & 打印页面 -->
     <div id="myrecords-tab" class="tab-content">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
             <h2 style="font-size: 1.1rem; color: var(--primary-color);">
-                My History & Submissions / Rekod Permohonan Saya / 个人历史提交记录
+                My History & Submissions / Rekod Saya / 个人历史提交记录
             </h2>
-            <div class="btn-group no-print" style="margin-top: 0;">
-                <button type="button" class="btn btn-primary" onclick="window.print()">
-                    🖨️ Save PDF / Print / Cetak & Simpan / 保存与打印
-                </button>
-            </div>
+            <button type="button" class="btn btn-primary no-print" onclick="window.print()">
+                🖨️ Save PDF / Print / Cetak & Simpan / 保存与打印
+            </button>
         </div>
 
         <div class="filter-bar no-print">
             <div class="filter-item">
-                <label>Search Name or ID / Cari Nama/ID / 搜索姓名或工号:</label>
+                <label>Search Name or ID / 搜索姓名或工号:</label>
                 <input type="text" id="mySearchInput" placeholder="Enter Name / ID..." oninput="renderMyRecords()">
             </div>
             <div class="filter-item">
-                <label>Status / Status / 状态:</label>
+                <label>Status / 状态:</label>
                 <select id="myStatusFilter" onchange="renderMyRecords()">
-                    <option value="ALL">All Status / Semua Status / 全部状态</option>
-                    <option value="CONFIRMED">CONFIRMED Only / 已确认</option>
-                    <option value="PENDING">PENDING Only / PENDING</option>
+                    <option value="ALL">All Status / 全部状态</option>
+                    <option value="CONFIRMED">CONFIRMED / 已确认</option>
+                    <option value="PENDING">PENDING / 待定</option>
                 </select>
             </div>
         </div>
@@ -381,56 +324,50 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Date / Tarikh / 日期</th>
-                        <th>Name / Nama / 姓名</th>
+                        <th>Date / 日期</th>
+                        <th>Name / 姓名</th>
                         <th>ID / 工号</th>
-                        <th>Hours / Masa / 小时</th>
-                        <th>Reason / Sebab / 原因</th>
-                        <th>Status / Status / 状态</th>
-                        <th class="no-print">Add Row / Quick Action / 快捷操作</th>
+                        <th>Hours / 小时</th>
+                        <th>Reason / 原因</th>
+                        <th>Status / 状态</th>
+                        <th class="no-print">Quick Action / 快捷操作</th>
                     </tr>
                 </thead>
-                <tbody id="myRecordsTbody">
-                    <!-- Dynamic User Records -->
-                </tbody>
+                <tbody id="myRecordsTbody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- 3. HR Archive & Monthly Records Tab -->
+    <!-- 3. HR 月度归档系统 -->
     <div id="archive-tab" class="tab-content">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
             <h2 style="font-size: 1.1rem; color: var(--primary-color);">
                 HR Archive & Monthly Records / Arkib Rekod Bulanan HR / HR月度归档系统
             </h2>
-            <div class="btn-group no-print" style="margin-top: 0;">
-                <button type="button" class="btn btn-primary" onclick="window.print()">
-                    🖨️ Print / Export PDF / Cetak Laporan / 打印与导出 PDF
-                </button>
-            </div>
+            <button type="button" class="btn btn-primary no-print" onclick="window.print()">
+                🖨️ Print / Export PDF / 打印与导出 PDF
+            </button>
         </div>
 
         <div class="filter-bar no-print">
             <div class="filter-item">
-                <label>Filter Month / Tapis Bulan / 月份筛选:</label>
+                <label>Filter Month / 月份筛选:</label>
                 <input type="month" id="hrMonthFilter" onchange="renderHRArchive()">
             </div>
             <div class="filter-item">
-                <label>Filter Year / Tapis Tahun / 年份筛选:</label>
-                <select id="hrYearFilter" onchange="renderHRArchive()">
-                    <option value="ALL">All Years / Semua Tahun / 全部年份</option>
-                </select>
+                <label>Filter Year / 年份筛选:</label>
+                <select id="hrYearFilter" onchange="renderHRArchive()"></select>
             </div>
             <div class="filter-item">
-                <label>Status / Status / 状态:</label>
+                <label>Status / 状态:</label>
                 <select id="hrStatusFilter" onchange="renderHRArchive()">
                     <option value="ALL">All Status / 所有状态</option>
                     <option value="CONFIRMED">CONFIRMED / 已确认</option>
-                    <option value="PENDING">PENDING / PENDING</option>
+                    <option value="PENDING">PENDING / 待定</option>
                 </select>
             </div>
             <div class="filter-item">
-                <label>Search Keyword / Cari / 搜索关键字:</label>
+                <label>Search / 搜索关键字:</label>
                 <input type="text" id="hrSearchInput" placeholder="Name/ID/Reason..." oninput="renderHRArchive()">
             </div>
         </div>
@@ -439,62 +376,48 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Date / Tarikh / 日期</th>
-                        <th>Name / Nama / 姓名</th>
+                        <th>Date / 日期</th>
+                        <th>Name / 姓名</th>
                         <th>ID / 工号</th>
                         <th>Hours / 小时</th>
                         <th>Reason / 原因</th>
                         <th>Status / 状态</th>
-                        <th class="no-print">HR Action / Append / 操作追加</th>
+                        <th class="no-print">HR Action / 操作追加</th>
                     </tr>
                 </thead>
-                <tbody id="hrArchiveTbody">
-                    <!-- Dynamic HR Records -->
-                </tbody>
+                <tbody id="hrArchiveTbody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- 4. Clear & Delete Records Tab -->
+    <!-- 4. 清除记录管理页面 -->
     <div id="clear-tab" class="tab-content">
         <h2 style="font-size: 1.1rem; color: var(--danger-color); margin-bottom: 12px;">
-            Clear Records Management / Pengurusan Padam Rekod / 删除与清理记录管理
+            Clear Records Management / 删除与清理记录管理
         </h2>
-        <p style="margin-bottom: 20px; color: #4b5563;">
-            Carefully select your deletion preference below. You can delete all records or choose specific months/years to remove.
-            <br><small>Sila pilih pilihan pemadaman di bawah. Anda boleh memadam semua rekod atau memilih bulan/tahun tertentu.</small>
-            <br><small>请谨慎选择以下删除选项。您可以清理全部记录或按特定月份/年份删除。</small>
-        </p>
-
         <div style="display: flex; flex-direction: column; gap: 15px; max-width: 600px;">
-            <!-- Delete Selective Month/Year -->
             <div style="background: #fff; border: 1px solid var(--border-color); padding: 16px; border-radius: 8px;">
                 <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--primary-color);">
-                    1. Delete By Specific Month & Year / Padam Mengikut Bulan & Tahun / 按特定月份年份删除
+                    1. Delete By Specific Month / 按特定月份年份删除
                 </h3>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
-                    <div style="flex: 1; min-width: 140px;">
-                        <label style="font-size: 0.8rem; font-weight: bold;">Select Month/Year / Pilih Bulan/Tahun:</label>
-                        <input type="month" id="deleteMonthInput">
-                    </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size: 0.8rem; font-weight: bold;">Select Month/Year / Pilih Bulan/Tahun:</label>
+                    <input type="month" id="deleteMonthInput">
                 </div>
                 <button type="button" class="btn btn-danger" onclick="deleteSelectiveRecords()">
-                    🗑️ Delete Selected Month / Padam Bulan Dipilih / 删除所选月份记录
+                    🗑️ Delete Selected Month / 删除所选月份记录
                 </button>
             </div>
 
-            <!-- Delete Entire Records -->
             <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px;">
                 <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--danger-color);">
-                    2. Delete ALL Records / Padam SEMUA Rekod / 清除全盘所有记录
+                    2. Delete ALL Records / 清除全盘所有记录
                 </h3>
                 <p style="font-size: 0.85rem; color: #991b1b; margin-bottom: 12px;">
                     ⚠️ Warning: This action cannot be undone. All OT records will be permanently erased.
-                    <br><small>Amaran: Tindakan ini tidak boleh dibatalkan.</small>
-                    <br><small>警告：此操作不可逆，将永久擦除所有 OT 记录。</small>
                 </p>
                 <button type="button" class="btn btn-danger" onclick="deleteAllRecords()">
-                    🚨 Clear ALL Records Now / Padam Semua Rekod Sekarang / 立即删除全部记录
+                    🚨 Clear ALL Records Now / 立即删除全部记录
                 </button>
             </div>
         </div>
@@ -502,25 +425,21 @@
 </div>
 
 <script>
-    // LocalStorage Keys
     const STORAGE_RECORDS = 'KAIZEN_OT_RECORDS_V3';
     const STORAGE_HISTORIES = 'KAIZEN_OT_HISTORIES_V3';
     const STORAGE_DRAFT_FORM = 'KAIZEN_OT_DRAFT_FORM';
 
-    // Auto-complete suggestion dictionary
     let histories = JSON.parse(localStorage.getItem(STORAGE_HISTORIES)) || {
         names: [],
         ids: [],
         reasons: ["Machine Maintenance / 机器维修", "Emergency Order / 紧急订单", "Stock Take / 盘点", "Daily Production / 生产加时"]
     };
 
-    // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
         updateDatalists();
         loadDraftOrInit();
         populateYearFilter();
 
-        // Default Filter Dates
         const now = new Date();
         const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         document.getElementById('hrMonthFilter').value = monthStr;
@@ -529,11 +448,9 @@
         renderMyRecords();
         renderHRArchive();
 
-        // Auto Save Listener for Entry Form
         document.getElementById('entryTbody').addEventListener('input', autoSaveDraft);
     });
 
-    // Tab Switcher
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -545,7 +462,6 @@
         if(tabId === 'archive-tab') renderHRArchive();
     }
 
-    // Dynamic Row Insertion for OT Entry
     function addRow(data = {}) {
         const tbody = document.getElementById('entryTbody');
         const tr = document.createElement('tr');
@@ -581,11 +497,10 @@
             btn.closest('tr').remove();
             autoSaveDraft();
         } else {
-            alert('At least one entry row is required! / Sekurang-kurangnya satu baris diperlukan! / 至少保留一行！');
+            alert('At least one row required! / 至少保留一行！');
         }
     }
 
-    // Auto-Save Draft System
     function autoSaveDraft() {
         const rows = document.querySelectorAll('#entryTbody tr');
         const draftData = [];
@@ -600,8 +515,7 @@
         });
 
         localStorage.setItem(STORAGE_DRAFT_FORM, JSON.stringify(draftData));
-        const now = new Date();
-        document.getElementById('autosaveTime').innerText = now.toLocaleTimeString();
+        document.getElementById('autosaveTime').innerText = new Date().toLocaleTimeString();
     }
 
     function loadDraftOrInit() {
@@ -614,7 +528,6 @@
         }
     }
 
-    // Auto-Complete Datalist Helpers
     function updateDatalists() {
         fillDatalist('history-names', histories.names);
         fillDatalist('history-ids', histories.ids);
@@ -641,12 +554,10 @@
         updateDatalists();
     }
 
-    // Submission Logic (CONFIRMED or PENDING)
     function submitData(status) {
         const rows = document.querySelectorAll('#entryTbody tr');
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         let isValid = true;
-
         const newEntries = [];
 
         rows.forEach(row => {
@@ -661,7 +572,7 @@
                 return;
             }
 
-            const recordItem = {
+            newEntries.push({
                 id: 'OT-' + Date.now() + '-' + Math.floor(Math.random()*1000),
                 date: date,
                 name: name,
@@ -670,34 +581,28 @@
                 reason: reason || '-',
                 status: status,
                 submittedAt: new Date().toISOString()
-            };
-
-            newEntries.push(recordItem);
+            });
             saveHistoryTraces(name, empId, reason);
         });
 
         if (!isValid) {
-            alert('Please fill in all required fields (Name, ID, Date, Hours)! / Sila isi semua maklumat yang diwajibkan! / 请完整填写必需项目！');
+            alert('Please fill in all required fields! / 请完整填写必需项目！');
             return;
         }
 
         records = records.concat(newEntries);
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
 
-        // Clear draft & form reset
         localStorage.removeItem(STORAGE_DRAFT_FORM);
         document.getElementById('entryTbody').innerHTML = '';
         addRow();
         populateYearFilter();
 
-        const statusLabel = status === 'CONFIRMED' ? 'CONFIRMED / 确认上交' : 'PENDING / PENDING 上交';
-        alert(`Successfully Saved as [${statusLabel}]! / Berjaya Disimpan! / 成功提交保存！`);
-
+        alert(`Saved as [${status}]! / 成功上交！`);
         renderMyRecords();
         renderHRArchive();
     }
 
-    // Render My Personal Records
     function renderMyRecords() {
         const tbody = document.getElementById('myRecordsTbody');
         tbody.innerHTML = '';
@@ -713,7 +618,7 @@
         });
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding: 20px;">No records found / Tiada rekod dijumpai / 暂无提交记录</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding: 20px;">No records found / 暂无记录</td></tr>`;
             return;
         }
 
@@ -738,7 +643,6 @@
         });
     }
 
-    // Render HR Archive & Monthly System
     function renderHRArchive() {
         const tbody = document.getElementById('hrArchiveTbody');
         tbody.innerHTML = '';
@@ -762,7 +666,7 @@
         });
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding: 20px;">No archive records matching criteria / Tiada rekod / 档案库无符合记录</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding: 20px;">No matching archive records / 无符合档案</td></tr>`;
             return;
         }
 
@@ -792,14 +696,12 @@
         });
     }
 
-    // Quick Append Row based on Past History Item
     function appendFromHistory(name, empId) {
         switchTab('entry-tab');
         addRow({ name: name, empId: empId });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Toggle Pending to Confirmed
     function toggleRecordStatus(id, newStatus) {
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         records = records.map(item => {
@@ -811,7 +713,6 @@
         renderMyRecords();
     }
 
-    // Populate Year Dropdown dynamically
     function populateYearFilter() {
         const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         const years = new Set();
@@ -820,7 +721,7 @@
         });
 
         const select = document.getElementById('hrYearFilter');
-        select.innerHTML = `<option value="ALL">All Years / Semua Tahun / 全部年份</option>`;
+        select.innerHTML = `<option value="ALL">All Years / 全部年份</option>`;
         Array.from(years).sort().reverse().forEach(yr => {
             const opt = document.createElement('option');
             opt.value = yr;
@@ -829,25 +730,20 @@
         });
     }
 
-    // Clear Records Logic
     function deleteSelectiveRecords() {
         const selectedMonth = document.getElementById('deleteMonthInput').value;
         if (!selectedMonth) {
-            alert('Please select a valid month and year! / Sila pilih bulan dan tahun! / 请选择有效月份和年份！');
+            alert('Please select a valid month! / 请选择月份！');
             return;
         }
 
-        if (confirm(`Are you sure you want to delete all records for [${selectedMonth}]?
-Adakah anda pasti mahu memadam rekod untuk [${selectedMonth}]?
-确定删除 [${selectedMonth}] 的所有记录吗？`)) {
+        if (confirm(`Delete all records for [${selectedMonth}]?\n确定删除 [${selectedMonth}] 的所有记录吗？`)) {
             let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
             const initialCount = records.length;
             records = records.filter(item => !item.date.startsWith(selectedMonth));
             
             localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            const deletedCount = initialCount - records.length;
-
-            alert(`Deleted ${deletedCount} records for [${selectedMonth}]. / Berjaya memadam ${deletedCount} rekod. / 已清理 ${deletedCount} 条记录。`);
+            alert(`Deleted ${initialCount - records.length} records. / 已清理记录。`);
             populateYearFilter();
             renderMyRecords();
             renderHRArchive();
@@ -855,14 +751,10 @@ Adakah anda pasti mahu memadam rekod untuk [${selectedMonth}]?
     }
 
     function deleteAllRecords() {
-        if (confirm("🚨 WARNING: Are you sure you want to PERMANENTLY ERASE ALL RECORDS?
-
-Adakah anda pasti mahu memadam SEMUA rekod?
-
-警告：确定要永久清空系统所有加班记录吗？")) {
+        if (confirm("🚨 WARNING: Permanently erase ALL records?\n警告：确定要永久清空系统所有记录吗？")) {
             localStorage.removeItem(STORAGE_RECORDS);
             localStorage.removeItem(STORAGE_DRAFT_FORM);
-            alert("All records have been cleared! / Semua rekod telah dipadam! / 所有记录已成功清空！");
+            alert("All records cleared! / 所有记录已成功清空！");
             
             populateYearFilter();
             renderMyRecords();
@@ -872,7 +764,6 @@ Adakah anda pasti mahu memadam SEMUA rekod?
         }
     }
 
-    // Utility XSS Prevention
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
