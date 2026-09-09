@@ -162,11 +162,11 @@
     </div>
 
     <div id="autosave-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align- items: center; flex-wrap: wrap; margin-bottom: 15px;">
             <h2>💾 Auto-Saved Database System / 自动保存备份系统</h2>
             <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 导出与打印</button>
         </div>
-        <p style="margin-bottom: 10px; color: #6b7280;">实时自动保存草稿与输入记录，确保数据不丢失（每人仅保留最新一条记录）。</p>
+        <p style="margin-bottom: 10px; color: #6b7280;">提交时自动备份数据记录（每人仅保留最新一条记录）。</p>
         <div class="table-responsive">
             <table>
                 <thead>
@@ -415,32 +415,31 @@
 
         tr.innerHTML = `
             <td>
-                <input type="text" class="input-name" list="memory-names" value="${name}" placeholder="Type or Select Name" oninput="onNameChange(this); triggerAutoSave();" onchange="onNameChange(this); triggerAutoSave();">
+                <input type="text" class="input-name" list="memory-names" value="${name}" placeholder="Type or Select Name" oninput="onNameChange(this);" onchange="onNameChange(this);">
             </td>
             <td>
-                <input type="text" class="input-id" list="memory-ids" value="${id}" placeholder="ID" oninput="onIdChange(this); triggerAutoSave();" onchange="onIdChange(this); triggerAutoSave();">
+                <input type="text" class="input-id" list="memory-ids" value="${id}" placeholder="ID" oninput="onIdChange(this);" onchange="onIdChange(this);">
             </td>
             <td>
-                <input type="date" class="input-date" value="${date}" onchange="triggerAutoSave()">
+                <input type="date" class="input-date" value="${date}">
             </td>
             <td>
-                <input type="time" class="input-start" value="${startTime}" onchange="calculateHours(this); triggerAutoSave();">
+                <input type="time" class="input-start" value="${startTime}" onchange="calculateHours(this);">
             </td>
             <td>
-                <input type="time" class="input-end" value="${endTime}" onchange="calculateHours(this); triggerAutoSave();">
+                <input type="time" class="input-end" value="${endTime}" onchange="calculateHours(this);">
             </td>
             <td>
-                <input type="number" step="0.5" class="input-hours" value="${hours}" placeholder="0.0" onchange="triggerAutoSave()">
+                <input type="number" step="0.5" class="input-hours" value="${hours}" placeholder="0.0">
             </td>
             <td>
-                <input type="text" class="input-reason" list="memory-reasons" value="${reason}" placeholder="Reason / Project No." onchange="triggerAutoSave()">
+                <input type="text" class="input-reason" list="memory-reasons" value="${reason}" placeholder="Reason / Project No.">
             </td>
             <td class="no-print">
-                <button type="button" class="btn btn-danger" style="padding: 4px 8px;" onclick="this.closest('tr').remove(); triggerAutoSave();">🗑️</button>
+                <button type="button" class="btn btn-danger" style="padding: 4px 8px;" onclick="this.closest('tr').remove();">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
-        triggerAutoSave();
     }
 
     function onNameChange(inputEl) {
@@ -486,38 +485,25 @@
         }
     }
 
-    function triggerAutoSave() {
-        const currentDept = document.getElementById('mainDeptSelect').value;
-        const rows = document.querySelectorAll('#entryTbody tr');
+    function saveToAutoSaveSystem(newEntries) {
         let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
-
-        // 使用 Map 保存，按姓名排重，保证每个人只出现最新的一条记录
         let autoSaveMap = {};
+
         autoSaveList.forEach(item => {
             autoSaveMap[item.name] = item;
         });
 
-        rows.forEach(row => {
-            const name = row.querySelector('.input-name').value.trim();
-            const empId = row.querySelector('.input-id').value.trim();
-            const date = row.querySelector('.input-date').value;
-            const startTime = row.querySelector('.input-start').value || '--:--';
-            const endTime = row.querySelector('.input-end').value || '--:--';
-            const hours = row.querySelector('.input-hours').value;
-            const reason = row.querySelector('.input-reason').value;
-
-            if (name) {
-                autoSaveMap[name] = {
-                    savedAt: new Date().toLocaleTimeString(),
-                    dept: currentDept,
-                    name: name,
-                    empId: empId || '-',
-                    date: date,
-                    timeRange: `${startTime} - ${endTime}`,
-                    hours: hours || '0',
-                    reason: reason || '-'
-                };
-            }
+        newEntries.forEach(item => {
+            autoSaveMap[item.name] = {
+                savedAt: new Date().toLocaleTimeString(),
+                dept: item.dept,
+                name: item.name,
+                empId: item.empId || '-',
+                date: item.date,
+                timeRange: `${item.startTime} - ${item.endTime}`,
+                hours: item.hours || '0',
+                reason: item.reason || '-'
+            };
         });
 
         localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(Object.values(autoSaveMap)));
@@ -529,6 +515,7 @@
         const rows = document.querySelectorAll('#entryTbody tr');
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         let isValid = true;
+        let entriesToSave = [];
 
         rows.forEach(row => {
             const name = row.querySelector('.input-name').value.trim();
@@ -558,7 +545,8 @@
                 status: status
             };
 
-            // 去重判断：如果在同一天内该员工已有记录，直接更新覆写，不再重复新增
+            entriesToSave.push(newEntry);
+
             const existingIndex = records.findIndex(r => r.date === date && r.name.toLowerCase() === name.toLowerCase());
             if (existingIndex !== -1) {
                 records[existingIndex] = newEntry;
@@ -572,7 +560,9 @@
             return;
         }
 
+        // 只有按 confirm 或 pending 时，才存入提交记录和 Auto-Save 数据库
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+        saveToAutoSaveSystem(entriesToSave);
         
         alert(`Successfully Submitted as [${status}]! / 上交成功！`);
         document.getElementById('entryTbody').innerHTML = '';
@@ -715,5 +705,3 @@
 </script>
 </body>
 </html>
-
-```
