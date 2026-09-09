@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Daily OverTime System / 加班管理系统</title>
+    <title>Kaizen Daily OverTime System / 系统</title>
     <style>
         :root {
             --primary-color: #1e3a8a;
@@ -18,10 +18,10 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding: 12px; font-size: 14px; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 12px; font-size: 13px; }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             background: var(--card-bg);
             padding: 20px;
@@ -30,7 +30,7 @@
         }
 
         header { text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); }
-        h1 { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 6px; }
+        h1 { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 4px; }
         .subtitle { font-size: 0.85rem; color: #6b7280; }
 
         .dept-selector-card {
@@ -49,44 +49,43 @@
         .dept-info span { font-weight: bold; color: var(--primary-color); }
 
         .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); overflow-x: auto; padding-bottom: 2px; }
-        .tab-btn { padding: 10px 16px; border: none; background: #f3f4f6; color: #4b5563; font-weight: 600; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; font-size: 0.9rem; }
+        .tab-btn { padding: 10px 16px; border: none; background: #f3f4f6; color: #4b5563; font-weight: 600; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; font-size: 0.88rem; }
         .tab-btn.active { background: var(--primary-color); color: #ffffff; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; min-width: 750px; background: #ffffff; }
-        th, td { padding: 10px 12px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
-        th { background-color: #f8fafc; color: var(--primary-color); font-weight: 700; font-size: 0.85rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; background: #ffffff; }
+        th, td { padding: 8px 10px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+        th { background-color: #f8fafc; color: var(--primary-color); font-weight: 700; font-size: 0.8rem; }
 
-        input, select { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; }
         input:focus, select:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-add { background: #4b5563; color: white; }
         .btn-confirm { background: var(--success-color); color: white; }
         .btn-pending { background: var(--warning-color); color: #1f2937; }
         .btn-danger { background: var(--danger-color); color: white; }
         .btn-primary { background: var(--primary-color); color: white; }
 
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
         .badge-confirmed { background: #d1fae5; color: #065f46; }
         .badge-pending { background: #fef3c7; color: #92400e; }
 
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .filter-item { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
-        .filter-item label { font-size: 0.75rem; font-weight: 600; color: #6b7280; }
+        .clear-box { background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .clear-box h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--primary-color); }
 
         @media print {
             body { padding: 0; background: white; }
             .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
-            .nav-tabs, .btn-group, .filter-bar, .no-print { display: none !important; }
+            .nav-tabs, .btn-group, .dept-selector-card, .no-print { display: none !important; }
             .tab-content { display: block !important; }
             #entry-tab, #clear-tab { display: none !important; }
             #archive-tab, #myrecords-tab { display: block !important; }
-            th, td { border: 1px solid #000 !important; font-size: 10pt; }
+            th, td { border: 1px solid #000 !important; font-size: 9pt; }
         }
     </style>
 </head>
@@ -94,14 +93,16 @@
 
 <div class="container">
     <header>
-        <h1>Kaizen Daily OverTime System</h1>
-        <div class="subtitle">Sistem Kerja Lebih Masa Harian Kaizen / Kaizen日常加班管理系统</div>
+        <h1>Kaizen Mould Technology Sdn. Bhd.</h1>
+        <div class="subtitle">Daily Overtime Form / Sistem OT Harian / 每日加班申请系统</div>
     </header>
 
-    <!-- 部门选择器与 HOD 信息卡片 -->
+    <!-- 部门选择与 HOD 卡片 -->
     <div class="dept-selector-card no-print">
         <div style="flex: 1; min-width: 200px;">
-            <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">Select Department / 选择部门:</label>
+            <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">
+                Select Department / Pilih Jabatan / 选择部门:
+            </label>
             <select id="mainDeptSelect" onchange="onDepartmentChange()">
                 <option value="ADMIN">ADMIN</option>
                 <option value="PURCHASING">PURCHASING</option>
@@ -117,17 +118,17 @@
             </select>
         </div>
         <div class="dept-info" style="flex: 1; min-width: 250px;">
-            <div>Current Department: <span id="displayDept">ADMIN</span></div>
-            <div>Head of Department (HOD): <span id="displayHOD">KALAISELVI</span></div>
+            <div>Department / 部门: <span id="displayDept">ADMIN</span></div>
+            <div>HOD Approval / 部门主管: <span id="displayHOD">KALAISELVI</span></div>
         </div>
     </div>
 
-    <!-- 导航标签 -->
+    <!-- 导航选项卡 -->
     <div class="nav-tabs no-print">
-        <button class="tab-btn active" onclick="switchTab('entry-tab')">📝 Submit OT / 登记上交</button>
-        <button class="tab-btn" onclick="switchTab('myrecords-tab')">👤 My Records / 个人记录</button>
-        <button class="tab-btn" onclick="switchTab('archive-tab')">📁 HR Archive / 月度归档</button>
-        <button class="tab-btn" onclick="switchTab('clear-tab')">🗑️ Clear Records / 清理记录</button>
+        <button class="tab-btn active" onclick="switchTab('entry-tab')">📝 Submit OT / Hantar OT / 登记上交</button>
+        <button class="tab-btn" onclick="switchTab('myrecords-tab')">👤 My Records / Rekod Saya / 个人记录</button>
+        <button class="tab-btn" onclick="switchTab('archive-tab')">📁 HR Archive / Arkib HR / 月度归档</button>
+        <button class="tab-btn" onclick="switchTab('clear-tab')">🗑️ Clear Records / Padam Rekod / 清理记录</button>
     </div>
 
     <!-- 1. 加班登记页面 -->
@@ -136,11 +137,13 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Employee Name / 姓名</th>
+                        <th>Employee / Pekerja / 员工</th>
                         <th>Emp ID / 工号</th>
                         <th>Date / 日期</th>
-                        <th>Time (Hours) / 时间</th>
-                        <th>Reason / 原因</th>
+                        <th>Start Time / 开始</th>
+                        <th>End Time / 结束</th>
+                        <th>Hours / 小时</th>
+                        <th>Purpose & Reason / Sebab / 原因</th>
                         <th class="no-print">Action / 操作</th>
                     </tr>
                 </thead>
@@ -149,65 +152,17 @@
         </div>
 
         <div class="btn-group no-print">
-            <button type="button" class="btn btn-add" onclick="addRow()">➕ Add Row / 添加新行</button>
-            <button type="button" class="btn btn-confirm" onclick="submitData('CONFIRMED')">✅ Confirm Submission / 确认上交</button>
-            <button type="button" class="btn btn-pending" onclick="submitData('PENDING')">⏳ Save as PENDING / PENDING 上交</button>
+            <button type="button" class="btn btn-add" onclick="addRow()">➕ Add Row / Tambah / 添加新行</button>
+            <button type="button" class="btn btn-confirm" onclick="submitData('CONFIRMED')">✅ Confirm Submission / Pengesahan / 确认上交</button>
+            <button type="button" class="btn btn-pending" onclick="submitData('PENDING')">⏳ Save PENDING / Simpan PENDING / PENDING 上交</button>
         </div>
     </div>
 
-    <!-- 2. 个人查看/打印页面 -->
+    <!-- 2. 个人记录查看 & 打印页面 -->
     <div id="myrecords-tab" class="tab-content">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
-            <h2>My Submissions / 个人上交记录</h2>
-            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Print / 保存PDF</button>
-        </div>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date / 日期</th>
-                        <th>Dept / 部门</th>
-                        <th>HOD / 部门主管</th>
-                        <th>Name / 姓名</th>
-                        <th>ID / 工号</th>
-                        <th>Hours / 小时</th>
-                        <th>Reason / 原因</th>
-                        <th>Status / 状态</th>
-                    </tr>
-                </thead>
-                <tbody id="myRecordsTbody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- 3. HR 归档页面 -->
-    <div id="archive-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
-            <h2>HR Monthly Archive / HR 月度归档</h2>
-            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Print / 导出PDF</button>
-        </div>
-        <div class="filter-bar no-print">
-            <div class="filter-item">
-                <label>Filter Dept / 部门:</label>
-                <select id="hrDeptFilter" onchange="renderHRArchive()">
-                    <option value="ALL">All Departments / 全部部门</option>
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="PURCHASING">PURCHASING</option>
-                    <option value="CAD">CAD</option>
-                    <option value="CAM">CAM</option>
-                    <option value="CNC">CNC</option>
-                    <option value="EDM">EDM</option>
-                    <option value="PROJECT">PROJECT</option>
-                    <option value="POLISHING">POLISHING</option>
-                    <option value="PRODUCTION">PRODUCTION</option>
-                    <option value="MOULD MAKER">MOULD MAKER</option>
-                    <option value="QC">QC</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>Filter Month / 月份:</label>
-                <input type="month" id="hrMonthFilter" onchange="renderHRArchive()">
-            </div>
+            <h2>My Submissions / Rekod Saya / 个人上交记录</h2>
+            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / Cetak & Simpan / 保存与打印</button>
         </div>
         <div class="table-responsive">
             <table>
@@ -218,6 +173,33 @@
                         <th>HOD / 主管</th>
                         <th>Name / 姓名</th>
                         <th>ID / 工号</th>
+                        <th>Time / 时间段</th>
+                        <th>Hours / 小时</th>
+                        <th>Reason / 原因</th>
+                        <th>Status / 状态</th>
+                    </tr>
+                </thead>
+                <tbody id="myRecordsTbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3. HR 归档系统 -->
+    <div id="archive-tab" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+            <h2>HR Monthly Archive / Arkib HR / HR 月度归档</h2>
+            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 导出PDF与打印</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date / 日期</th>
+                        <th>Dept / 部门</th>
+                        <th>HOD / 主管</th>
+                        <th>Name / 姓名</th>
+                        <th>ID / 工号</th>
+                        <th>Time / 时间段</th>
                         <th>Hours / 小时</th>
                         <th>Reason / 原因</th>
                         <th>Status / 状态</th>
@@ -229,15 +211,46 @@
         </div>
     </div>
 
-    <!-- 4. 清理页面 -->
+    <!-- 4. 清理记录管理页面 -->
     <div id="clear-tab" class="tab-content">
-        <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records / 清除记录</h2>
-        <button class="btn btn-danger" onclick="deleteAllRecords()">🚨 Delete ALL Records / 彻底清空所有记录</button>
+        <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records Management / Pengurusan Padam Rekod / 清理记录管理</h2>
+        
+        <!-- 按时间段删除 -->
+        <div class="clear-box">
+            <h3>1. Delete By Specific Date Range / 按时间段（日期范围）删除</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                <div style="flex:1; min-width: 140px;">
+                    <label>Start Date / 开始日期:</label>
+                    <input type="date" id="clearStartDate">
+                </div>
+                <div style="flex:1; min-width: 140px;">
+                    <label>End Date / 结束日期:</label>
+                    <input type="date" id="clearEndDate">
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="deleteByDateRange()">🗑️ Delete Range Records / 删除指定日期段记录</button>
+        </div>
+
+        <!-- 按月份删除 -->
+        <div class="clear-box">
+            <h3>2. Delete By Specific Month / 按特定月份删除</h3>
+            <div style="margin-bottom: 10px; max-width: 250px;">
+                <label>Select Month / 选择月份:</label>
+                <input type="month" id="clearMonthInput">
+            </div>
+            <button class="btn btn-danger" onclick="deleteByMonth()">🗑️ Delete Selected Month / 删除所选月份记录</button>
+        </div>
+
+        <!-- 全盘清空 -->
+        <div class="clear-box" style="background: #fef2f2; border-color: #fecaca;">
+            <h3 style="color: var(--danger-color);">3. Clear ALL Records / 清除全盘所有记录</h3>
+            <p style="margin-bottom: 10px; color: #991b1b;">⚠️ Warning: All records will be permanently erased. / 警告：所有历史加班记录将被永久擦除。</p>
+            <button class="btn btn-danger" onclick="deleteAllRecords()">🚨 CLEAR ALL RECORDS / 彻底清空所有记录</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 部门主管 HOD 映射规则
     const HOD_MAP = {
         'ADMIN': 'KALAISELVI',
         'PURCHASING': 'KALAISELVI',
@@ -252,7 +265,6 @@
         'QC': 'TAN KAH CHYE ( 266 )'
     };
 
-    // 员工完整数据库
     const EMPLOYEES_DB = [
         { dept: 'ADMIN', name: 'KISTINNA ANAQIN', id: '316' },
         { dept: 'ADMIN', name: 'TAN KYLE', id: '328' },
@@ -301,12 +313,15 @@
         { dept: 'QC', name: 'NUR LIANA SOFIA', id: '323' }
     ];
 
-    const STORAGE_RECORDS = 'KAIZEN_OT_RECORDS_V4';
+    const STORAGE_RECORDS = 'KAIZEN_OT_RECORDS_V5';
 
     document.addEventListener('DOMContentLoaded', () => {
         onDepartmentChange();
         const now = new Date();
-        document.getElementById('hrMonthFilter').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const todayStr = now.toISOString().split('T')[0];
+        document.getElementById('clearStartDate').value = todayStr;
+        document.getElementById('clearEndDate').value = todayStr;
+        document.getElementById('clearMonthInput').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     });
 
     function switchTab(tabId) {
@@ -323,8 +338,6 @@
         const dept = document.getElementById('mainDeptSelect').value;
         document.getElementById('displayDept').innerText = dept;
         document.getElementById('displayHOD').innerText = HOD_MAP[dept] || '-';
-        
-        // 重置表格为该部门
         document.getElementById('entryTbody').innerHTML = '';
         addRow();
     }
@@ -354,10 +367,16 @@
                 <input type="date" class="input-date" value="${todayStr}">
             </td>
             <td>
-                <input type="number" step="0.5" class="input-time" placeholder="Hours">
+                <input type="time" class="input-start" onchange="calculateHours(this)">
             </td>
             <td>
-                <input type="text" class="input-reason" placeholder="Overtime Reason">
+                <input type="time" class="input-end" onchange="calculateHours(this)">
+            </td>
+            <td>
+                <input type="number" step="0.5" class="input-hours" placeholder="0.0">
+            </td>
+            <td>
+                <input type="text" class="input-reason" placeholder="Reason / Project No.">
             </td>
             <td class="no-print">
                 <button type="button" class="btn btn-danger" style="padding: 4px 8px;" onclick="this.closest('tr').remove()">🗑️</button>
@@ -373,6 +392,25 @@
         row.querySelector('.input-id').value = empId;
     }
 
+    function calculateHours(inputEl) {
+        const row = inputEl.closest('tr');
+        const startTime = row.querySelector('.input-start').value;
+        const endTime = row.querySelector('.input-end').value;
+
+        if (startTime && endTime) {
+            const start = new Date(`1970-01-01T${startTime}:00`);
+            let end = new Date(`1970-01-01T${endTime}:00`);
+            
+            if (end < start) {
+                end.setDate(end.getDate() + 1); // 跨夜加班处理
+            }
+            
+            const diffMs = end - start;
+            const diffHrs = (diffMs / (1000 * 60 * 60)).toFixed(1);
+            row.querySelector('.input-hours').value = diffHrs;
+        }
+    }
+
     function submitData(status) {
         const currentDept = document.getElementById('mainDeptSelect').value;
         const hod = HOD_MAP[currentDept];
@@ -385,7 +423,9 @@
             const name = row.querySelector('.input-name').value;
             const empId = row.querySelector('.input-id').value;
             const date = row.querySelector('.input-date').value;
-            const hours = row.querySelector('.input-time').value;
+            const startTime = row.querySelector('.input-start').value || '--:--';
+            const endTime = row.querySelector('.input-end').value || '--:--';
+            const hours = row.querySelector('.input-hours').value;
             const reason = row.querySelector('.input-reason').value;
 
             if (!name || !hours || !date) {
@@ -400,6 +440,8 @@
                 date: date,
                 name: name,
                 empId: empId,
+                startTime: startTime,
+                endTime: endTime,
                 hours: hours,
                 reason: reason || '-',
                 status: status
@@ -407,14 +449,14 @@
         });
 
         if (!isValid) {
-            alert('Please fill all employee and hours fields! / 请把员工与时间填写完整！');
+            alert('Please select Employee and input Hours/Time! / 请把员工与时间填写完整！');
             return;
         }
 
         records = records.concat(newEntries);
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
         
-        alert(`Successfully Submitted as [${status}]!`);
+        alert(`Successfully Submitted as [${status}]! / 上交成功！`);
         document.getElementById('entryTbody').innerHTML = '';
         addRow();
     }
@@ -432,6 +474,7 @@
                 <td>${item.hod}</td>
                 <td><strong>${item.name}</strong></td>
                 <td>${item.empId}</td>
+                <td>${item.startTime} - ${item.endTime}</td>
                 <td>${item.hours} hrs</td>
                 <td>${item.reason}</td>
                 <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
@@ -444,16 +487,8 @@
         const tbody = document.getElementById('hrArchiveTbody');
         tbody.innerHTML = '';
         const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        const deptFilter = document.getElementById('hrDeptFilter').value;
-        const monthFilter = document.getElementById('hrMonthFilter').value;
 
-        const filtered = records.filter(item => {
-            const matchDept = deptFilter === 'ALL' || item.dept === deptFilter;
-            const matchMonth = !monthFilter || item.date.startsWith(monthFilter);
-            return matchDept && matchMonth;
-        });
-
-        filtered.reverse().forEach(item => {
+        records.reverse().forEach(item => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${item.date}</td>
@@ -461,6 +496,7 @@
                 <td>${item.hod}</td>
                 <td><strong>${item.name}</strong></td>
                 <td>${item.empId}</td>
+                <td>${item.startTime} - ${item.endTime}</td>
                 <td>${item.hours} hrs</td>
                 <td>${item.reason}</td>
                 <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
@@ -482,10 +518,47 @@
         renderHRArchive();
     }
 
+    function deleteByDateRange() {
+        const start = document.getElementById('clearStartDate').value;
+        const end = document.getElementById('clearEndDate').value;
+        if (!start || !end) {
+            alert('Please select both Start and End Dates! / 请选择完整开始与结束日期！');
+            return;
+        }
+
+        if (confirm(`Delete records from ${start} to ${end}?\n确定删除从 ${start} 至 ${end} 的记录吗？`)) {
+            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+            const initialCount = records.length;
+            records = records.filter(item => item.date < start || item.date > end);
+            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+            alert(`Deleted ${initialCount - records.length} records. / 成功删除记录。`);
+            renderMyRecords();
+            renderHRArchive();
+        }
+    }
+
+    function deleteByMonth() {
+        const selectedMonth = document.getElementById('clearMonthInput').value;
+        if (!selectedMonth) {
+            alert('Please select a Month! / 请选择月份！');
+            return;
+        }
+
+        if (confirm(`Delete all records for [${selectedMonth}]?\n确定删除 [${selectedMonth}] 的所有记录吗？`)) {
+            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+            const initialCount = records.length;
+            records = records.filter(item => !item.date.startsWith(selectedMonth));
+            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+            alert(`Deleted ${initialCount - records.length} records. / 成功删除记录。`);
+            renderMyRecords();
+            renderHRArchive();
+        }
+    }
+
     function deleteAllRecords() {
-        if(confirm("🚨 Are you sure you want to delete ALL records?\n确定要永久清空记录吗？")) {
+        if(confirm("🚨 CLEAR ALL RECORDS?\n警告：确定要永久清空系统所有记录吗？")) {
             localStorage.removeItem(STORAGE_RECORDS);
-            alert("All records cleared!");
+            alert("All records cleared! / 所有记录已成功清空！");
             renderMyRecords();
             renderHRArchive();
         }
