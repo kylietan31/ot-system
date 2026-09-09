@@ -162,7 +162,7 @@
     </div>
 
     <div id="autosave-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align- items: center; flex-wrap: wrap; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
             <h2>💾 Auto-Saved Database System / 自动保存备份系统</h2>
             <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 导出与打印</button>
         </div>
@@ -241,8 +241,42 @@
     <div id="clear-tab" class="tab-content">
         <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records Management / 清理记录管理</h2>
         
+        <!-- 新增功能：按部门删除 -->
+        <div class="clear-box" style="border-left: 4px solid var(--primary-color);">
+            <h3>🏢 1. Delete By Specific Department / 按指定部门删除</h3>
+            <div style="margin-bottom: 10px; max-width: 300px;">
+                <label>Select Department / 选择要删除的部门:</label>
+                <select id="clearDeptSelect">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="PURCHASING">PURCHASING</option>
+                    <option value="CAD">CAD</option>
+                    <option value="CAM">CAM</option>
+                    <option value="CNC">CNC</option>
+                    <option value="EDM">EDM</option>
+                    <option value="PROJECT">PROJECT</option>
+                    <option value="POLISHING">POLISHING</option>
+                    <option value="PRODUCTION">PRODUCTION</option>
+                    <option value="MOULD MAKER">MOULD MAKER</option>
+                    <option value="QC">QC</option>
+                </select>
+            </div>
+            <button class="btn btn-danger" onclick="deleteByDepartment()">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
+        </div>
+
+        <!-- 新增功能：按特定员工姓名/工号删除 -->
+        <div class="clear-box" style="border-left: 4px solid #8b5cf6;">
+            <h3>👤 2. Delete By Specific Employee / 按指定员工姓名或工号删除</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                <div style="flex:1; min-width: 180px;">
+                    <label>Employee Name or ID / 员工姓名或工号:</label>
+                    <input type="text" id="clearEmpInput" placeholder="Enter Name or ID (e.g. TAN KYLE or 328)">
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="deleteByEmployee()">🗑️ Delete Employee Records / 删除该员工所有记录</button>
+        </div>
+
         <div class="clear-box">
-            <h3>1. Delete By Specific Date Range & Time / 按特定日期段与时间范围删除</h3>
+            <h3>📅 3. Delete By Specific Date Range / 按特定日期段删除</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
                 <div style="flex:1; min-width: 130px;">
                     <label>Start Date / 开始日期:</label>
@@ -257,7 +291,7 @@
         </div>
 
         <div class="clear-box">
-            <h3>2. Delete By Specific Month / 按特定月份删除</h3>
+            <h3>📆 4. Delete By Specific Month / 按特定月份删除</h3>
             <div style="margin-bottom: 10px; max-width: 250px;">
                 <label>Select Month / 选择月份:</label>
                 <input type="month" id="clearMonthInput">
@@ -266,7 +300,7 @@
         </div>
 
         <div class="clear-box">
-            <h3>3. Delete By Specific Year / 按特定年份删除</h3>
+            <h3>🗓️ 5. Delete By Specific Year / 按特定年份删除</h3>
             <div style="margin-bottom: 10px; max-width: 250px;">
                 <label>Select Year / 选择年份:</label>
                 <input type="number" id="clearYearInput" placeholder="e.g. 2026" min="2020" max="2099">
@@ -275,7 +309,7 @@
         </div>
 
         <div class="clear-box" style="background: #fef2f2; border-color: #fecaca;">
-            <h3 style="color: var(--danger-color);">4. CLEAR ALL RECORDS / 彻底清空所有记录</h3>
+            <h3 style="color: var(--danger-color);">🚨 6. CLEAR ALL RECORDS / 彻底清空所有记录</h3>
             <p style="margin-bottom: 10px; color: #991b1b;">⚠️ Warning: All saved & auto-saved records will be permanently erased.</p>
             <button class="btn btn-danger" onclick="deleteAllRecords()">🚨 CLEAR ALL / 清空全盘数据</button>
         </div>
@@ -560,7 +594,6 @@
             return;
         }
 
-        // 只有按 confirm 或 pending 时，才存入提交记录和 Auto-Save 数据库
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
         saveToAutoSaveSystem(entriesToSave);
         
@@ -630,8 +663,9 @@
                 <td>${item.hours} hrs</td>
                 <td>${item.reason}</td>
                 <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
-                <td class="no-print">
+                <td class="no-print" style="display: flex; gap: 4px;">
                     ${item.status === 'PENDING' ? `<button class="btn btn-confirm" style="padding: 3px 6px; font-size: 0.75rem;" onclick="changeStatus('${item.id}', 'CONFIRMED')">Set CONFIRMED</button>` : ''}
+                    <button class="btn btn-danger" style="padding: 3px 6px; font-size: 0.75rem;" onclick="deleteSingleRecord('${item.id}')">🗑️ Delete</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -646,6 +680,55 @@
         });
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
         renderHRArchive();
+    }
+
+    function deleteSingleRecord(id) {
+        if(confirm("Delete this single record?\n确定删除这条单笔记录吗？")) {
+            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+            renderHRArchive();
+        }
+    }
+
+    /* 新增删除功能：按部门删除 */
+    function deleteByDepartment() {
+        const dept = document.getElementById('clearDeptSelect').value;
+        if (confirm(`Delete ALL records for department [${dept}]?\n确定要删除 [${dept}] 部门的所有记录吗？`)) {
+            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+            let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
+
+            records = records.filter(item => item.dept !== dept);
+            autoSaveList = autoSaveList.filter(item => item.dept !== dept);
+
+            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+            localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(autoSaveList));
+
+            alert(`Department [${dept}] records successfully deleted! / [${dept}] 部门记录已全被删除！`);
+        }
+    }
+
+    /* 新增删除功能：按员工姓名或工号删除 */
+    function deleteByEmployee() {
+        const keyword = document.getElementById('clearEmpInput').value.trim().toLowerCase();
+        if (!keyword) {
+            alert('Please enter Employee Name or ID! / 请输入员工姓名或工号！');
+            return;
+        }
+
+        if (confirm(`Delete all records for employee matching "${keyword}"?\n确定删除匹配 "${keyword}" 的员工所有记录吗？`)) {
+            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
+            let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
+
+            records = records.filter(item => item.name.toLowerCase() !== keyword && item.empId.toLowerCase() !== keyword);
+            autoSaveList = autoSaveList.filter(item => item.name.toLowerCase() !== keyword && item.empId.toLowerCase() !== keyword);
+
+            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+            localStorage.setItem(STORAGE_AUTOSAVE, JSON.stringify(autoSaveList));
+
+            alert(`Records for "${keyword}" successfully deleted! / 指定员工记录已删除！`);
+            document.getElementById('clearEmpInput').value = '';
+        }
     }
 
     function deleteByDateRange() {
