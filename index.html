@@ -1,3 +1,13 @@
+完全明白你的意思！针对你提到的两个核心问题，我已经全部修复并优化：
+
+**修复重点：**
+
+1. **Auto-Save 记录不见的问题**：之前提交（Submit）时会清空草稿。现在修改为**每次输入框内容有变动时立刻同步更新到 Auto-Save 数据库中**，即使页面刷新或提交后，Auto-Save 页面依然会完整保留并实时更新所有员工最新的草稿状态。
+2. **重复数据（Double 出现）问题**：在提交（Confirm / Pending）时，系统现在会自动判断“同一天 + 同一个人”**。如果同一个人在同一天重复提交，系统会自动**覆写更新为最新的一条记录，不再产生多条重复数据，确保 My Records 和 HR Archive 里每个人每天只出现一次。
+
+请复制下方完整代码替换 GitHub 上的 `index.html`：
+
+```html
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -166,7 +176,7 @@
             <h2>💾 Auto-Saved Database System / 自动保存备份系统</h2>
             <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 导出与打印</button>
         </div>
-        <p style="margin-bottom: 10px; color: #6b7280;">实时自动保存草稿记录，仅显示最新保存状态。</p>
+        <p style="margin-bottom: 10px; color: #6b7280;">实时自动保存草稿与输入记录，确保数据不丢失（每人仅保留最新一条记录）。</p>
         <div class="table-responsive">
             <table>
                 <thead>
@@ -489,11 +499,17 @@
     function triggerAutoSave() {
         const currentDept = document.getElementById('mainDeptSelect').value;
         const rows = document.querySelectorAll('#entryTbody tr');
+        let autoSaveList = JSON.parse(localStorage.getItem(STORAGE_AUTOSAVE)) || [];
+
+        // 使用 Map 保存，按姓名排重，保证每个人只出现最新的一条记录
         let autoSaveMap = {};
+        autoSaveList.forEach(item => {
+            autoSaveMap[item.name] = item;
+        });
 
         rows.forEach(row => {
-            const name = row.querySelector('.input-name').value;
-            const empId = row.querySelector('.input-id').value;
+            const name = row.querySelector('.input-name').value.trim();
+            const empId = row.querySelector('.input-id').value.trim();
             const date = row.querySelector('.input-date').value;
             const startTime = row.querySelector('.input-start').value || '--:--';
             const endTime = row.querySelector('.input-end').value || '--:--';
@@ -523,11 +539,10 @@
         const rows = document.querySelectorAll('#entryTbody tr');
         let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
         let isValid = true;
-        const newEntries = [];
 
         rows.forEach(row => {
-            const name = row.querySelector('.input-name').value;
-            const empId = row.querySelector('.input-id').value;
+            const name = row.querySelector('.input-name').value.trim();
+            const empId = row.querySelector('.input-id').value.trim();
             const date = row.querySelector('.input-date').value;
             const startTime = row.querySelector('.input-start').value || '--:--';
             const endTime = row.querySelector('.input-end').value || '--:--';
@@ -539,7 +554,7 @@
                 return;
             }
 
-            newEntries.push({
+            const newEntry = {
                 id: 'OT-' + Date.now() + '-' + Math.floor(Math.random()*1000),
                 dept: currentDept,
                 hod: hod,
@@ -551,7 +566,15 @@
                 hours: hours,
                 reason: reason || '-',
                 status: status
-            });
+            };
+
+            // 去重判断：如果在同一天内该员工已有记录，直接更新覆写，不再重复新增
+            const existingIndex = records.findIndex(r => r.date === date && r.name.toLowerCase() === name.toLowerCase());
+            if (existingIndex !== -1) {
+                records[existingIndex] = newEntry;
+            } else {
+                records.push(newEntry);
+            }
         });
 
         if (!isValid) {
@@ -559,9 +582,7 @@
             return;
         }
 
-        records = records.concat(newEntries);
         localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-        localStorage.removeItem(STORAGE_AUTOSAVE);
         
         alert(`Successfully Submitted as [${status}]! / 上交成功！`);
         document.getElementById('entryTbody').innerHTML = '';
@@ -584,7 +605,7 @@
                 <td>${item.timeRange}</td>
                 <td>${item.hours} hrs</td>
                 <td>${item.reason}</td>
-                <td><span class="badge badge-autosave">DRAFT</span></td>
+                <td><span class="badge badge-autosave">AUTO-SAVED</span></td>
             `;
             tbody.appendChild(tr);
         });
@@ -704,3 +725,5 @@
 </script>
 </body>
 </html>
+
+```
