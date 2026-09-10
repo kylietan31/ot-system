@@ -118,6 +118,7 @@
                 <option value="PRODUCTION">PRODUCTION</option>
                 <option value="MOULD MAKER">MOULD MAKER</option>
                 <option value="QC">QC</option>
+                <option value="INJENCTION TRIAL">INJENCTION TRIAL</option>
             </select>
         </div>
         <div class="dept-info" style="flex: 1; min-width: 250px;">
@@ -229,6 +230,7 @@
                     <option value="PRODUCTION">PRODUCTION</option>
                     <option value="MOULD MAKER">MOULD MAKER</option>
                     <option value="QC">QC</option>
+                    <option value="INJENCTION TRIAL">INJENCTION TRIAL</option>
                 </select>
             </div>
             <button class="btn btn-danger" onclick="deleteByDepartment()">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
@@ -302,7 +304,8 @@
         'POLISHING': 'CHONG FAT KEONG ( 003 )',
         'PRODUCTION': 'CHONG FAT KEONG ( 003 )',
         'MOULD MAKER': 'LEE YOONG HON ( 272 )',
-        'QC': 'TAN KAH CHYE ( 266 )'
+        'QC': 'TAN KAH CHYE ( 266 )',
+        'INJENCTION TRIAL': 'KALAISELVI'
     };
 
     const EMPLOYEES_DB = [
@@ -350,7 +353,8 @@
         { dept: 'MOULD MAKER', name: 'SARATH', id: '322' },
         { dept: 'MOULD MAKER', name: 'GOH CHEE KUAN', id: '326' },
         { dept: 'QC', name: 'TAN KAH CHYE', id: '266' },
-        { dept: 'QC', name: 'NUR LIANA SOFIA', id: '323' }
+        { dept: 'QC', name: 'NUR LIANA SOFIA', id: '323' },
+        { dept: 'INJENCTION TRIAL', name: 'MAHAJI', id: '329' }
     ];
 
     const STORAGE_RECORDS = 'KAIZEN_OT_SUBMISSIONS_V6';
@@ -687,11 +691,12 @@
         }
     }
 
-    /* 彻底清空所有记录 */
+    /* 清空所有记录 */
     function deleteAllRecords() {
-        if (confirm("🚨 WARNING: Are you sure you want to PERMANENTLY erase ALL records?\n🚨 警告：确定要彻底清空全盘所有记录吗？此操作无法撤销！")) {
+        if (confirm("🚨 WARNING: Are you sure you want to delete ALL records?\n⚠️ 警告：确定要彻底清空全盘所有记录吗？此操作不可恢复！")) {
             localStorage.removeItem(STORAGE_RECORDS);
-            alert("All records have been completely wiped.\n全盘数据已彻底清空！");
+            alert("All records have been cleared!\n所有记录已被彻底清空！");
+            location.reload();
         }
     }
 </script>
