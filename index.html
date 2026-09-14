@@ -6,7 +6,7 @@
     <title>Kaizen Mould Technology - Daily Overtime Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase App & Database (v9 Dynamic Modules) -->
+    <!-- Firebase App & Database -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
@@ -39,20 +39,33 @@
             </div>
         </div>
 
-        <!-- Department Control Panel -->
+        <!-- Department Control Panel (Separated Departments) -->
         <div class="bg-blue-50/50 p-4 m-6 rounded-lg border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
             <div class="flex items-center gap-3 w-full md:w-auto">
-                <label class="text-sm font-bold text-blue-900 whitespace-nowrap" id="lblSelectDept">Select Department / Pilih Jabatan / 选择部门:</label>
-                <select id="deptSelect" onchange="onDeptChange()" class="bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-2 focus:ring-blue-500 w-full md:w-80 font-medium">
-                    <option value="CAD_CAM_CNC">CAD, CAM & CNC DEPARTMENT</option>
-                    <option value="EDM_PROJECT_PRODUCTION">EDM, PROJECT, POLISHING, PRODUCTION & INJECTION TRIAL</option>
+                <label class="text-sm font-bold text-blue-900 whitespace-nowrap" id="lblSelectDept">Select Department / 选择部门:</label>
+                <select id="deptSelect" onchange="onDeptChange()" class="bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-2 focus:ring-blue-500 w-full md:w-80 font-bold">
+                    <!-- CAD, CAM, CNC Separate -->
+                    <option value="CAD">CAD DEPARTMENT</option>
+                    <option value="CAM">CAM DEPARTMENT</option>
+                    <option value="CNC">CNC DEPARTMENT</option>
+                    
+                    <!-- EDM, Project, Polishing, Production, Injection Trial Separate -->
+                    <option value="EDM">EDM DEPARTMENT</option>
+                    <option value="PROJECT">PROJECT DEPARTMENT</option>
+                    <option value="POLISHING">POLISHING DEPARTMENT</option>
+                    <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
+                    <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
+                    
                     <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
                     <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
-                    <option value="ADMIN_HR_PURCHASING" selected>ADMIN, HR & PURCHASING DEPARTMENT</option>
+                    
+                    <!-- Admin & Purchasing/HR Separate -->
+                    <option value="ADMIN" selected>ADMIN DEPARTMENT</option>
+                    <option value="PURCHASING_HR">PURCHASING & HR DEPARTMENT</option>
                 </select>
             </div>
             <div class="text-right text-xs text-slate-600">
-                <div><span id="lblDept">Department / 部门:</span> <strong id="currentDeptDisplay" class="text-blue-900 font-bold">ADMIN, HR & PURCHASING</strong></div>
+                <div><span id="lblDept">Department / 部门:</span> <strong id="currentDeptDisplay" class="text-blue-900 font-bold">ADMIN DEPARTMENT</strong></div>
                 <div><span id="lblHod">HOD Approval / 部门主管:</span> <strong id="currentHodDisplay" class="text-slate-900 font-bold">KALAISELVI A/P SOORIAMOORTHY</strong></div>
             </div>
         </div>
@@ -60,16 +73,16 @@
         <!-- Navigation Tabs -->
         <div class="px-6 flex flex-wrap gap-2 border-b border-slate-200 no-print">
             <button onclick="switchTab('submit')" id="tab-submit" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-blue-900 text-white flex items-center gap-2">
-                📝 <span id="navSubmit">Submit OT / Hantar OT / 登记上交</span>
+                📝 <span id="navSubmit">Submit OT / 登记上交</span>
             </button>
             <button onclick="switchTab('myrecords')" id="tab-myrecords" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
-                👤 <span id="navRecords">My Records / Rekod Saya / 个人记录</span>
+                👤 <span id="navRecords">My Records / 个人记录</span>
             </button>
             <button onclick="switchTab('archive')" id="tab-archive" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
-                📁 <span id="navArchive">HR Archive / Arkib HR / 月度归档</span>
+                📁 <span id="navArchive">HR Archive / 月度归档</span>
             </button>
             <button onclick="switchTab('clear')" id="tab-clear" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
-                🗑️ <span id="navClear">Clear Records / Padam Rekod / 清理记录</span>
+                🗑️ <span id="navClear">Clear Records / 清理记录</span>
             </button>
         </div>
 
@@ -96,7 +109,7 @@
             </div>
             <div class="flex flex-wrap gap-3">
                 <button onclick="addInputRow()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
-                    ➕ <span id="btnAddRow">Add Row / Tambah / 添加新行</span>
+                    ➕ <span id="btnAddRow">Add Row / 添加新行</span>
                 </button>
                 <button onclick="submitRecords('SUBMITTED')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
                     ✅ <span id="btnConfirm">Confirm Submission / 确认上交</span>
@@ -172,12 +185,19 @@
             <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
                 <h4 class="font-bold text-sm text-slate-700">🏢 1. Delete By Specific Department / 按指定部门删除</h4>
                 <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
-                    <select id="clearDeptSelect" class="border border-slate-300 rounded p-2 text-sm w-full md:w-64">
-                        <option value="CAD_CAM_CNC">CAD, CAM & CNC DEPARTMENT</option>
-                        <option value="EDM_PROJECT_PRODUCTION">EDM, PROJECT, POLISHING, PRODUCTION & INJECTION TRIAL</option>
+                    <select id="clearDeptSelect" class="border border-slate-300 rounded p-2 text-sm w-full md:w-64 font-medium">
+                        <option value="CAD">CAD DEPARTMENT</option>
+                        <option value="CAM">CAM DEPARTMENT</option>
+                        <option value="CNC">CNC DEPARTMENT</option>
+                        <option value="EDM">EDM DEPARTMENT</option>
+                        <option value="PROJECT">PROJECT DEPARTMENT</option>
+                        <option value="POLISHING">POLISHING DEPARTMENT</option>
+                        <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
+                        <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
                         <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
                         <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
-                        <option value="ADMIN_HR_PURCHASING">ADMIN, HR & PURCHASING DEPARTMENT</option>
+                        <option value="ADMIN">ADMIN DEPARTMENT</option>
+                        <option value="PURCHASING_HR">PURCHASING & HR DEPARTMENT</option>
                     </select>
                     <button onclick="clearByDept()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
                 </div>
@@ -246,23 +266,37 @@
     <script>
         // Database & Multi-device Live Synchronization Initialization
         const firebaseConfig = {
-            databaseURL: "https://ot-system-default-rtdb.firebaseio.com" // Default Realtime Endpoint
+            databaseURL: "https://ot-system-default-rtdb.firebaseio.com"
         };
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // Exact Organization Structure & Employee Database
+        // Refactored Separated Department Structure & Members Database
         const deptDatabase = {
-            "CAD_CAM_CNC": {
-                name: "CAD, CAM & CNC DEPARTMENT",
+            "CAD": {
+                name: "CAD DEPARTMENT",
                 hod: "CHAN KENG LEONG",
                 members: [
                     { id: "2", name: "CHAN KENG LEONG", role: "Manager" },
                     { id: "274", name: "SOH GIM BOON", role: "Team Member" },
-                    { id: "305", name: "ADARSH DAMODARAN", role: "Team Member" },
+                    { id: "305", name: "ADARSH DAMODARAN", role: "Team Member" }
+                ]
+            },
+            "CAM": {
+                name: "CAM DEPARTMENT",
+                hod: "CHAN KENG LEONG",
+                members: [
+                    { id: "2", name: "CHAN KENG LEONG", role: "Manager" },
                     { id: "28", name: "HAN AYE", role: "Team Member" },
                     { id: "60", name: "MD KANCHAN", role: "Team Member" },
-                    { id: "269", name: "KHAU LIANG YU", role: "Team Member" },
+                    { id: "269", name: "KHAU LIANG YU", role: "Team Member" }
+                ]
+            },
+            "CNC": {
+                name: "CNC DEPARTMENT",
+                hod: "CHAN KENG LEONG",
+                members: [
+                    { id: "2", name: "CHAN KENG LEONG", role: "Manager" },
                     { id: "300", name: "NAY MYO ZAW", role: "Team Member" },
                     { id: "307", name: "MA LIK CHAN", role: "Team Member" },
                     { id: "27", name: "SA MASAN BA", role: "Team Member" },
@@ -272,22 +306,50 @@
                     { id: "325", name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", role: "Team Member" }
                 ]
             },
-            "EDM_PROJECT_PRODUCTION": {
-                name: "EDM, PROJECT, POLISHING, PRODUCTION & INJECTION TRIAL DEPARTMENT",
+            "EDM": {
+                name: "EDM DEPARTMENT",
                 hod: "CHONG FAT KEONG",
                 members: [
                     { id: "3", name: "CHONG FAT KEONG", role: "Manager" },
                     { id: "302", name: "TEE NYEIN AUNG", role: "Team Member" },
-                    { id: "306", name: "KAYW ZIN HEIN", role: "Team Member" },
+                    { id: "306", name: "KAYW ZIN HEIN", role: "Team Member" }
+                ]
+            },
+            "PROJECT": {
+                name: "PROJECT DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                members: [
+                    { id: "3", name: "CHONG FAT KEONG", role: "Manager" },
                     { id: "309", name: "JOSHWIN SANTHOSH POILIL THAZHATH", role: "Team Member" },
-                    { id: "318", name: "YUVANNESH A/L MAYADEVAN", role: "Team Member" },
+                    { id: "318", name: "YUVANNESH A/L MAYADEVAN", role: "Team Member" }
+                ]
+            },
+            "POLISHING": {
+                name: "POLISHING DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                members: [
+                    { id: "3", name: "CHONG FAT KEONG", role: "Manager" },
                     { id: "257", name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", role: "Team Member" },
-                    { id: "262", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", role: "Team Member" },
+                    { id: "262", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", role: "Team Member" }
+                ]
+            },
+            "PRODUCTION": {
+                name: "PRODUCTION DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                members: [
+                    { id: "3", name: "CHONG FAT KEONG", role: "Manager" },
                     { id: "19", name: "MD SHOPON", role: "Team Member" },
                     { id: "299", name: "MIN THU", role: "Team Member" },
                     { id: "20", name: "MD SHAHA BUDIN", role: "Team Member" },
                     { id: "68", name: "MD ALAMGIR", role: "Team Member" },
-                    { id: "301", name: "SHAING THU AUNG", role: "Team Member" },
+                    { id: "301", name: "SHAING THU AUNG", role: "Team Member" }
+                ]
+            },
+            "INJECTION_TRIAL": {
+                name: "INJECTION TRIAL DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                members: [
+                    { id: "3", name: "CHONG FAT KEONG", role: "Manager" },
                     { id: "329", name: "MAHAJI", role: "Team Member" }
                 ]
             },
@@ -315,14 +377,21 @@
                     { id: "323", name: "NUR LIANASOFIA PUTRI BINTI KATENI", role: "Team Member" }
                 ]
             },
-            "ADMIN_HR_PURCHASING": {
-                name: "ADMIN, HR & PURCHASING DEPARTMENT",
+            "ADMIN": {
+                name: "ADMIN DEPARTMENT",
+                hod: "KALAISELVI A/P SOORIAMOORTHY",
+                members: [
+                    { id: "108", name: "KALAISELVI A/P SOORIAMOORTHY", role: "HR / Head of Dept" },
+                    { id: "328", name: "TAN KYLE", role: "Team Member" }
+                ]
+            },
+            "PURCHASING_HR": {
+                name: "PURCHASING & HR DEPARTMENT",
                 hod: "KALAISELVI A/P SOORIAMOORTHY",
                 members: [
                     { id: "108", name: "KALAISELVI A/P SOORIAMOORTHY", role: "HR / Head of Dept" },
                     { id: "212", name: "THILAGAH A/P KRISHNAN", role: "Team Member" },
-                    { id: "316", name: "KISTINNA ANAQIN", role: "Team Member" },
-                    { id: "328", name: "TAN KYLE", role: "Team Member" }
+                    { id: "316", name: "KISTINNA ANAQIN", role: "Team Member" }
                 ]
             }
         };
@@ -334,13 +403,13 @@
         const i18n = {
             zh: {
                 subHeader: "Daily Overtime Management System / 每日加班管理系统",
-                lblSelectDept: "Select Department / Pilih Jabatan / 选择部门:",
+                lblSelectDept: "Select Department / 选择部门:",
                 lblDept: "Department / 部门:",
                 lblHod: "HOD Approval / 部门主管:",
-                navSubmit: "Submit OT / Hantar OT / 登记上交",
-                navRecords: "My Records / Rekod Saya / 个人记录",
-                navArchive: "HR Archive / Arkib HR / 月度归档",
-                navClear: "Clear Records / Padam Rekod / 清理记录",
+                navSubmit: "Submit OT / 登记上交",
+                navRecords: "My Records / 个人记录",
+                navArchive: "HR Archive / 月度归档",
+                navClear: "Clear Records / 清理记录",
                 thEmp: "Employee / 姓名",
                 thId: "Emp ID / 工号",
                 thDate: "Date / 日期",
@@ -349,7 +418,7 @@
                 thHours: "Hours / 小时",
                 thReason: "Purpose & Reason / 原因",
                 thAction: "Action / 操作",
-                btnAddRow: "+ Add Row / Tambah / 添加新行",
+                btnAddRow: "+ Add Row / 添加新行",
                 btnConfirm: "Confirm Submission / 确认上交",
                 btnPending: "Save PENDING / PENDING 上交",
                 titleMyRecords: "My Submissions / 个人上交记录",
@@ -508,200 +577,183 @@
                 const select = row.querySelector('.emp-select');
                 const empId = row.querySelector('.emp-id').value;
                 const empName = select.options[select.selectedIndex]?.getAttribute('data-name');
-                const otDate = row.querySelector('.ot-date').value;
+                const date = row.querySelector('.ot-date').value;
                 const startTime = row.querySelector('.start-time').value;
                 const endTime = row.querySelector('.end-time').value;
                 const hours = row.querySelector('.ot-hours').value;
                 const reason = row.querySelector('.ot-reason').value;
 
-                if (empId && otDate && reason) {
+                if (empId && empName && date) {
                     records.push({
-                        id: Date.now() + Math.random().toString(36).substr(2, 4),
                         deptKey: deptKey,
                         deptName: dept.name,
                         hod: dept.hod,
                         empId: empId,
                         empName: empName,
-                        date: otDate,
-                        time: `${startTime} - ${endTime}`,
+                        date: date,
+                        startTime: startTime,
+                        endTime: endTime,
                         hours: hours,
                         reason: reason,
                         status: status,
-                        timestamp: new Date().toISOString()
+                        timestamp: Date.now()
                     });
                 }
             });
 
             if (records.length === 0) {
-                alert("Please fill in complete employee and overtime details.");
+                alert("Please complete at least one row / 请至少填写完整一行记录");
                 return;
             }
 
-            // Sync with Cloud
-            const updates = {};
-            records.forEach(r => {
-                updates['/records/' + r.id] = r;
+            records.forEach(rec => {
+                db.ref('ot_records').push(rec);
             });
 
-            db.ref().update(updates).then(() => {
-                alert(`Successfully saved ${records.length} record(s) as ${status}!`);
-                document.getElementById('inputRowsBody').innerHTML = '';
-                addInputRow();
-            });
+            alert(`Successfully saved with status: ${status} / 成功保存并上交 (状态: ${status})`);
+            document.getElementById('inputRowsBody').innerHTML = '';
+            addInputRow();
+            switchTab('myrecords');
         }
 
-        // Multi-device Live Synchronization Listener
+        // Firebase Realtime Listener
         function listenRealtimeDatabase() {
-            db.ref('/records').on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                activeRecords = Object.values(data);
+            db.ref('ot_records').on('value', snapshot => {
+                const data = snapshot.val();
+                activeRecords = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        activeRecords.push({ _key: key, ...data[key] });
+                    });
+                }
                 renderMyRecords();
                 renderArchive();
-                checkPendingApprovals();
             });
         }
 
         function renderMyRecords() {
             const tbody = document.getElementById('myRecordsTableBody');
-            tbody.innerHTML = activeRecords.map(r => `
-                <tr class="border-b border-slate-100">
-                    <td class="p-3">${r.date}</td>
-                    <td class="p-3">${r.deptKey}</td>
-                    <td class="p-3">${r.hod}</td>
-                    <td class="p-3 font-semibold">${r.empName}</td>
-                    <td class="p-3">${r.empId}</td>
-                    <td class="p-3">${r.time}</td>
-                    <td class="p-3 font-bold text-blue-900">${r.hours}</td>
-                    <td class="p-3">${r.reason}</td>
-                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${r.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${r.status}</span></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = '';
+            activeRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                const badgeClass = rec.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${rec.date}</td>
+                    <td class="p-3">${rec.deptName}</td>
+                    <td class="p-3">${rec.hod}</td>
+                    <td class="p-3 font-bold">${rec.empName}</td>
+                    <td class="p-3">${rec.empId}</td>
+                    <td class="p-3">${rec.startTime} - ${rec.endTime}</td>
+                    <td class="p-3 font-bold text-blue-900">${rec.hours} hrs</td>
+                    <td class="p-3">${rec.reason || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${badgeClass}">${rec.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         function renderArchive() {
             const tbody = document.getElementById('archiveTableBody');
-            tbody.innerHTML = activeRecords.map(r => `
-                <tr class="border-b border-slate-100">
-                    <td class="p-3">${r.date}</td>
-                    <td class="p-3">${r.deptKey}</td>
-                    <td class="p-3">${r.hod}</td>
-                    <td class="p-3 font-semibold">${r.empName}</td>
-                    <td class="p-3">${r.empId}</td>
-                    <td class="p-3">${r.time}</td>
-                    <td class="p-3 font-bold text-blue-900">${r.hours}</td>
-                    <td class="p-3">${r.reason}</td>
-                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${r.status === 'APPROVED' ? 'bg-blue-100 text-blue-700' : (r.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700')}">${r.status}</span></td>
+            tbody.innerHTML = '';
+            activeRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                const badgeClass = rec.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${rec.date}</td>
+                    <td class="p-3">${rec.deptName}</td>
+                    <td class="p-3">${rec.hod}</td>
+                    <td class="p-3 font-bold">${rec.empName}</td>
+                    <td class="p-3">${rec.empId}</td>
+                    <td class="p-3">${rec.startTime} - ${rec.endTime}</td>
+                    <td class="p-3 font-bold text-blue-900">${rec.hours} hrs</td>
+                    <td class="p-3">${rec.reason || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${badgeClass}">${rec.status}</span></td>
                     <td class="p-3 text-center no-print">
-                        <button onclick="requestHODEdit('${r.id}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded text-xs">Edit / 申请修改</button>
+                        <button onclick="deleteSingleRecord('${rec._key}')" class="bg-rose-100 text-rose-600 hover:bg-rose-200 px-2 py-1 rounded text-xs">Delete</button>
                     </td>
-                </tr>
-            `).join('');
-        }
-
-        // HOD Edit Request & HR Approval Workflow
-        function requestHODEdit(id) {
-            const newReason = prompt("HOD: Enter modified reason / 输入需要修正的加班原因:");
-            if (newReason) {
-                db.ref('/records/' + id).update({
-                    pendingReason: newReason,
-                    status: 'PENDING HR APPROVAL'
-                }).then(() => {
-                    alert("Change submitted! Awaiting HR approval notice.");
-                });
-            }
-        }
-
-        function checkPendingApprovals() {
-            const pending = activeRecords.find(r => r.status === 'PENDING HR APPROVAL');
-            if (pending) {
-                pendingApprovalKey = pending.id;
-                document.getElementById('hrModalDetails').innerHTML = `
-                    <div><strong>Emp:</strong> ${pending.empName} (${pending.empId})</div>
-                    <div><strong>Dept:</strong> ${pending.deptName}</div>
-                    <div><strong>New Proposed Reason:</strong> ${pending.pendingReason}</div>
                 `;
-                document.getElementById('hrModal').classList.remove('hidden');
-            } else {
-                document.getElementById('hrModal').classList.add('hidden');
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteSingleRecord(key) {
+            if (confirm("Are you sure you want to delete this record? / 确定要删除该条记录吗？")) {
+                db.ref('ot_records/' + key).remove();
             }
         }
 
-        function approveHODChange() {
-            if (!pendingApprovalKey) return;
-            const rec = activeRecords.find(r => r.id === pendingApprovalKey);
-            db.ref('/records/' + pendingApprovalKey).update({
-                reason: rec.pendingReason,
-                status: 'APPROVED',
-                pendingReason: null
-            }).then(() => {
-                document.getElementById('hrModal').classList.add('hidden');
-                alert("HR Approved modification!");
+        // Tab Switching Logic
+        function switchTab(tab) {
+            ['submit', 'myrecords', 'archive', 'clear'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                if (t === tab) {
+                    btn.className = "px-4 py-2.5 font-bold text-sm rounded-t-lg bg-blue-900 text-white flex items-center gap-2";
+                    view.classList.remove('hidden');
+                } else {
+                    btn.className = "px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2";
+                    view.classList.add('hidden');
+                }
             });
         }
 
-        function rejectHODChange() {
-            if (!pendingApprovalKey) return;
-            db.ref('/records/' + pendingApprovalKey).update({
-                status: 'SUBMITTED',
-                pendingReason: null
-            }).then(() => {
-                document.getElementById('hrModal').classList.add('hidden');
-                alert("HR Rejected modification.");
-            });
-        }
-
-        // Clear Records Management Functions
+        // CLEAR FUNCTIONS
         function clearByDept() {
-            const dept = document.getElementById('clearDeptSelect').value;
-            if (confirm(`Delete all records for department: ${dept}?`)) {
-                activeRecords.filter(r => r.deptKey === dept).forEach(r => db.ref('/records/' + r.id).remove());
+            const deptKey = document.getElementById('clearDeptSelect').value;
+            if (confirm(`Delete all records for department: ${deptDatabase[deptKey].name}?`)) {
+                activeRecords.filter(r => r.deptKey === deptKey).forEach(r => db.ref('ot_records/' + r._key).remove());
+                alert("Records cleared / 部门记录已清理");
             }
         }
 
         function clearByEmp() {
             const val = document.getElementById('clearEmpInput').value.trim().toLowerCase();
-            if (!val) return;
-            if (confirm(`Delete all records for employee: ${val}?`)) {
-                activeRecords.filter(r => r.empName.toLowerCase().includes(val) || r.empId.toLowerCase() === val).forEach(r => db.ref('/records/' + r.id).remove());
+            if (!val) return alert("Please enter name or ID / 请输入姓名或工号");
+            if (confirm(`Delete records for employee matching: ${val}?`)) {
+                activeRecords.filter(r => r.empName.toLowerCase().includes(val) || r.empId.toString() === val)
+                             .forEach(r => db.ref('ot_records/' + r._key).remove());
+                alert("Employee records cleared / 员工记录已清理");
             }
         }
 
         function clearByDateRange() {
-            const st = document.getElementById('clearStartDate').value;
-            const et = document.getElementById('clearEndDate').value;
-            if (st && et && confirm(`Delete records from ${st} to ${et}?`)) {
-                activeRecords.filter(r => r.date >= st && r.date <= et).forEach(r => db.ref('/records/' + r.id).remove());
+            const start = document.getElementById('clearStartDate').value;
+            const end = document.getElementById('clearEndDate').value;
+            if (!start || !end) return alert("Select both dates / 请选择完整日期范围");
+            if (confirm(`Delete records from ${start} to ${end}?`)) {
+                activeRecords.filter(r => r.date >= start && r.date <= end)
+                             .forEach(r => db.ref('ot_records/' + r._key).remove());
+                alert("Date range records cleared / 指定日期段记录已清理");
             }
         }
 
         function clearByMonth() {
-            const m = document.getElementById('clearMonthInput').value; // YYYY-MM
-            if (m && confirm(`Delete all records in month: ${m}?`)) {
-                activeRecords.filter(r => r.date.startsWith(m)).forEach(r => db.ref('/records/' + r.id).remove());
+            const month = document.getElementById('clearMonthInput').value; // YYYY-MM
+            if (!month) return alert("Select month / 请选择月份");
+            if (confirm(`Delete records for month: ${month}?`)) {
+                activeRecords.filter(r => r.date.startsWith(month))
+                             .forEach(r => db.ref('ot_records/' + r._key).remove());
+                alert("Monthly records cleared / 月度记录已清理");
             }
         }
 
         function clearByYear() {
-            const y = document.getElementById('clearYearInput').value;
-            if (y && confirm(`Delete all records in year: ${y}?`)) {
-                activeRecords.filter(r => r.date.startsWith(y)).forEach(r => db.ref('/records/' + r.id).remove());
+            const year = document.getElementById('clearYearInput').value;
+            if (!year) return alert("Enter year / 请输入年份");
+            if (confirm(`Delete records for year: ${year}?`)) {
+                activeRecords.filter(r => r.date.startsWith(year))
+                             .forEach(r => db.ref('ot_records/' + r._key).remove());
+                alert("Yearly records cleared / 年份记录已清理");
             }
         }
 
         function clearAll() {
-            if (confirm("🚨 WARNING: Permanently delete ALL overtime records across the entire system?")) {
-                db.ref('/records').remove().then(() => alert("All records cleared successfully."));
+            if (confirm("🚨 WARNING: Are you sure you want to permanently erase ALL records? / 警告：确定要彻底清空全盘记录吗？")) {
+                db.ref('ot_records').remove();
+                alert("All records cleared / 所有的记录已全盘清空");
             }
-        }
-
-        // Navigation Switching
-        function switchTab(tab) {
-            ['submit', 'myrecords', 'archive', 'clear'].forEach(t => {
-                document.getElementById('view-' + t).classList.add('hidden');
-                document.getElementById('tab-' + t).className = "px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2";
-            });
-            document.getElementById('view-' + tab).classList.remove('hidden');
-            document.getElementById('tab-' + tab).className = "px-4 py-2.5 font-bold text-sm rounded-t-lg bg-blue-900 text-white flex items-center gap-2";
         }
     </script>
 </body>
