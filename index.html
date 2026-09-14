@@ -45,7 +45,6 @@
     .header {
       text-align: center;
       margin-bottom: 24px;
-      position: relative;
     }
 
     .header h1 {
@@ -87,7 +86,7 @@
     @keyframes pulse {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
     }
 
     /* Department Selector Box */
@@ -263,7 +262,7 @@
       <div class="subtitle">Daily Overtime Management System / 每日加班管理系统</div>
       <div class="sync-status">
         <span class="sync-dot"></span>
-        <span>多设备实时同步中</span>
+        <span id="sync-label">多设备实时同步中</span>
       </div>
     </div>
 
@@ -271,7 +270,7 @@
     <div class="dept-card">
       <div class="dept-left">
         <label class="dept-label" for="dept-select">Select Department / Pilih Jabatan / 选择部门:</label>
-        <select id="dept-select" class="dept-select">
+        <select id="dept-select" class="dept-select" onchange="syncData()">
           <option value="ADMIN">ADMIN</option>
           <option value="PRODUCTION">PRODUCTION</option>
           <option value="QUALITY">QUALITY CONTROL</option>
@@ -289,12 +288,12 @@
       <button class="tab-btn active">📝 Submit OT / Hantar OT / 登记提交</button>
       <button class="tab-btn">👤 My Records / Rekod Saya / 个人记录</button>
       <button class="tab-btn">📁 HR Archive / Arkib HR / 月度归档</button>
-      <button class="tab-btn">🗑️ Clear Records / Padam Rekod</button>
+      <button class="tab-btn" onclick="clearAllRecords()">🗑️ Clear Records / Padam Rekod</button>
     </div>
 
     <!-- OT Entry Table -->
     <div class="table-responsive">
-      <table id="ot-table">
+      <table>
         <thead>
           <tr>
             <th style="width: 15%;">Employee / 姓名</th>
@@ -307,49 +306,118 @@
             <th style="width: 6%; text-align: center;">Action / 操作</th>
           </tr>
         </thead>
-        <tbody id="table-body">
-          <tr>
-            <td><input type="text" placeholder="Type or Select Name" /></td>
-            <td><input type="text" placeholder="ID" /></td>
-            <td><input type="date" value="2026-09-14" /></td>
-            <td><input type="time" value="17:00" /></td>
-            <td><input type="time" value="21:00" /></td>
-            <td><input type="number" step="0.5" value="4.0" /></td>
-            <td><input type="text" placeholder="Reason / Project" /></td>
-            <td style="text-align: center;">
-              <button class="btn btn-delete" title="Delete Row">🗑️</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="table-body"></tbody>
       </table>
     </div>
 
     <!-- Bottom Action Bar -->
     <div class="action-bar">
       <button class="btn btn-add" onclick="addRow()">➕ Add Row / Tambah / 添加新行</button>
-      <button class="btn btn-confirm">✅ Confirm Submission / 确认提交</button>
-      <button class="btn btn-pending">⏳ Save PENDING / PENDING 上交</button>
+      <button class="btn btn-confirm" onclick="syncData()">✅ Confirm Submission / 确认提交</button>
+      <button class="btn btn-pending" onclick="syncData()">⏳ Save PENDING / PENDING 上交</button>
     </div>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <script>
-    // Quick script to support adding dynamic rows
-    function addRow() {
-      const tbody = document.getElementById('table-body');
-      const newRow = document.createElement('tr');
-      newRow.innerHTML = `
-        <td><input type="text" placeholder="Type or Select Name" /></td>
-        <td><input type="text" placeholder="ID" /></td>
-        <td><input type="date" value="2026-09-14" /></td>
-        <td><input type="time" value="17:00" /></td>
-        <td><input type="time" value="21:00" /></td>
-        <td><input type="number" step="0.5" value="4.0" /></td>
-        <td><input type="text" placeholder="Reason / Project" /></td>
+    // 1. Paste your Firebase Web Config details here
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('ot_submissions');
+
+    // Load initial empty row if no data
+    const tbody = document.getElementById('table-body');
+    const deptSelect = document.getElementById('dept-select');
+    const deptName = document.getElementById('dept-name');
+
+    deptSelect.addEventListener('change', () => {
+      deptName.textContent = deptSelect.value;
+    });
+
+    // Real-time listener: Triggers automatically across ALL connected devices when data changes
+    db.on('value', (snapshot) => {
+      const data = snapshot.val();
+      tbody.innerHTML = '';
+
+      if (data && data.rows && data.rows.length > 0) {
+        if (data.department) {
+          deptSelect.value = data.department;
+          deptName.textContent = data.department;
+        }
+        data.rows.forEach(rowData => createRowElement(rowData));
+      } else {
+        createRowElement(); // default blank row
+      }
+    });
+
+    function createRowElement(data = {}) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="emp-name" value="${data.name || ''}" placeholder="Type or Select Name" oninput="syncData()" /></td>
+        <td><input type="text" class="emp-id" value="${data.id || ''}" placeholder="ID" oninput="syncData()" /></td>
+        <td><input type="date" class="emp-date" value="${data.date || '2026-09-14'}" onchange="syncData()" /></td>
+        <td><input type="time" class="emp-start" value="${data.start || '17:00'}" onchange="syncData()" /></td>
+        <td><input type="time" class="emp-end" value="${data.end || '21:00'}" onchange="syncData()" /></td>
+        <td><input type="number" step="0.5" class="emp-hours" value="${data.hours || '4.0'}" oninput="syncData()" /></td>
+        <td><input type="text" class="emp-reason" value="${data.reason || ''}" placeholder="Reason / Project" oninput="syncData()" /></td>
         <td style="text-align: center;">
-          <button class="btn btn-delete" onclick="this.closest('tr').remove()" title="Delete Row">🗑️</button>
+          <button class="btn btn-delete" onclick="deleteRow(this)" title="Delete Row">🗑️</button>
         </td>
       `;
-      tbody.appendChild(newRow);
+      tbody.appendChild(tr);
+    }
+
+    function addRow() {
+      createRowElement();
+      syncData();
+    }
+
+    function deleteRow(btn) {
+      btn.closest('tr').remove();
+      syncData();
+    }
+
+    function clearAllRecords() {
+      if (confirm("Are you sure you want to clear all records?")) {
+        db.set({ department: deptSelect.value, rows: [] });
+      }
+    }
+
+    // Push local state to Firebase in real time
+    let syncTimer;
+    function syncData() {
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => {
+        const rows = [];
+        document.querySelectorAll('#table-body tr').forEach(tr => {
+          rows.push({
+            name: tr.querySelector('.emp-name').value,
+            id: tr.querySelector('.emp-id').value,
+            date: tr.querySelector('.emp-date').value,
+            start: tr.querySelector('.emp-start').value,
+            end: tr.querySelector('.emp-end').value,
+            hours: tr.querySelector('.emp-hours').value,
+            reason: tr.querySelector('.emp-reason').value
+          });
+        });
+
+        db.set({
+          department: deptSelect.value,
+          rows: rows
+        });
+      }, 300); // Debounce to prevent rapid network calls while typing
     }
   </script>
 </body>
