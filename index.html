@@ -4,39 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaizen Mould Technology - Daily OT System</title>
-    <!-- 引入 Firebase 数据库 SDK -->
+    <!-- Firebase Cloud Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
-        :root { --primary-color: #1f4e79; --secondary-color: #2c3e50; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        header { display: flex; justify-space-between; align-items: center; border-bottom: 3px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 20px; }
-        h1 { color: var(--primary-color); margin: 0; font-size: 24px; }
-        .subtitle { color: #666; font-size: 14px; margin-top: 5px; }
-        .sync-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
-        .online { background-color: #e8f8f5; color: #27ae60; border: 1px solid #27ae60; }
-        .local { background-color: #fef9e7; color: #d35400; border: 1px solid #d35400; }
-        .form-section, .table-section, .admin-section { background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 25px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-        button { background: var(--primary-color); color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        button:hover { opacity: 0.9; }
-        .btn-danger { background: #c0392b; }
-        .btn-success { background: #27ae60; }
-        .btn-warning { background: #f39c12; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        header { border-bottom: 2px solid #1f4e79; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; color: #1f4e79; font-size: 24px; }
+        header .subtitle { color: #666; font-size: 14px; margin-top: 4px; }
+        .sync-btn { background: #f39c12; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .sync-badge { font-size: 12px; padding: 4px 8px; border-radius: 12px; font-weight: bold; margin-right: 8px; }
+        .badge-cloud { background: #d4edda; color: #155724; }
+        .badge-local { background: #fff3cd; color: #856404; }
+        .section-box { border: 1px solid #e0e0e0; border-radius: 6px; padding: 18px; margin-bottom: 25px; background-color: #ffffff; }
+        .section-box h2, .section-box h3 { margin-top: 0; color: #1f4e79; border-bottom: 1px solid #eee; padding-bottom: 8px; font-size: 18px; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
+        .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
+        .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #444; }
+        .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .btn-submit { background-color: #1f4e79; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100%; }
+        .btn-submit:hover { background-color: #163857; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-        th { background: var(--primary-color); color: white; }
+        th { background-color: #1f4e79; color: white; font-weight: 600; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
-        .badge-pending { background: #ffeaa7; color: #d35400; }
-        .badge-approved { background: #55efc4; color: #00b894; }
-        .badge-rejected { background: #ff7675; color: #d63031; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 450px; }
+        .btn-act { padding: 4px 8px; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; color: white; }
+        .btn-approve { background-color: #27ae60; margin-right: 4px; }
+        .btn-reject { background-color: #e74c3c; }
+        .btn-delete { background-color: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-body { background: white; padding: 20px; border-radius: 8px; width: 400px; }
     </style>
 </head>
 <body>
@@ -48,17 +46,17 @@
             <div class="subtitle">Daily Overtime Management System / 每日加班管理系统</div>
         </div>
         <div>
-            <span id="syncBadge" class="sync-status local">单机模式 (Local)</span>
-            <button onclick="openConfigModal()" class="btn-warning" style="margin-left:10px;">⚙️ 云同步配置</button>
+            <span id="cloudBadge" class="sync-badge badge-local">单机模式</span>
+            <button onclick="openCloudModal()" class="sync-btn">⚙️ 数据库连接配置</button>
         </div>
     </header>
 
-    <!-- 部门选择与 HOD 动态加载 -->
-    <div class="form-section">
-        <div class="form-grid">
+    <!-- 部门与 HOD 选择区 -->
+    <div class="section-box">
+        <div class="form-row">
             <div class="form-group">
-                <label>Select Department / 选择部门</label>
-                <select id="deptSelect" onchange="updateHOD()">
+                <label>Department / 部门</label>
+                <select id="deptSelect" onchange="onDeptChange()">
                     <option value="ADMIN">ADMIN</option>
                     <option value="PURCHASING">PURCHASING</option>
                     <option value="CAD">CAD</option>
@@ -74,59 +72,80 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Department / 部门</label>
-                <input type="text" id="displayDept" readonly style="background:#e9ecef;">
+                <label>Department / 部门: <span id="lblDept" style="color:#1f4e79; font-weight:bold;">ADMIN</span></label>
             </div>
             <div class="form-group">
-                <label>HOD Approval / 部门主管</label>
-                <input type="text" id="displayHOD" readonly style="background:#e9ecef;">
+                <label>HOD Approval / 部门主管: <span id="lblHOD" style="color:#1f4e79; font-weight:bold;">KALAISELVI</span></label>
             </div>
         </div>
 
-        <!-- 提交加班表单 -->
-        <form id="otForm" onsubmit="handleFormSubmit(event)">
-            <div class="form-grid">
+        <!-- 提交加班资料表单 -->
+        <form id="otForm" onsubmit="submitForm(event)">
+            <div class="form-row">
                 <div class="form-group">
-                    <label>Employee Name / 姓名</label>
-                    <input type="text" id="empName" required placeholder="例: Tan Kyle">
+                    <label>Employee / 姓名</label>
+                    <input type="text" id="empName" required>
                 </div>
                 <div class="form-group">
                     <label>Emp ID / 工号</label>
-                    <input type="text" id="empId" required placeholder="例: K102">
+                    <input type="text" id="empId" required>
                 </div>
                 <div class="form-group">
                     <label>Date / 日期</label>
                     <input type="date" id="otDate" required>
                 </div>
                 <div class="form-group">
-                    <label>Start Time / 开始时间</label>
+                    <label>Start Time / 开始</label>
                     <input type="time" id="startTime" required onchange="calcHours()">
                 </div>
                 <div class="form-group">
-                    <label>End Time / 结束时间</label>
+                    <label>End Time / 结束</label>
                     <input type="time" id="endTime" required onchange="calcHours()">
                 </div>
                 <div class="form-group">
-                    <label>Total Hours / 加班小时</label>
-                    <input type="number" id="totalHours" step="0.5" readonly style="background:#e9ecef;">
+                    <label>Hours / 小时</label>
+                    <input type="number" id="totHours" step="0.5" readonly style="background:#f0f0f0;">
                 </div>
             </div>
             <div class="form-group" style="margin-bottom:15px;">
-                <label>Purpose & Reason / 加班原因与项目</label>
-                <textarea id="otReason" rows="2" required placeholder="请输入详细加班原因..."></textarea>
+                <label>Purpose & Reason / 原因</label>
+                <textarea id="otReason" rows="2" required></textarea>
             </div>
-            <button type="submit" class="btn-success" style="width:100%;"> Submit OT Record / 提交加班记录</button>
+            <button type="submit" class="btn-submit">Submit / 提交</button>
         </form>
     </div>
 
-    <!-- 记录查看与 HR 月度归档 -->
-    <div class="table-section">
+    <!-- 个人上交记录 -->
+    <div class="section-box">
+        <h2>My Submissions / 个人上交记录</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date / 日期</th>
+                        <th>Dept / 部门</th>
+                        <th>HOD / 主管</th>
+                        <th>Name / 姓名</th>
+                        <th>ID / 工号</th>
+                        <th>Time / 时间段</th>
+                        <th>Hours / 小时</th>
+                        <th>Reason / 原因</th>
+                        <th>Status / 状态</th>
+                    </tr>
+                </thead>
+                <tbody id="mySubmissionsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HR 月度归档 -->
+    <div class="section-box">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>HR Monthly Archive & Records / HR 月度归档与记录</h2>
-            <button onclick="exportToCSV()" class="btn-warning">📥 Export to CSV / 导出 Excel</button>
+            <h2>HR Monthly Archive / HR 月度归档</h2>
+            <button onclick="exportCSV()" style="background:#27ae60; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">📥 Export CSV</button>
         </div>
         <div style="overflow-x:auto;">
-            <table id="recordsTable">
+            <table>
                 <thead>
                     <tr>
                         <th>Date / 日期</th>
@@ -141,241 +160,299 @@
                         <th>Action / 操作</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <!-- 动态加载数据 -->
-                </tbody>
+                <tbody id="archiveBody"></tbody>
             </table>
         </div>
     </div>
 
     <!-- 清理记录管理 -->
-    <div class="admin-section">
-        <h3>🚨 Clear Records Management / 清理记录管理</h3>
-        <div style="display:flex; gap:10px;">
-            <button onclick="clearAllData()" class="btn-danger">彻底清空所有记录 (CLEAR ALL)</button>
+    <div class="section-box">
+        <h2>Clear Records Management / 清理记录管理</h2>
+        
+        <h3>🏢 1. Delete By Specific Department / 按指定部门删除</h3>
+        <div class="form-row" style="align-items:flex-end;">
+            <div class="form-group">
+                <select id="delDept">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="PURCHASING">PURCHASING</option>
+                    <option value="CAD">CAD</option>
+                    <option value="CAM">CAM</option>
+                    <option value="CNC">CNC</option>
+                    <option value="EDM">EDM</option>
+                    <option value="PROJECT">PROJECT</option>
+                    <option value="POLISHING">POLISHING</option>
+                    <option value="PRODUCTION">PRODUCTION</option>
+                    <option value="MOULD MAKER">MOULD MAKER</option>
+                    <option value="QC">QC</option>
+                    <option value="INJECTION TRIAL">INJECTION TRIAL</option>
+                </select>
+            </div>
+            <button class="btn-delete" onclick="deleteByDept()">Delete Department Records</button>
         </div>
+
+        <h3>👤 2. Delete By Specific Employee / 按指定员工姓名或工号删除</h3>
+        <div class="form-row" style="align-items:flex-end;">
+            <div class="form-group">
+                <input type="text" id="delEmpKey" placeholder="输入姓名或工号">
+            </div>
+            <button class="btn-delete" onclick="deleteByEmp()">Delete Employee Records</button>
+        </div>
+
+        <h3>📅 3. Delete By Specific Date Range / 按特定日期段删除</h3>
+        <div class="form-row" style="align-items:flex-end;">
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="delStartDate">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="delEndDate">
+            </div>
+            <button class="btn-delete" onclick="deleteByDateRange()">Delete Range Records</button>
+        </div>
+
+        <h3>🚨 6. CLEAR ALL RECORDS / 彻底清空所有记录</h3>
+        <p style="color:#d9534f; font-size:12px;">⚠️ Warning: All saved records will be permanently erased.</p>
+        <button class="btn-delete" style="background:#c0392b;" onclick="clearAll()">Clear All Records</button>
     </div>
 </div>
 
-<!-- 云同步配置弹窗 -->
-<div id="configModal" class="modal">
-    <div class="modal-content">
-        <h3>⚡ 在线数据库（多设备同步）设置</h3>
-        <p style="font-size:12px; color:#666;">免费注册 Firebase Firestore 数据库后，将 API Key 和 Project ID 粘贴在此处即可完成多设备同步。</p>
+<!-- 云端数据库配置窗口 -->
+<div id="cloudModal" class="modal">
+    <div class="modal-body">
+        <h3>配置云端实时同步数据库</h3>
+        <p style="font-size:12px; color:#666;">填入 Firebase 配置后，经理提交记录您就能跨设备实时刷新看到！</p>
         <div class="form-group" style="margin-bottom:10px;">
-            <label>Firebase API Key</label>
-            <input type="text" id="cfgApiKey" placeholder="AIzaSy...">
+            <label>API Key</label>
+            <input type="text" id="cfgKey">
         </div>
         <div class="form-group" style="margin-bottom:15px;">
-            <label>Firebase Project ID</label>
-            <input type="text" id="cfgProjectId" placeholder="kaizen-ot-system">
+            <label>Project ID</label>
+            <input type="text" id="cfgPid">
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button onclick="closeConfigModal()">取消</button>
-            <button onclick="saveFirebaseConfig()" class="btn-success">保存并连接</button>
+            <button onclick="closeCloudModal()" style="padding:6px 12px;">取消</button>
+            <button onclick="saveCloudConfig()" style="background:#1f4e79; color:white; border:none; padding:6px 12px; border-radius:4px;">保存并连接</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 12 部门与 HOD 映射表
-    const hodMapping = {
-        'ADMIN': 'KALAISELVI',
-        'PURCHASING': 'LIM',
-        'CAD': 'CHAI',
-        'CAM': 'ALVIN',
-        'CNC': 'AH SOON',
-        'EDM': 'TAN',
-        'PROJECT': 'EDMOND',
-        'POLISHING': 'AH BOON',
-        'PRODUCTION': 'KAN',
-        'MOULD MAKER': 'KONG',
-        'QC': 'VIVIAN',
-        'INJECTION TRIAL': 'JASON'
+    const hodMap = {
+        'ADMIN': 'KALAISELVI', 'PURCHASING': 'LIM', 'CAD': 'CHAI', 'CAM': 'ALVIN',
+        'CNC': 'AH SOON', 'EDM': 'TAN', 'PROJECT': 'EDMOND', 'POLISHING': 'AH BOON',
+        'PRODUCTION': 'KAN', 'MOULD MAKER': 'KONG', 'QC': 'VIVIAN', 'INJECTION TRIAL': 'JASON'
     };
 
     let db = null;
-    let records = [];
+    let recordsData = [];
 
-    // 初始化
     window.onload = function() {
         document.getElementById('otDate').valueAsDate = new Date();
-        updateHOD();
-        initFirebase();
+        onDeptChange();
+        initCloud();
     };
 
-    function updateHOD() {
-        const dept = document.getElementById('deptSelect').value;
-        document.getElementById('displayDept').value = dept;
-        document.getElementById('displayHOD').value = hodMapping[dept] || '';
+    function onDeptChange() {
+        const d = document.getElementById('deptSelect').value;
+        document.getElementById('lblDept').innerText = d;
+        document.getElementById('lblHOD').innerText = hodMap[d] || '';
     }
 
     function calcHours() {
-        const start = document.getElementById('startTime').value;
-        const end = document.getElementById('endTime').value;
-        if(start && end) {
-            let s = new Date(`1970-01-01T${start}:00`);
-            let e = new Date(`1970-01-01T${end}:00`);
-            if(e < s) e.setDate(e.getDate() + 1);
-            let diff = (e - s) / (1000 * 60 * 60);
-            document.getElementById('totalHours').value = diff.toFixed(1);
+        const s = document.getElementById('startTime').value;
+        const e = document.getElementById('endTime').value;
+        if(s && e) {
+            let st = new Date(`1970-01-01T${s}:00`);
+            let et = new Date(`1970-01-01T${e}:00`);
+            if(et < st) et.setDate(et.getDate() + 1);
+            document.getElementById('totHours').value = ((et - st) / 3600000).toFixed(1);
         }
     }
 
-    // 初始化云数据库
-    function initFirebase() {
-        const apiKey = localStorage.getItem('fb_apiKey');
-        const projectId = localStorage.getItem('fb_projectId');
-
-        if(apiKey && projectId) {
+    function initCloud() {
+        const k = localStorage.getItem('ot_fb_k');
+        const p = localStorage.getItem('ot_fb_p');
+        if(k && p) {
             try {
-                if(!firebase.apps.length) {
-                    firebase.initializeApp({ apiKey: apiKey, projectId: projectId });
-                }
+                if(!firebase.apps.length) firebase.initializeApp({ apiKey: k, projectId: p });
                 db = firebase.firestore();
-                document.getElementById('syncBadge').innerText = "🌐 多设备实时同步中 (Cloud)";
-                document.getElementById('syncBadge').className = "sync-status online";
-                
-                // 实时监听数据库变动
-                db.collection("ot_records").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                    records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderTable();
+                document.getElementById('cloudBadge').innerText = "🌐 在线实时同步 (Cloud)";
+                document.getElementById('cloudBadge').className = "sync-badge badge-cloud";
+                db.collection("ot_records").orderBy("time", "desc").onSnapshot(ss => {
+                    recordsData = ss.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    render();
                 });
                 return;
-            } catch(e) {
-                console.error("Firebase init failed:", e);
-            }
+            } catch(e) { console.error(e); }
         }
-        
-        // 未配置时自动退回本地模式
-        document.getElementById('syncBadge').innerText = "单机模式 (未连接云端)";
-        document.getElementById('syncBadge').className = "sync-status local";
-        loadLocalRecords();
+        document.getElementById('cloudBadge').innerText = "单机模式";
+        document.getElementById('cloudBadge').className = "sync-badge badge-local";
+        recordsData = JSON.parse(localStorage.getItem('kaizen_ot_records') || '[]');
+        render();
     }
 
-    function loadLocalRecords() {
-        records = JSON.parse(localStorage.getItem('kaizen_ot_data') || '[]');
-        renderTable();
-    }
-
-    // 提交数据
-    async function handleFormSubmit(e) {
+    async function submitForm(e) {
         e.preventDefault();
-        const newRecord = {
+        const rec = {
             date: document.getElementById('otDate').value,
-            dept: document.getElementById('displayDept').value,
-            hod: document.getElementById('displayHOD').value,
+            dept: document.getElementById('lblDept').innerText,
+            hod: document.getElementById('lblHOD').innerText,
             name: document.getElementById('empName').value,
             empId: document.getElementById('empId').value,
             startTime: document.getElementById('startTime').value,
             endTime: document.getElementById('endTime').value,
-            hours: document.getElementById('totalHours').value,
+            hours: document.getElementById('totHours').value,
             reason: document.getElementById('otReason').value,
             status: 'Pending',
-            timestamp: new Date().getTime()
+            time: Date.now()
         };
 
         if(db) {
-            await db.collection("ot_records").add(newRecord);
+            await db.collection("ot_records").add(rec);
         } else {
-            newRecord.id = 'loc_' + Date.now();
-            records.unshift(newRecord);
-            localStorage.setItem('kaizen_ot_data', JSON.stringify(records));
-            renderTable();
+            rec.id = 'loc_' + Date.now();
+            recordsData.unshift(rec);
+            localStorage.setItem('kaizen_ot_records', JSON.stringify(recordsData));
+            render();
         }
 
         document.getElementById('otForm').reset();
         document.getElementById('otDate').valueAsDate = new Date();
-        updateHOD();
-        alert('加班记录已成功提交！');
+        onDeptChange();
+        alert('提交成功！');
     }
 
-    // 渲染表格
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        records.forEach(r => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
+    function render() {
+        const myBody = document.getElementById('mySubmissionsBody');
+        const arcBody = document.getElementById('archiveBody');
+        myBody.innerHTML = '';
+        arcBody.innerHTML = '';
+
+        recordsData.forEach(r => {
+            const rowHtml = `
                 <td>${r.date}</td>
                 <td>${r.dept}</td>
                 <td>${r.hod}</td>
                 <td>${r.name}</td>
                 <td>${r.empId}</td>
                 <td>${r.startTime} - ${r.endTime}</td>
-                <td><b>${r.hours}</b> hrs</td>
+                <td><b>${r.hours}</b></td>
                 <td style="text-align:left;">${r.reason}</td>
-                <td><span class="badge badge-${r.status.toLowerCase()}">${r.status}</span></td>
-                <td>
-                    <button onclick="updateStatus('${r.id}', 'Approved')" class="btn-success" style="padding:4px 8px; font-size:11px;">Approve</button>
-                    <button onclick="updateStatus('${r.id}', 'Rejected')" class="btn-danger" style="padding:4px 8px; font-size:11px;">Reject</button>
-                </td>
+                <td><b>${r.status}</b></td>
             `;
-            tbody.appendChild(tr);
+
+            myBody.innerHTML += `<tr>${rowHtml}</tr>`;
+            arcBody.innerHTML += `
+                <tr>
+                    ${rowHtml}
+                    <td>
+                        <button class="btn-act btn-approve" onclick="setStatus('${r.id}', 'Approved')">Approve</button>
+                        <button class="btn-act btn-reject" onclick="setStatus('${r.id}', 'Rejected')">Reject</button>
+                    </td>
+                </tr>
+            `;
         });
     }
 
-    // 状态更新 (批准/拒绝)
-    async function updateStatus(id, status) {
+    async function setStatus(id, st) {
         if(db) {
-            await db.collection("ot_records").doc(id).update({ status: status });
+            await db.collection("ot_records").doc(id).update({ status: st });
         } else {
-            const index = records.findIndex(r => r.id === id);
-            if(index !== -1) {
-                records[index].status = status;
-                localStorage.setItem('kaizen_ot_data', JSON.stringify(records));
-                renderTable();
+            const idx = recordsData.findIndex(x => x.id === id);
+            if(idx !== -1) {
+                recordsData[idx].status = st;
+                localStorage.setItem('kaizen_ot_records', JSON.stringify(recordsData));
+                render();
             }
         }
     }
 
-    // 清空记录
-    async function clearAllData() {
-        if(!confirm("⚠️ 确定要彻底清空所有加班记录吗？此操作无法撤销！")) return;
+    async function clearAll() {
+        if(!confirm("确定清空全部记录？")) return;
         if(db) {
-            const snapshot = await db.collection("ot_records").get();
+            const ss = await db.collection("ot_records").get();
             const batch = db.batch();
-            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            ss.docs.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
         } else {
-            records = [];
-            localStorage.removeItem('kaizen_ot_data');
-            renderTable();
+            recordsData = [];
+            localStorage.removeItem('kaizen_ot_records');
+            render();
         }
     }
 
-    // 导出 CSV
-    function exportToCSV() {
-        if(records.length === 0) return alert("暂无记录可导出！");
-        let csv = "\uFEFFDate,Dept,HOD,Name,EmpID,Start,End,Hours,Reason,Status\n";
-        records.forEach(r => {
-            csv += `"${r.date}","${r.dept}","${r.hod}","${r.name}","${r.empId}","${r.startTime}","${r.endTime}","${r.hours}","${r.reason.replace(/"/g, '""')}","${r.status}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `Kaizen_OT_Records_${new Date().toISOString().slice(0,10)}.csv`;
-        link.click();
-    }
-
-    // 弹窗管理
-    function openConfigModal() {
-        document.getElementById('cfgApiKey').value = localStorage.getItem('fb_apiKey') || '';
-        document.getElementById('cfgProjectId').value = localStorage.getItem('fb_projectId') || '';
-        document.getElementById('configModal').style.display = 'flex';
-    }
-    function closeConfigModal() { document.getElementById('configModal').style.display = 'none'; }
-    function saveFirebaseConfig() {
-        const key = document.getElementById('cfgApiKey').value.trim();
-        const pid = document.getElementById('cfgProjectId').value.trim();
-        if(key && pid) {
-            localStorage.setItem('fb_apiKey', key);
-            localStorage.setItem('fb_projectId', pid);
-            closeConfigModal();
-            location.reload();
+    async function deleteByDept() {
+        const dept = document.getElementById('delDept').value;
+        if(db) {
+            const ss = await db.collection("ot_records").where("dept", "==", dept).get();
+            const batch = db.batch();
+            ss.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
         } else {
-            alert('请填写完整的 API Key 和 Project ID！');
+            recordsData = recordsData.filter(r => r.dept !== dept);
+            localStorage.setItem('kaizen_ot_records', JSON.stringify(recordsData));
+            render();
         }
+    }
+
+    async function deleteByEmp() {
+        const key = document.getElementById('delEmpKey').value.trim();
+        if(!key) return;
+        if(db) {
+            const ss = await db.collection("ot_records").get();
+            const batch = db.batch();
+            ss.docs.forEach(doc => {
+                const d = doc.data();
+                if(d.name.includes(key) || d.empId.includes(key)) batch.delete(doc.ref);
+            });
+            await batch.commit();
+        } else {
+            recordsData = recordsData.filter(r => !r.name.includes(key) && !r.empId.includes(key));
+            localStorage.setItem('kaizen_ot_records', JSON.stringify(recordsData));
+            render();
+        }
+    }
+
+    async function deleteByDateRange() {
+        const s = document.getElementById('delStartDate').value;
+        const e = document.getElementById('delEndDate').value;
+        if(!s || !e) return;
+        if(db) {
+            const ss = await db.collection("ot_records").where("date", ">=", s).where("date", "<=", e).get();
+            const batch = db.batch();
+            ss.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+        } else {
+            recordsData = recordsData.filter(r => r.date < s || r.date > e);
+            localStorage.setItem('kaizen_ot_records', JSON.stringify(recordsData));
+            render();
+        }
+    }
+
+    function exportCSV() {
+        let csv = "\uFEFFDate,Dept,HOD,Name,EmpID,Start,End,Hours,Reason,Status\n";
+        recordsData.forEach(r => {
+            csv += `"${r.date}","${r.dept}","${r.hod}","${r.name}","${r.empId}","${r.startTime}","${r.endTime}","${r.hours}","${r.reason}","${r.status}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;' });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `OT_Records.csv`;
+        a.click();
+    }
+
+    function openCloudModal() {
+        document.getElementById('cfgKey').value = localStorage.getItem('ot_fb_k') || '';
+        document.getElementById('cfgPid').value = localStorage.getItem('ot_fb_p') || '';
+        document.getElementById('cloudModal').style.display = 'flex';
+    }
+    function closeCloudModal() { document.getElementById('cloudModal').style.display = 'none'; }
+    function saveCloudConfig() {
+        localStorage.setItem('ot_fb_k', document.getElementById('cfgKey').value.trim());
+        localStorage.setItem('ot_fb_p', document.getElementById('cfgPid').value.trim());
+        closeCloudModal();
+        location.reload();
     }
 </script>
 </body>
