@@ -33,8 +33,8 @@
                 <!-- Role Mode Switch -->
                 <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
                     <span class="text-xs font-bold text-slate-600">Access Mode / 身份:</span>
-                    <span id="roleBadge" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700">USER / 普通员工</span>
-                    <button onclick="toggleHRMode()" id="btnHRToggle" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-2.5 py-1 rounded text-xs">Switch to HR Mode / 切换HR模式</button>
+                    <span id="roleBadge" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700">STAFF / 普通员工模式</span>
+                    <button onclick="toggleHRMode()" id="btnHRToggle" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-2.5 py-1 rounded text-xs">Switch to HR Portal / 切换HR部门模式</button>
                 </div>
                 <!-- Language Toggle -->
                 <div class="flex items-center gap-2">
@@ -80,11 +80,9 @@
             <button onclick="switchTab('myrecords')" id="tab-myrecords" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
                 👤 <span id="navRecords">My Records / 个人记录</span>
             </button>
-            <!-- HR Archive - Visible to ALL, Full Access for HR -->
             <button onclick="switchTab('archive')" id="tab-archive" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
                 📁 <span id="navArchive">HR Archive / 月度归档 (全员全盘网路汇总)</span>
             </button>
-            <!-- Clear Records - Restricted to HR ONLY -->
             <button onclick="switchTab('clear')" id="tab-clear" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
                 🗑️ <span id="navClear">Clear Records / 清理记录 (HR Only)</span>
             </button>
@@ -158,7 +156,7 @@
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h3 class="font-bold text-lg text-slate-800" id="titleArchive">HR Monthly Archive / HR 月度归档</h3>
-                    <p class="text-xs text-slate-500">（HR可在此掌控并批准所有终端用户的提交与更新请求）</p>
+                    <p class="text-xs text-slate-500">（HR专属全网实时查看窗口：只有切换到 HR 模式才能在此进行跨设备修改与批准）</p>
                 </div>
                 <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 no-print">
                     🖨️ <span id="btnPrint2">Save PDF / Print / 导出打印</span>
@@ -272,9 +270,9 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        let isHRMode = false; // Default: Regular User Mode
+        let isHRMode = false; // Default: Regular Staff Mode
 
-        // Updated Database with Requested Personnel Changes
+        // Updated Database Structure according to exact specifications
         const deptDatabase = {
             "CAD": {
                 name: "CAD DEPARTMENT",
@@ -401,24 +399,114 @@
         let activeRecords = [];
         let pendingApprovalKey = null;
 
-        // HR Mode Toggle Function
+        // Multilingual Translation Dictionary
+        const i18n = {
+            zh: {
+                subHeader: "Daily Overtime Management System / 每日加班管理系统",
+                lblSelectDept: "Select Department / 选择部门:",
+                lblDept: "Department / 部门:",
+                lblHod: "HOD Approval / 部门主管:",
+                navSubmit: "Submit OT / 登记上交",
+                navRecords: "My Records / 个人记录",
+                navArchive: "HR Archive / 月度归档 (全员全盘网路汇总)",
+                navClear: "Clear Records / 清理记录 (HR Only)",
+                thEmp: "Employee / 姓名",
+                thId: "Emp ID / 工号",
+                thDate: "Date / 日期",
+                thStart: "Start Time / 开始",
+                thEnd: "End Time / 结束",
+                thHours: "Hours / 小时",
+                thReason: "Purpose & Reason / 原因",
+                thAction: "Action / 操作",
+                btnAddRow: "+ Add Row / 添加新行",
+                btnConfirm: "Confirm Submission / 确认上交",
+                btnPending: "Save PENDING / PENDING 上交",
+                titleMyRecords: "My Submissions / 个人上交记录",
+                titleArchive: "HR Monthly Archive / HR 月度归档",
+                titleClear: "Clear Records Management / 清理记录管理",
+                btnPrint1: "Save PDF / Print / 保存与打印",
+                btnPrint2: "Save PDF / Print / 导出打印"
+            },
+            en: {
+                subHeader: "Daily Overtime Management System",
+                lblSelectDept: "Select Department:",
+                lblDept: "Department:",
+                lblHod: "HOD Approval:",
+                navSubmit: "Submit OT",
+                navRecords: "My Records",
+                navArchive: "HR Archive",
+                navClear: "Clear Records",
+                thEmp: "Employee Name",
+                thId: "Emp ID",
+                thDate: "Date",
+                thStart: "Start Time",
+                thEnd: "End Time",
+                thHours: "Hours",
+                thReason: "Purpose & Reason",
+                thAction: "Action",
+                btnAddRow: "+ Add Row",
+                btnConfirm: "Confirm Submission",
+                btnPending: "Save PENDING",
+                titleMyRecords: "My Submissions",
+                titleArchive: "HR Monthly Archive",
+                titleClear: "Clear Records Management",
+                btnPrint1: "Save PDF / Print",
+                btnPrint2: "Save PDF / Print"
+            },
+            ms: {
+                subHeader: "Sistem Pengurusan Kerja Lebih Masa Harian",
+                lblSelectDept: "Pilih Jabatan:",
+                lblDept: "Jabatan:",
+                lblHod: "Kelulusan HOD:",
+                navSubmit: "Hantar OT",
+                navRecords: "Rekod Saya",
+                navArchive: "Arkib HR",
+                navClear: "Padam Rekod",
+                thEmp: "Nama Pekerja",
+                thId: "ID Pekerja",
+                thDate: "Tarikh",
+                thStart: "Masa Mula",
+                thEnd: "Masa Tamat",
+                thHours: "Jam",
+                thReason: "Tujuan & Sebab",
+                thAction: "Tindakan",
+                btnAddRow: "+ Tambah Baris",
+                btnConfirm: "Sahkan Hantar",
+                btnPending: "Simpan PENDING",
+                titleMyRecords: "Penyerahan Saya",
+                titleArchive: "Arkib Bulanan HR",
+                titleClear: "Pengurusan Padam Rekod",
+                btnPrint1: "Cetak / Simpan PDF",
+                btnPrint2: "Cetak / Simpan PDF"
+            }
+        };
+
+        function switchLanguage(lang) {
+            const dict = i18n[lang];
+            for (let key in dict) {
+                const el = document.getElementById(key);
+                if (el) el.innerText = dict[key];
+            }
+        }
+
+        // HR Portal Switch Function
         function toggleHRMode() {
             if (!isHRMode) {
                 const pwd = prompt("Enter HR Access Password / 输入 HR 访问密码:");
-                if (pwd === "1234") { // Default password
+                if (pwd === "1234") {
                     isHRMode = true;
                     document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-emerald-200 text-emerald-800";
                     document.getElementById('roleBadge').innerText = "HR MODE / HR管理员";
                     document.getElementById('btnHRToggle').innerText = "Exit HR Mode / 退出HR模式";
-                    alert("Switched to HR Mode! You now have full access to view, edit and approve all records.");
+                    alert("HR Access Granted! You can now view, edit, and approve all entries across all devices.");
                 } else {
                     alert("Incorrect Password!");
                 }
             } else {
                 isHRMode = false;
                 document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700";
-                document.getElementById('roleBadge').innerText = "USER / 普通员工";
-                document.getElementById('btnHRToggle').innerText = "Switch to HR Mode / 切换HR模式";
+                document.getElementById('roleBadge').innerText = "STAFF / 普通员工模式";
+                document.getElementById('btnHRToggle').innerText = "Switch to HR Portal / 切换HR部门模式";
             }
             renderMyRecords();
             renderArchive();
@@ -598,7 +686,7 @@
                 tr.className = "border-b border-slate-100 hover:bg-slate-50";
                 const badgeClass = rec.status === 'APPROVED' ? 'bg-blue-100 text-blue-800' : (rec.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800');
                 
-                let hrActionHtml = `<span class="text-xs text-slate-400">仅HR可直接修改</span>`;
+                let hrActionHtml = `<span class="text-xs text-slate-400">需切换HR模式处理</span>`;
                 if (isHRMode) {
                     hrActionHtml = `
                         <button onclick="hrDirectEdit('${rec._key}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded text-xs">HR Edit</button>
@@ -622,7 +710,6 @@
             });
         }
 
-        // Employee Request Edit Logic (Triggers HR Approval)
         function requestEdit(key) {
             const newReason = prompt("Enter requested modification / 请输入你需要修改的加班原因说明:");
             if (newReason) {
@@ -635,7 +722,6 @@
             }
         }
 
-        // HR Direct Edit Functionality
         function hrDirectEdit(key) {
             const rec = activeRecords.find(r => r._key === key);
             if (!rec) return;
@@ -648,7 +734,6 @@
             }
         }
 
-        // HR Popup Check for Pending Modifications
         function checkPendingApprovals() {
             const pending = activeRecords.find(r => r.status === 'PENDING HR APPROVAL');
             if (pending) {
