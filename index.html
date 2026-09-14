@@ -1,243 +1,708 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Mould Technology - Daily Overtime Management System / 每日加班管理系统</title>
+    <title>Kaizen Mould Technology - Daily Overtime Management System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase App & Database (v9 Dynamic Modules) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        body { background-color: #f8fafc; color: #334155; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0; }
-        
-        /* Header */
-        .header { background: linear-gradient(135deg, #1e3a8a, #312e81); color: #ffffff; padding: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-        .header h1 { font-size: 22px; font-weight: 700; }
-        .header p { color: #93c5fd; font-size: 14px; margin-top: 4px; }
-        .sync-badge { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(59, 130, 246, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #6ee7b7; display: flex; items-center; gap: 8px; }
-        .dot { width: 8px; height: 8px; background-color: #34d399; border-radius: 50%; display: inline-block; }
-
-        /* Controls */
-        .controls { background: #f1f5f9; padding: 16px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-        .dept-select-group { display: flex; align-items: center; gap: 10px; }
-        .dept-select-group label { font-size: 14px; font-weight: 600; color: #475569; }
-        select { background: #fff; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer; }
-        .info-card { background: #fff; padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; display: flex; gap: 16px; }
-        .info-card span.highlight { font-weight: 700; color: #1e3a8a; }
-
-        /* Form */
-        .form-section { padding: 24px; border-bottom: 1px solid #e2e8f0; }
-        .form-section h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 16px; letter-spacing: 0.5px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #475569; }
-        .form-group input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
-        .form-group input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.2); }
-        .time-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .full-width { grid-column: 1 / -1; }
-        .btn-submit { background: #2563eb; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; height: max-content; align-self: flex-end; }
-        .btn-submit:hover { background: #1d4ed8; }
-
-        /* Table */
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th { background: #f8fafc; color: #475569; padding: 12px 16px; font-weight: 600; text-transform: uppercase; font-size: 12px; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-        tr:hover { background: #f8fafc; }
-        .btn-delete { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .btn-delete:hover { background: #fee2e2; }
-
-        /* Footer */
-        .footer { padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 12px; color: #64748b; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; padding: 0; }
+            .container-box { border: none !important; box-shadow: none !important; }
+        }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen p-4 md:p-8 text-slate-800">
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div>
-                <h1>Kaizen Mould Technology Sdn. Bhd.</h1>
-                <p>Daily Overtime Management System / 每日加班管理系统</p>
+    <!-- System Container -->
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden container-box">
+        
+        <!-- Top Header & Language Toggle -->
+        <div class="bg-white p-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl font-bold text-blue-950">Kaizen Mould Technology Sdn. Bhd.</h1>
+                <p class="text-xs text-slate-500 mt-1" id="subHeader">Daily Overtime Management System / 每日加班管理系统</p>
             </div>
-            <div class="sync-badge">
-                <span class="dot"></span>
-                <span>多设备实时同步中</span>
-            </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <div class="dept-select-group">
-                <label for="deptSelect">Department / 部门:</label>
-                <select id="deptSelect">
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="PRODUCTION">PRODUCTION</option>
-                    <option value="QUALITY CONTROL">QUALITY CONTROL</option>
-                    <option value="MAINTENANCE">MAINTENANCE</option>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-slate-500">Language / 语言:</span>
+                <select id="langSelect" onchange="switchLanguage(this.value)" class="border border-slate-300 rounded px-2 py-1 text-xs bg-slate-50 focus:outline-none">
+                    <option value="zh">中文 (Chinese)</option>
+                    <option value="en">English</option>
+                    <option value="ms">Bahasa Melayu</option>
                 </select>
             </div>
-            <div class="info-card">
-                <div>部门: <span id="currentDeptLabel" class="highlight">ADMIN</span></div>
-                <div>主管: <span id="hodLabel" class="highlight">KALAISELVI</span></div>
+        </div>
+
+        <!-- Department Control Panel -->
+        <div class="bg-blue-50/50 p-4 m-6 rounded-lg border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <label class="text-sm font-bold text-blue-900 whitespace-nowrap" id="lblSelectDept">Select Department / Pilih Jabatan / 选择部门:</label>
+                <select id="deptSelect" onchange="onDeptChange()" class="bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-2 focus:ring-blue-500 w-full md:w-80 font-medium">
+                    <option value="CAD_CAM_CNC">CAD, CAM & CNC DEPARTMENT</option>
+                    <option value="EDM_PROJECT_PRODUCTION">EDM, PROJECT, POLISHING, PRODUCTION & INJECTION TRIAL</option>
+                    <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
+                    <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                    <option value="ADMIN_HR_PURCHASING" selected>ADMIN, HR & PURCHASING DEPARTMENT</option>
+                </select>
+            </div>
+            <div class="text-right text-xs text-slate-600">
+                <div><span id="lblDept">Department / 部门:</span> <strong id="currentDeptDisplay" class="text-blue-900 font-bold">ADMIN, HR & PURCHASING</strong></div>
+                <div><span id="lblHod">HOD Approval / 部门主管:</span> <strong id="currentHodDisplay" class="text-slate-900 font-bold">KALAISELVI A/P SOORIAMOORTHY</strong></div>
             </div>
         </div>
 
-        <!-- Form -->
-        <div class="form-section">
-            <h2>Add Overtime Record / 添加加班记录</h2>
-            <form id="otForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Employee Name / 姓名</label>
-                        <input type="text" id="empName" required placeholder="e.g. Tan Kyle">
-                    </div>
-                    <div class="form-group">
-                        <label>Emp ID / 工号</label>
-                        <input type="text" id="empId" required placeholder="e.g. KM-1024">
-                    </div>
-                    <div class="form-group">
-                        <label>Date / 日期</label>
-                        <input type="date" id="otDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Start - End Time / 时间段</label>
-                        <div class="time-group">
-                            <input type="time" id="startTime" required>
-                            <input type="time" id="endTime" required>
-                        </div>
-                    </div>
-                    <div class="form-group full-width" style="display: flex; gap: 16px; align-items: flex-end;">
-                        <div style="flex: 1;">
-                            <label>Purpose & Reason / 加班原因说明</label>
-                            <input type="text" id="otReason" required placeholder="e.g. Urgent machine maintenance / 紧急机器维修">
-                        </div>
-                        <button type="submit" class="btn-submit">+ 提交记录</button>
-                    </div>
+        <!-- Navigation Tabs -->
+        <div class="px-6 flex flex-wrap gap-2 border-b border-slate-200 no-print">
+            <button onclick="switchTab('submit')" id="tab-submit" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-blue-900 text-white flex items-center gap-2">
+                📝 <span id="navSubmit">Submit OT / Hantar OT / 登记上交</span>
+            </button>
+            <button onclick="switchTab('myrecords')" id="tab-myrecords" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
+                👤 <span id="navRecords">My Records / Rekod Saya / 个人记录</span>
+            </button>
+            <button onclick="switchTab('archive')" id="tab-archive" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
+                📁 <span id="navArchive">HR Archive / Arkib HR / 月度归档</span>
+            </button>
+            <button onclick="switchTab('clear')" id="tab-clear" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
+                🗑️ <span id="navClear">Clear Records / Padam Rekod / 清理记录</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: SUBMIT OT -->
+        <div id="view-submit" class="p-6">
+            <div class="overflow-x-auto border border-slate-200 rounded-lg mb-4">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                            <th class="p-3" id="thEmp">Employee / 姓名</th>
+                            <th class="p-3" id="thId">Emp ID / 工号</th>
+                            <th class="p-3" id="thDate">Date / 日期</th>
+                            <th class="p-3" id="thStart">Start Time / 开始</th>
+                            <th class="p-3" id="thEnd">End Time / 结束</th>
+                            <th class="p-3" id="thHours">Hours / 小时</th>
+                            <th class="p-3" id="thReason">Purpose & Reason / 原因</th>
+                            <th class="p-3 text-center" id="thAction">Action / 操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inputRowsBody">
+                        <!-- Dynamic Input Rows -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="addInputRow()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+                    ➕ <span id="btnAddRow">Add Row / Tambah / 添加新行</span>
+                </button>
+                <button onclick="submitRecords('SUBMITTED')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+                    ✅ <span id="btnConfirm">Confirm Submission / 确认上交</span>
+                </button>
+                <button onclick="submitRecords('PENDING')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+                    ⏳ <span id="btnPending">Save PENDING / PENDING 上交</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB 2: MY RECORDS -->
+        <div id="view-myrecords" class="p-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-slate-800" id="titleMyRecords">My Submissions / 个人上交记录</h3>
+                <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 no-print">
+                    🖨️ <span id="btnPrint1">Save PDF / Print / 保存与打印</span>
+                </button>
+            </div>
+            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                            <th class="p-3">Date / 日期</th>
+                            <th class="p-3">Dept / 部门</th>
+                            <th class="p-3">HOD / 主管</th>
+                            <th class="p-3">Name / 姓名</th>
+                            <th class="p-3">ID / 工号</th>
+                            <th class="p-3">Time / 时间段</th>
+                            <th class="p-3">Hours / 小时</th>
+                            <th class="p-3">Reason / 原因</th>
+                            <th class="p-3">Status / 状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myRecordsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: HR ARCHIVE -->
+        <div id="view-archive" class="p-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-slate-800" id="titleArchive">HR Monthly Archive / HR 月度归档</h3>
+                <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 no-print">
+                    🖨️ <span id="btnPrint2">Save PDF / Print / 导出打印</span>
+                </button>
+            </div>
+            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
+                            <th class="p-3">Date / 日期</th>
+                            <th class="p-3">Dept / 部门</th>
+                            <th class="p-3">HOD / 主管</th>
+                            <th class="p-3">Name / 姓名</th>
+                            <th class="p-3">ID / 工号</th>
+                            <th class="p-3">Time / 时间段</th>
+                            <th class="p-3">Hours / 小时</th>
+                            <th class="p-3">Reason / 原因</th>
+                            <th class="p-3">Status / 状态</th>
+                            <th class="p-3 text-center no-print">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archiveTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 4: CLEAR RECORDS -->
+        <div id="view-clear" class="p-6 space-y-6 hidden">
+            <h3 class="font-bold text-xl text-rose-600 border-b pb-2" id="titleClear">Clear Records Management / 清理记录管理</h3>
+            
+            <!-- 1. Dept -->
+            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
+                <h4 class="font-bold text-sm text-slate-700">🏢 1. Delete By Specific Department / 按指定部门删除</h4>
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <select id="clearDeptSelect" class="border border-slate-300 rounded p-2 text-sm w-full md:w-64">
+                        <option value="CAD_CAM_CNC">CAD, CAM & CNC DEPARTMENT</option>
+                        <option value="EDM_PROJECT_PRODUCTION">EDM, PROJECT, POLISHING, PRODUCTION & INJECTION TRIAL</option>
+                        <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
+                        <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                        <option value="ADMIN_HR_PURCHASING">ADMIN, HR & PURCHASING DEPARTMENT</option>
+                    </select>
+                    <button onclick="clearByDept()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <!-- Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>姓名</th>
-                        <th>工号</th>
-                        <th>日期</th>
-                        <th>开始</th>
-                        <th>结束</th>
-                        <th>小时</th>
-                        <th>加班原因</th>
-                        <th style="text-align: center;">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="otTableBody">
-                    <!-- 动态生成记录 -->
-                </tbody>
-            </table>
-        </div>
+            <!-- 2. Employee -->
+            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
+                <h4 class="font-bold text-sm text-slate-700">👤 2. Delete By Specific Employee / 按指定员工姓名或工号删除</h4>
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <input type="text" id="clearEmpInput" placeholder="Enter Name or ID (e.g. TAN KYLE or 328)" class="border border-slate-300 rounded p-2 text-sm w-full md:w-80">
+                    <button onclick="clearByEmp()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Employee Records / 删除该员工所有记录</button>
+                </div>
+            </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            <div id="recordCount">Total Records: 0</div>
-            <div>Kaizen Mould Technology Sdn. Bhd. © 2026</div>
+            <!-- 3. Date Range -->
+            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
+                <h4 class="font-bold text-sm text-slate-700">📅 3. Delete By Specific Date Range / 按特定日期段删除</h4>
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <input type="date" id="clearStartDate" class="border border-slate-300 rounded p-2 text-sm">
+                    <span class="text-xs text-slate-400">to</span>
+                    <input type="date" id="clearEndDate" class="border border-slate-300 rounded p-2 text-sm">
+                    <button onclick="clearByDateRange()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Range Records / 删除指定段记录</button>
+                </div>
+            </div>
+
+            <!-- 4. Month -->
+            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
+                <h4 class="font-bold text-sm text-slate-700">🗓️ 4. Delete By Specific Month / 按特定月份删除</h4>
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <input type="month" id="clearMonthInput" class="border border-slate-300 rounded p-2 text-sm">
+                    <button onclick="clearByMonth()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Month / 删除所选月份记录</button>
+                </div>
+            </div>
+
+            <!-- 5. Year -->
+            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
+                <h4 class="font-bold text-sm text-slate-700">📆 5. Delete By Specific Year / 按特定年份删除</h4>
+                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <input type="number" id="clearYearInput" placeholder="e.g. 2026" class="border border-slate-300 rounded p-2 text-sm w-32">
+                    <button onclick="clearByYear()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Year / 删除所选年份记录</button>
+                </div>
+            </div>
+
+            <!-- 6. CLEAR ALL -->
+            <div class="p-4 bg-rose-50 border border-rose-200 rounded-lg space-y-3">
+                <h4 class="font-bold text-sm text-rose-700">🚨 6. CLEAR ALL RECORDS / 彻底清空所有记录</h4>
+                <p class="text-xs text-rose-500">⚠️ Warning: All saved records will be permanently erased. / 警告：全盘清空后数据无法恢复。</p>
+                <button onclick="clearAll()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-5 py-2.5 rounded text-xs shadow">🚨 CLEAR ALL / 清空全盘数据</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR Approval Alert Modal -->
+    <div id="hrModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full border border-slate-200 space-y-4">
+            <h3 class="font-bold text-lg text-amber-600 flex items-center gap-2">⚠️ HR Approval Needed / 部门修改审批请求</h3>
+            <p class="text-sm text-slate-600" id="hrModalText">有主管修改了 OT 提交记录，需要 HR 部门批准才能生效。</p>
+            <div id="hrModalDetails" class="bg-slate-50 p-3 rounded text-xs text-slate-700 space-y-1 font-mono"></div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="rejectHODChange()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold px-4 py-2 rounded text-xs">Reject / 拒绝</button>
+                <button onclick="approveHODChange()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded text-xs">Approve / 批准修改</button>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('otDate').valueAsDate = new Date();
+        // Database & Multi-device Live Synchronization Initialization
+        const firebaseConfig = {
+            databaseURL: "https://ot-system-default-rtdb.firebaseio.com" // Default Realtime Endpoint
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
 
-        const hodMapping = {
-            "ADMIN": "KALAISELVI",
-            "PRODUCTION": "MOHD RAZAK",
-            "QUALITY CONTROL": "LIM TECK HOCK",
-            "MAINTENANCE": "MR. KUMAR"
+        // Exact Organization Structure & Employee Database
+        const deptDatabase = {
+            "CAD_CAM_CNC": {
+                name: "CAD, CAM & CNC DEPARTMENT",
+                hod: "CHAN KENG LEONG",
+                members: [
+                    { id: "2", name: "CHAN KENG LEONG", role: "Manager" },
+                    { id: "274", name: "SOH GIM BOON", role: "Team Member" },
+                    { id: "305", name: "ADARSH DAMODARAN", role: "Team Member" },
+                    { id: "28", name: "HAN AYE", role: "Team Member" },
+                    { id: "60", name: "MD KANCHAN", role: "Team Member" },
+                    { id: "269", name: "KHAU LIANG YU", role: "Team Member" },
+                    { id: "300", name: "NAY MYO ZAW", role: "Team Member" },
+                    { id: "307", name: "MA LIK CHAN", role: "Team Member" },
+                    { id: "27", name: "SA MASAN BA", role: "Team Member" },
+                    { id: "290", name: "BHARAT BOHARA", role: "Team Member" },
+                    { id: "291", name: "BOHARA DHAN BAHADUR", role: "Team Member" },
+                    { id: "294", name: "BOHARA MILAN", role: "Team Member" },
+                    { id: "325", name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", role: "Team Member" }
+                ]
+            },
+            "EDM_PROJECT_PRODUCTION": {
+                name: "EDM, PROJECT, POLISHING, PRODUCTION & INJECTION TRIAL DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                members: [
+                    { id: "3", name: "CHONG FAT KEONG", role: "Manager" },
+                    { id: "302", name: "TEE NYEIN AUNG", role: "Team Member" },
+                    { id: "306", name: "KAYW ZIN HEIN", role: "Team Member" },
+                    { id: "309", name: "JOSHWIN SANTHOSH POILIL THAZHATH", role: "Team Member" },
+                    { id: "318", name: "YUVANNESH A/L MAYADEVAN", role: "Team Member" },
+                    { id: "257", name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", role: "Team Member" },
+                    { id: "262", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", role: "Team Member" },
+                    { id: "19", name: "MD SHOPON", role: "Team Member" },
+                    { id: "299", name: "MIN THU", role: "Team Member" },
+                    { id: "20", name: "MD SHAHA BUDIN", role: "Team Member" },
+                    { id: "68", name: "MD ALAMGIR", role: "Team Member" },
+                    { id: "301", name: "SHAING THU AUNG", role: "Team Member" },
+                    { id: "329", name: "MAHAJI", role: "Team Member" }
+                ]
+            },
+            "MOULD_MAKER": {
+                name: "MOULD MAKER DEPARTMENT",
+                hod: "LEE YOONG HON",
+                members: [
+                    { id: "15", name: "LEE YOONG HON", role: "Manager" },
+                    { id: "69", name: "MD JAHIR", role: "Team Member" },
+                    { id: "72", name: "MD JAHANGIR ALAM", role: "Team Member" },
+                    { id: "286", name: "HING YONG HOW", role: "Team Member" },
+                    { id: "303", name: "ZAW MYO HTIKE", role: "Team Member" },
+                    { id: "310", name: "AMARNATH SIVADAS", role: "Team Member" },
+                    { id: "311", name: "JAISON CHRISTOPHER", role: "Team Member" },
+                    { id: "319", name: "VIMALKUMAR PUTHIYA VALAPPIL", role: "Team Member" },
+                    { id: "322", name: "SARATH SASIDHARAKAIMAL", role: "Team Member" },
+                    { id: "326", name: "GOH CHEE KUAN", role: "Team Member" }
+                ]
+            },
+            "QC": {
+                name: "QUALITY CONTROL (QC) DEPARTMENT",
+                hod: "TAN KAH CHYE",
+                members: [
+                    { id: "266", name: "TAN KAH CHYE", role: "Manager" },
+                    { id: "323", name: "NUR LIANASOFIA PUTRI BINTI KATENI", role: "Team Member" }
+                ]
+            },
+            "ADMIN_HR_PURCHASING": {
+                name: "ADMIN, HR & PURCHASING DEPARTMENT",
+                hod: "KALAISELVI A/P SOORIAMOORTHY",
+                members: [
+                    { id: "108", name: "KALAISELVI A/P SOORIAMOORTHY", role: "HR / Head of Dept" },
+                    { id: "212", name: "THILAGAH A/P KRISHNAN", role: "Team Member" },
+                    { id: "316", name: "KISTINNA ANAQIN", role: "Team Member" },
+                    { id: "328", name: "TAN KYLE", role: "Team Member" }
+                ]
+            }
         };
 
-        const deptSelect = document.getElementById('deptSelect');
-        const currentDeptLabel = document.getElementById('currentDeptLabel');
-        const hodLabel = document.getElementById('hodLabel');
+        let activeRecords = [];
+        let pendingApprovalKey = null;
 
-        deptSelect.addEventListener('change', (e) => {
-            const val = e.target.value;
-            currentDeptLabel.textContent = val;
-            hodLabel.textContent = hodMapping[val] || "KALAISELVI";
-            loadRecords();
-        });
+        // Multilingual Translations Dictionary
+        const i18n = {
+            zh: {
+                subHeader: "Daily Overtime Management System / 每日加班管理系统",
+                lblSelectDept: "Select Department / Pilih Jabatan / 选择部门:",
+                lblDept: "Department / 部门:",
+                lblHod: "HOD Approval / 部门主管:",
+                navSubmit: "Submit OT / Hantar OT / 登记上交",
+                navRecords: "My Records / Rekod Saya / 个人记录",
+                navArchive: "HR Archive / Arkib HR / 月度归档",
+                navClear: "Clear Records / Padam Rekod / 清理记录",
+                thEmp: "Employee / 姓名",
+                thId: "Emp ID / 工号",
+                thDate: "Date / 日期",
+                thStart: "Start Time / 开始",
+                thEnd: "End Time / 结束",
+                thHours: "Hours / 小时",
+                thReason: "Purpose & Reason / 原因",
+                thAction: "Action / 操作",
+                btnAddRow: "+ Add Row / Tambah / 添加新行",
+                btnConfirm: "Confirm Submission / 确认上交",
+                btnPending: "Save PENDING / PENDING 上交",
+                titleMyRecords: "My Submissions / 个人上交记录",
+                titleArchive: "HR Monthly Archive / HR 月度归档",
+                titleClear: "Clear Records Management / 清理记录管理",
+                btnPrint1: "Save PDF / Print / 保存与打印",
+                btnPrint2: "Save PDF / Print / 导出打印"
+            },
+            en: {
+                subHeader: "Daily Overtime Management System",
+                lblSelectDept: "Select Department:",
+                lblDept: "Department:",
+                lblHod: "HOD Approval:",
+                navSubmit: "Submit OT",
+                navRecords: "My Records",
+                navArchive: "HR Archive",
+                navClear: "Clear Records",
+                thEmp: "Employee Name",
+                thId: "Emp ID",
+                thDate: "Date",
+                thStart: "Start Time",
+                thEnd: "End Time",
+                thHours: "Hours",
+                thReason: "Purpose & Reason",
+                thAction: "Action",
+                btnAddRow: "+ Add Row",
+                btnConfirm: "Confirm Submission",
+                btnPending: "Save PENDING",
+                titleMyRecords: "My Submissions",
+                titleArchive: "HR Monthly Archive",
+                titleClear: "Clear Records Management",
+                btnPrint1: "Save PDF / Print",
+                btnPrint2: "Save PDF / Print"
+            },
+            ms: {
+                subHeader: "Sistem Pengurusan Kerja Lebih Masa Harian",
+                lblSelectDept: "Pilih Jabatan:",
+                lblDept: "Jabatan:",
+                lblHod: "Kelulusan HOD:",
+                navSubmit: "Hantar OT",
+                navRecords: "Rekod Saya",
+                navArchive: "Arkib HR",
+                navClear: "Padam Rekod",
+                thEmp: "Nama Pekerja",
+                thId: "ID Pekerja",
+                thDate: "Tarikh",
+                thStart: "Masa Mula",
+                thEnd: "Masa Tamat",
+                thHours: "Jam",
+                thReason: "Tujuan & Sebab",
+                thAction: "Tindakan",
+                btnAddRow: "+ Tambah Baris",
+                btnConfirm: "Sahkan Hantar",
+                btnPending: "Simpan PENDING",
+                titleMyRecords: "Penyerahan Saya",
+                titleArchive: "Arkib Bulanan HR",
+                titleClear: "Pengurusan Padam Rekod",
+                btnPrint1: "Cetak / Simpan PDF",
+                btnPrint2: "Cetak / Simpan PDF"
+            }
+        };
 
-        function getStorageKey() {
-            return `kaizen_ot_${deptSelect.value}`;
+        function switchLanguage(lang) {
+            const dict = i18n[lang];
+            for (let key in dict) {
+                const el = document.getElementById(key);
+                if (el) el.innerText = dict[key];
+            }
         }
 
-        function loadRecords() {
-            const tbody = document.getElementById('otTableBody');
-            tbody.innerHTML = '';
-            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+        // On Load Setup
+        window.onload = function() {
+            onDeptChange();
+            addInputRow();
+            listenRealtimeDatabase();
+        };
+
+        function onDeptChange() {
+            const key = document.getElementById('deptSelect').value;
+            const dept = deptDatabase[key];
+            document.getElementById('currentDeptDisplay').innerText = dept.name;
+            document.getElementById('currentHodDisplay').innerText = dept.hod;
             
-            document.getElementById('recordCount').textContent = `Total Records: ${data.length}`;
-
-            if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 32px; color: #94a3b8;">暂无加班记录 (No overtime records found)</td></tr>`;
-                return;
-            }
-
-            data.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight: 600;">${item.empName}</td>
-                    <td style="color: #64748b;">${item.empId}</td>
-                    <td>${item.otDate}</td>
-                    <td>${item.startTime}</td>
-                    <td>${item.endTime}</td>
-                    <td style="font-weight: 700; color: #2563eb;">${item.hours} hrs</td>
-                    <td>${item.otReason}</td>
-                    <td style="text-align: center;">
-                        <button onclick="deleteRecord(${index})" class="btn-delete">删除</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            // Re-populate employee options on open rows
+            const selects = document.querySelectorAll('.emp-select');
+            selects.forEach(select => {
+                const currentVal = select.value;
+                select.innerHTML = `<option value="">Select Employee</option>` + 
+                    dept.members.map(m => `<option value="${m.id}" data-name="${m.name}">${m.name} (${m.id})</option>`).join('');
+                select.value = currentVal;
             });
         }
 
-        document.getElementById('otForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const empName = document.getElementById('empName').value;
-            const empId = document.getElementById('empId').value;
-            const otDate = document.getElementById('otDate').value;
-            const startTime = document.getElementById('startTime').value;
-            const endTime = document.getElementById('endTime').value;
-            const otReason = document.getElementById('otReason').value;
+        function addInputRow() {
+            const tbody = document.getElementById('inputRowsBody');
+            const deptKey = document.getElementById('deptSelect').value;
+            const dept = deptDatabase[deptKey];
 
-            const start = new Date(`1970-01-01T${startTime}:00`);
-            const end = new Date(`1970-01-01T${endTime}:00`);
-            let diff = (end - start) / 36e5;
-            if(diff < 0) diff += 24;
+            const today = new Date().toISOString().split('T')[0];
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-slate-100";
+            tr.innerHTML = `
+                <td class="p-2">
+                    <select onchange="onEmpSelect(this)" class="emp-select w-full border border-slate-300 rounded p-1.5 text-xs">
+                        <option value="">Select Employee</option>
+                        ${dept.members.map(m => `<option value="${m.id}" data-name="${m.name}">${m.name} (${m.id})</option>`).join('')}
+                    </select>
+                </td>
+                <td class="p-2"><input type="text" class="emp-id w-full border border-slate-300 rounded p-1.5 text-xs bg-slate-50" readonly></td>
+                <td class="p-2"><input type="date" value="${today}" class="ot-date w-full border border-slate-300 rounded p-1.5 text-xs"></td>
+                <td class="p-2"><input type="time" value="17:00" onchange="calcHours(this)" class="start-time w-full border border-slate-300 rounded p-1.5 text-xs"></td>
+                <td class="p-2"><input type="time" value="21:00" onchange="calcHours(this)" class="end-time w-full border border-slate-300 rounded p-1.5 text-xs"></td>
+                <td class="p-2"><input type="text" value="4.0" class="ot-hours w-full border border-slate-300 rounded p-1.5 text-xs bg-slate-50" readonly></td>
+                <td class="p-2"><input type="text" placeholder="Reason / Project" class="ot-reason w-full border border-slate-300 rounded p-1.5 text-xs"></td>
+                <td class="p-2 text-center">
+                    <button onclick="removeRow(this)" class="bg-rose-100 text-rose-600 hover:bg-rose-200 p-1.5 rounded">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
 
-            const newRecord = { empName, empId, otDate, startTime, endTime, hours: diff.toFixed(1), otReason };
-
-            const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
-            data.push(newRecord);
-            localStorage.setItem(getStorageKey(), JSON.stringify(data));
-
-            document.getElementById('empName').value = '';
-            document.getElementById('empId').value = '';
-            document.getElementById('otReason').value = '';
-            
-            loadRecords();
-        });
-
-        function deleteRecord(index) {
-            if(confirm('确定要删除这条加班记录吗？')) {
-                const data = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
-                data.splice(index, 1);
-                localStorage.setItem(getStorageKey(), JSON.stringify(data));
-                loadRecords();
+        function removeRow(btn) {
+            const tbody = document.getElementById('inputRowsBody');
+            if (tbody.rows.length > 1) {
+                btn.closest('tr').remove();
             }
         }
 
-        loadRecords();
+        function onEmpSelect(select) {
+            const row = select.closest('tr');
+            const idInput = row.querySelector('.emp-id');
+            idInput.value = select.value;
+        }
+
+        function calcHours(element) {
+            const row = element.closest('tr');
+            const st = row.querySelector('.start-time').value;
+            const et = row.querySelector('.end-time').value;
+            if (st && et) {
+                let s = new Date(`1970-01-01T${st}:00`);
+                let e = new Date(`1970-01-01T${et}:00`);
+                let diff = (e - s) / 36e5;
+                if (diff < 0) diff += 24;
+                row.querySelector('.ot-hours').value = diff.toFixed(1);
+            }
+        }
+
+        // Save Records to Cloud Realtime DB
+        function submitRecords(status) {
+            const rows = document.querySelectorAll('#inputRowsBody tr');
+            const deptKey = document.getElementById('deptSelect').value;
+            const dept = deptDatabase[deptKey];
+            let records = [];
+
+            rows.forEach(row => {
+                const select = row.querySelector('.emp-select');
+                const empId = row.querySelector('.emp-id').value;
+                const empName = select.options[select.selectedIndex]?.getAttribute('data-name');
+                const otDate = row.querySelector('.ot-date').value;
+                const startTime = row.querySelector('.start-time').value;
+                const endTime = row.querySelector('.end-time').value;
+                const hours = row.querySelector('.ot-hours').value;
+                const reason = row.querySelector('.ot-reason').value;
+
+                if (empId && otDate && reason) {
+                    records.push({
+                        id: Date.now() + Math.random().toString(36).substr(2, 4),
+                        deptKey: deptKey,
+                        deptName: dept.name,
+                        hod: dept.hod,
+                        empId: empId,
+                        empName: empName,
+                        date: otDate,
+                        time: `${startTime} - ${endTime}`,
+                        hours: hours,
+                        reason: reason,
+                        status: status,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            });
+
+            if (records.length === 0) {
+                alert("Please fill in complete employee and overtime details.");
+                return;
+            }
+
+            // Sync with Cloud
+            const updates = {};
+            records.forEach(r => {
+                updates['/records/' + r.id] = r;
+            });
+
+            db.ref().update(updates).then(() => {
+                alert(`Successfully saved ${records.length} record(s) as ${status}!`);
+                document.getElementById('inputRowsBody').innerHTML = '';
+                addInputRow();
+            });
+        }
+
+        // Multi-device Live Synchronization Listener
+        function listenRealtimeDatabase() {
+            db.ref('/records').on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                activeRecords = Object.values(data);
+                renderMyRecords();
+                renderArchive();
+                checkPendingApprovals();
+            });
+        }
+
+        function renderMyRecords() {
+            const tbody = document.getElementById('myRecordsTableBody');
+            tbody.innerHTML = activeRecords.map(r => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3">${r.date}</td>
+                    <td class="p-3">${r.deptKey}</td>
+                    <td class="p-3">${r.hod}</td>
+                    <td class="p-3 font-semibold">${r.empName}</td>
+                    <td class="p-3">${r.empId}</td>
+                    <td class="p-3">${r.time}</td>
+                    <td class="p-3 font-bold text-blue-900">${r.hours}</td>
+                    <td class="p-3">${r.reason}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${r.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${r.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderArchive() {
+            const tbody = document.getElementById('archiveTableBody');
+            tbody.innerHTML = activeRecords.map(r => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3">${r.date}</td>
+                    <td class="p-3">${r.deptKey}</td>
+                    <td class="p-3">${r.hod}</td>
+                    <td class="p-3 font-semibold">${r.empName}</td>
+                    <td class="p-3">${r.empId}</td>
+                    <td class="p-3">${r.time}</td>
+                    <td class="p-3 font-bold text-blue-900">${r.hours}</td>
+                    <td class="p-3">${r.reason}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${r.status === 'APPROVED' ? 'bg-blue-100 text-blue-700' : (r.status === 'SUBMITTED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700')}">${r.status}</span></td>
+                    <td class="p-3 text-center no-print">
+                        <button onclick="requestHODEdit('${r.id}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded text-xs">Edit / 申请修改</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // HOD Edit Request & HR Approval Workflow
+        function requestHODEdit(id) {
+            const newReason = prompt("HOD: Enter modified reason / 输入需要修正的加班原因:");
+            if (newReason) {
+                db.ref('/records/' + id).update({
+                    pendingReason: newReason,
+                    status: 'PENDING HR APPROVAL'
+                }).then(() => {
+                    alert("Change submitted! Awaiting HR approval notice.");
+                });
+            }
+        }
+
+        function checkPendingApprovals() {
+            const pending = activeRecords.find(r => r.status === 'PENDING HR APPROVAL');
+            if (pending) {
+                pendingApprovalKey = pending.id;
+                document.getElementById('hrModalDetails').innerHTML = `
+                    <div><strong>Emp:</strong> ${pending.empName} (${pending.empId})</div>
+                    <div><strong>Dept:</strong> ${pending.deptName}</div>
+                    <div><strong>New Proposed Reason:</strong> ${pending.pendingReason}</div>
+                `;
+                document.getElementById('hrModal').classList.remove('hidden');
+            } else {
+                document.getElementById('hrModal').classList.add('hidden');
+            }
+        }
+
+        function approveHODChange() {
+            if (!pendingApprovalKey) return;
+            const rec = activeRecords.find(r => r.id === pendingApprovalKey);
+            db.ref('/records/' + pendingApprovalKey).update({
+                reason: rec.pendingReason,
+                status: 'APPROVED',
+                pendingReason: null
+            }).then(() => {
+                document.getElementById('hrModal').classList.add('hidden');
+                alert("HR Approved modification!");
+            });
+        }
+
+        function rejectHODChange() {
+            if (!pendingApprovalKey) return;
+            db.ref('/records/' + pendingApprovalKey).update({
+                status: 'SUBMITTED',
+                pendingReason: null
+            }).then(() => {
+                document.getElementById('hrModal').classList.add('hidden');
+                alert("HR Rejected modification.");
+            });
+        }
+
+        // Clear Records Management Functions
+        function clearByDept() {
+            const dept = document.getElementById('clearDeptSelect').value;
+            if (confirm(`Delete all records for department: ${dept}?`)) {
+                activeRecords.filter(r => r.deptKey === dept).forEach(r => db.ref('/records/' + r.id).remove());
+            }
+        }
+
+        function clearByEmp() {
+            const val = document.getElementById('clearEmpInput').value.trim().toLowerCase();
+            if (!val) return;
+            if (confirm(`Delete all records for employee: ${val}?`)) {
+                activeRecords.filter(r => r.empName.toLowerCase().includes(val) || r.empId.toLowerCase() === val).forEach(r => db.ref('/records/' + r.id).remove());
+            }
+        }
+
+        function clearByDateRange() {
+            const st = document.getElementById('clearStartDate').value;
+            const et = document.getElementById('clearEndDate').value;
+            if (st && et && confirm(`Delete records from ${st} to ${et}?`)) {
+                activeRecords.filter(r => r.date >= st && r.date <= et).forEach(r => db.ref('/records/' + r.id).remove());
+            }
+        }
+
+        function clearByMonth() {
+            const m = document.getElementById('clearMonthInput').value; // YYYY-MM
+            if (m && confirm(`Delete all records in month: ${m}?`)) {
+                activeRecords.filter(r => r.date.startsWith(m)).forEach(r => db.ref('/records/' + r.id).remove());
+            }
+        }
+
+        function clearByYear() {
+            const y = document.getElementById('clearYearInput').value;
+            if (y && confirm(`Delete all records in year: ${y}?`)) {
+                activeRecords.filter(r => r.date.startsWith(y)).forEach(r => db.ref('/records/' + r.id).remove());
+            }
+        }
+
+        function clearAll() {
+            if (confirm("🚨 WARNING: Permanently delete ALL overtime records across the entire system?")) {
+                db.ref('/records').remove().then(() => alert("All records cleared successfully."));
+            }
+        }
+
+        // Navigation Switching
+        function switchTab(tab) {
+            ['submit', 'myrecords', 'archive', 'clear'].forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).className = "px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2";
+            });
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).className = "px-4 py-2.5 font-bold text-sm rounded-t-lg bg-blue-900 text-white flex items-center gap-2";
+        }
     </script>
 </body>
 </html>
