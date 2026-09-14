@@ -1,224 +1,64 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Daily OverTime System</title>
+    <title>Kaizen Mould Technology - Daily OT System</title>
+    <!-- 引入 Firebase 数据库 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
-        :root {
-            --primary-color: #1e3a8a;
-            --primary-light: #3b82f6;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --border-color: #e5e7eb;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding: 12px; font-size: 13px; }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        header { text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); }
-        h1 { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 4px; }
-        .subtitle { font-size: 0.85rem; color: #6b7280; }
-
-        .dept-selector-card {
-            background: #eff6ff;
-            border: 2px solid #bfdbfe;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .dept-info span { font-weight: bold; color: var(--primary-color); }
-
-        .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); overflow-x: auto; padding-bottom: 2px; }
-        .tab-btn { padding: 10px 16px; border: none; background: #f3f4f6; color: #4b5563; font-weight: 600; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; font-size: 0.88rem; }
-        .tab-btn.active { background: var(--primary-color); color: #ffffff; }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; background: #ffffff; }
-        th, td { padding: 8px 10px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
-        th { background-color: #f8fafc; color: var(--primary-color); font-weight: 700; font-size: 0.8rem; }
-
-        input, select { width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; }
-        input:focus, select:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-add { background: #4b5563; color: white; }
-        .btn-confirm { background: var(--success-color); color: white; }
-        .btn-pending { background: var(--warning-color); color: #1f2937; }
-        .btn-danger { background: var(--danger-color); color: white; }
-        .btn-primary { background: var(--primary-color); color: white; }
-
-        .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
-        .badge-confirmed { background: #d1fae5; color: #065f46; }
-        .badge-pending { background: #fef3c7; color: #92400e; }
-
-        .clear-box { background: #fff; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .clear-box h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--primary-color); }
-
-        @media print {
-            body { padding: 0; background: white; }
-            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
-            .nav-tabs, .btn-group, .dept-selector-card, .no-print { display: none !important; }
-            .tab-content { display: block !important; }
-            #entry-tab, #clear-tab { display: none !important; }
-            #archive-tab, #myrecords-tab { display: block !important; }
-            th, td { border: 1px solid #000 !important; font-size: 9pt; }
-        }
+        :root { --primary-color: #1f4e79; --secondary-color: #2c3e50; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        header { display: flex; justify-space-between; align-items: center; border-bottom: 3px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { color: var(--primary-color); margin: 0; font-size: 24px; }
+        .subtitle { color: #666; font-size: 14px; margin-top: 5px; }
+        .sync-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .online { background-color: #e8f8f5; color: #27ae60; border: 1px solid #27ae60; }
+        .local { background-color: #fef9e7; color: #d35400; border: 1px solid #d35400; }
+        .form-section, .table-section, .admin-section { background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        button { background: var(--primary-color); color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
+        .btn-danger { background: #c0392b; }
+        .btn-success { background: #27ae60; }
+        .btn-warning { background: #f39c12; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: var(--primary-color); color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .badge-pending { background: #ffeaa7; color: #d35400; }
+        .badge-approved { background: #55efc4; color: #00b894; }
+        .badge-rejected { background: #ff7675; color: #d63031; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 450px; }
     </style>
 </head>
 <body>
 
-<datalist id="memory-names"></datalist>
-<datalist id="memory-ids"></datalist>
-<datalist id="memory-reasons"></datalist>
-
 <div class="container">
     <header>
-        <h1>Kaizen Mould Technology Sdn. Bhd.</h1>
-        <div class="subtitle">Daily Overtime Management System / 每日加班管理系统</div>
+        <div>
+            <h1>Kaizen Mould Technology Sdn. Bhd.</h1>
+            <div class="subtitle">Daily Overtime Management System / 每日加班管理系统</div>
+        </div>
+        <div>
+            <span id="syncBadge" class="sync-status local">单机模式 (Local)</span>
+            <button onclick="openConfigModal()" class="btn-warning" style="margin-left:10px;">⚙️ 云同步配置</button>
+        </div>
     </header>
 
-    <div class="dept-selector-card no-print">
-        <div style="flex: 1; min-width: 200px;">
-            <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary-color);">
-                Select Department / Pilih Jabatan / 选择部门:
-            </label>
-            <select id="mainDeptSelect" onchange="onDepartmentChange()">
-                <option value="ADMIN">ADMIN</option>
-                <option value="PURCHASING">PURCHASING</option>
-                <option value="CAD">CAD</option>
-                <option value="CAM">CAM</option>
-                <option value="CNC">CNC</option>
-                <option value="EDM">EDM</option>
-                <option value="PROJECT">PROJECT</option>
-                <option value="POLISHING">POLISHING</option>
-                <option value="PRODUCTION">PRODUCTION</option>
-                <option value="MOULD MAKER">MOULD MAKER</option>
-                <option value="QC">QC</option>
-                <option value="INJECTION TRIAL">INJECTION TRIAL</option>
-            </select>
-        </div>
-        <div class="dept-info" style="flex: 1; min-width: 250px;">
-            <div>Department / 部门: <span id="displayDept">ADMIN</span></div>
-            <div>HOD Approval / 部门主管: <span id="displayHOD">KALAISELVI</span></div>
-        </div>
-    </div>
-
-    <div class="nav-tabs no-print">
-        <button class="tab-btn active" onclick="switchTab('entry-tab')">📝 Submit OT / Hantar OT / 登记上交</button>
-        <button class="tab-btn" onclick="switchTab('myrecords-tab')">👤 My Records / Rekod Saya / 个人记录</button>
-        <button class="tab-btn" onclick="switchTab('archive-tab')">📁 HR Archive / Arkib HR / 月度归档</button>
-        <button class="tab-btn" onclick="switchTab('clear-tab')">🗑️ Clear Records / Padam Rekod / 清理记录</button>
-    </div>
-
-    <div id="entry-tab" class="tab-content active">
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Employee / 姓名</th>
-                        <th>Emp ID / 工号</th>
-                        <th>Date / 日期</th>
-                        <th>Start Time / 开始</th>
-                        <th>End Time / 结束</th>
-                        <th>Hours / 小时</th>
-                        <th>Purpose & Reason / 原因</th>
-                        <th class="no-print">Action / 操作</th>
-                    </tr>
-                </thead>
-                <tbody id="entryTbody"></tbody>
-            </table>
-        </div>
-
-        <div class="btn-group no-print">
-            <button type="button" class="btn btn-add" onclick="addRow()">➕ Add Row / Tambah / 添加新行</button>
-            <button type="button" class="btn btn-confirm" onclick="submitData('CONFIRMED')">✅ Confirm Submission / 确认上交</button>
-            <button type="button" class="btn btn-pending" onclick="submitData('PENDING')">⏳ Save PENDING / PENDING 上交</button>
-        </div>
-    </div>
-
-    <div id="myrecords-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
-            <h2>My Submissions / 个人上交记录</h2>
-            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 保存与打印</button>
-        </div>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date / 日期</th>
-                        <th>Dept / 部门</th>
-                        <th>HOD / 主管</th>
-                        <th>Name / 姓名</th>
-                        <th>ID / 工号</th>
-                        <th>Time / 时间段</th>
-                        <th>Hours / 小时</th>
-                        <th>Reason / 原因</th>
-                        <th>Status / 状态</th>
-                    </tr>
-                </thead>
-                <tbody id="myRecordsTbody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="archive-tab" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
-            <h2>HR Monthly Archive / HR 月度归档</h2>
-            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Save PDF / Print / 导出打印</button>
-        </div>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date / 日期</th>
-                        <th>Dept / 部门</th>
-                        <th>HOD / 主管</th>
-                        <th>Name / 姓名</th>
-                        <th>ID / 工号</th>
-                        <th>Time / 时间段</th>
-                        <th>Hours / 小时</th>
-                        <th>Reason / 原因</th>
-                        <th>Status / 状态</th>
-                        <th class="no-print">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="hrArchiveTbody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="clear-tab" class="tab-content">
-        <h2 style="color: var(--danger-color); margin-bottom: 15px;">Clear Records Management / 清理记录管理</h2>
-        
-        <div class="clear-box" style="border-left: 4px solid var(--primary-color);">
-            <h3>🏢 1. Delete By Specific Department / 按指定部门删除</h3>
-            <div style="margin-bottom: 10px; max-width: 300px;">
-                <label>Select Department / 选择要删除的部门:</label>
-                <select id="clearDeptSelect">
+    <!-- 部门选择与 HOD 动态加载 -->
+    <div class="form-section">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Select Department / 选择部门</label>
+                <select id="deptSelect" onchange="updateHOD()">
                     <option value="ADMIN">ADMIN</option>
                     <option value="PURCHASING">PURCHASING</option>
                     <option value="CAD">CAD</option>
@@ -233,469 +73,308 @@
                     <option value="INJECTION TRIAL">INJECTION TRIAL</option>
                 </select>
             </div>
-            <button class="btn btn-danger" onclick="deleteByDepartment()">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
+            <div class="form-group">
+                <label>Department / 部门</label>
+                <input type="text" id="displayDept" readonly style="background:#e9ecef;">
+            </div>
+            <div class="form-group">
+                <label>HOD Approval / 部门主管</label>
+                <input type="text" id="displayHOD" readonly style="background:#e9ecef;">
+            </div>
         </div>
 
-        <div class="clear-box" style="border-left: 4px solid #8b5cf6;">
-            <h3>👤 2. Delete By Specific Employee / 按指定员工姓名或工号删除</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-                <div style="flex:1; min-width: 180px;">
-                    <label>Employee Name or ID / 员工姓名或工号:</label>
-                    <input type="text" id="clearEmpInput" placeholder="Enter Name or ID (e.g. TAN KYLE or 328)">
+        <!-- 提交加班表单 -->
+        <form id="otForm" onsubmit="handleFormSubmit(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Employee Name / 姓名</label>
+                    <input type="text" id="empName" required placeholder="例: Tan Kyle">
+                </div>
+                <div class="form-group">
+                    <label>Emp ID / 工号</label>
+                    <input type="text" id="empId" required placeholder="例: K102">
+                </div>
+                <div class="form-group">
+                    <label>Date / 日期</label>
+                    <input type="date" id="otDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Start Time / 开始时间</label>
+                    <input type="time" id="startTime" required onchange="calcHours()">
+                </div>
+                <div class="form-group">
+                    <label>End Time / 结束时间</label>
+                    <input type="time" id="endTime" required onchange="calcHours()">
+                </div>
+                <div class="form-group">
+                    <label>Total Hours / 加班小时</label>
+                    <input type="number" id="totalHours" step="0.5" readonly style="background:#e9ecef;">
                 </div>
             </div>
-            <button class="btn btn-danger" onclick="deleteByEmployee()">🗑️ Delete Employee Records / 删除该员工所有记录</button>
-        </div>
-
-        <div class="clear-box">
-            <h3>📅 3. Delete By Specific Date Range / 按特定日期段删除</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-                <div style="flex:1; min-width: 130px;">
-                    <label>Start Date / 开始日期:</label>
-                    <input type="date" id="clearStartDate">
-                </div>
-                <div style="flex:1; min-width: 130px;">
-                    <label>End Date / 结束日期:</label>
-                    <input type="date" id="clearEndDate">
-                </div>
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>Purpose & Reason / 加班原因与项目</label>
+                <textarea id="otReason" rows="2" required placeholder="请输入详细加班原因..."></textarea>
             </div>
-            <button class="btn btn-danger" onclick="deleteByDateRange()">🗑️ Delete Range Records / 删除指定段记录</button>
-        </div>
+            <button type="submit" class="btn-success" style="width:100%;"> Submit OT Record / 提交加班记录</button>
+        </form>
+    </div>
 
-        <div class="clear-box">
-            <h3>📆 4. Delete By Specific Month / 按特定月份删除</h3>
-            <div style="margin-bottom: 10px; max-width: 250px;">
-                <label>Select Month / 选择月份:</label>
-                <input type="month" id="clearMonthInput">
-            </div>
-            <button class="btn btn-danger" onclick="deleteByMonth()">🗑️ Delete Selected Month / 删除所选月份记录</button>
+    <!-- 记录查看与 HR 月度归档 -->
+    <div class="table-section">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>HR Monthly Archive & Records / HR 月度归档与记录</h2>
+            <button onclick="exportToCSV()" class="btn-warning">📥 Export to CSV / 导出 Excel</button>
         </div>
-
-        <div class="clear-box">
-            <h3>🗓️ 5. Delete By Specific Year / 按特定年份删除</h3>
-            <div style="margin-bottom: 10px; max-width: 250px;">
-                <label>Select Year / 选择年份:</label>
-                <input type="number" id="clearYearInput" placeholder="e.g. 2026" min="2020" max="2099">
-            </div>
-            <button class="btn btn-danger" onclick="deleteByYear()">🗑️ Delete Selected Year / 删除所选年份记录</button>
+        <div style="overflow-x:auto;">
+            <table id="recordsTable">
+                <thead>
+                    <tr>
+                        <th>Date / 日期</th>
+                        <th>Dept / 部门</th>
+                        <th>HOD / 主管</th>
+                        <th>Name / 姓名</th>
+                        <th>ID / 工号</th>
+                        <th>Time / 时间段</th>
+                        <th>Hours / 小时</th>
+                        <th>Reason / 原因</th>
+                        <th>Status / 状态</th>
+                        <th>Action / 操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- 动态加载数据 -->
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <div class="clear-box" style="background: #fef2f2; border-color: #fecaca;">
-            <h3 style="color: var(--danger-color);">🚨 6. CLEAR ALL RECORDS / 彻底清空所有记录</h3>
-            <p style="margin-bottom: 10px; color: #991b1b;">⚠️ Warning: All saved records will be permanently erased.</p>
-            <button class="btn btn-danger" onclick="deleteAllRecords()">🚨 CLEAR ALL / 清空全盘数据</button>
+    <!-- 清理记录管理 -->
+    <div class="admin-section">
+        <h3>🚨 Clear Records Management / 清理记录管理</h3>
+        <div style="display:flex; gap:10px;">
+            <button onclick="clearAllData()" class="btn-danger">彻底清空所有记录 (CLEAR ALL)</button>
+        </div>
+    </div>
+</div>
+
+<!-- 云同步配置弹窗 -->
+<div id="configModal" class="modal">
+    <div class="modal-content">
+        <h3>⚡ 在线数据库（多设备同步）设置</h3>
+        <p style="font-size:12px; color:#666;">免费注册 Firebase Firestore 数据库后，将 API Key 和 Project ID 粘贴在此处即可完成多设备同步。</p>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>Firebase API Key</label>
+            <input type="text" id="cfgApiKey" placeholder="AIzaSy...">
+        </div>
+        <div class="form-group" style="margin-bottom:15px;">
+            <label>Firebase Project ID</label>
+            <input type="text" id="cfgProjectId" placeholder="kaizen-ot-system">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button onclick="closeConfigModal()">取消</button>
+            <button onclick="saveFirebaseConfig()" class="btn-success">保存并连接</button>
         </div>
     </div>
 </div>
 
 <script>
-    const DEFAULT_START_TIME = "17:00";
-    const DEFAULT_END_TIME = "21:00";
-    const DEFAULT_HOURS = "4.0";
-
-    const HOD_MAP = {
+    // 12 部门与 HOD 映射表
+    const hodMapping = {
         'ADMIN': 'KALAISELVI',
-        'PURCHASING': 'KALAISELVI',
-        'CAD': 'CHAN KENG LEONG ( 002 )',
-        'CAM': 'CHAN KENG LEONG ( 002 )',
-        'CNC': 'CHAN KENG LEONG ( 002 )',
-        'EDM': 'CHONG FAT KEONG ( 003 )',
-        'PROJECT': 'CHONG FAT KEONG ( 003 )',
-        'POLISHING': 'CHONG FAT KEONG ( 003 )',
-        'PRODUCTION': 'CHONG FAT KEONG ( 003 )',
-        'MOULD MAKER': 'LEE YOONG HON ( 272 )',
-        'QC': 'TAN KAH CHYE ( 266 )',
-        'INJECTION TRIAL': 'CHONG FAT KEONG 003'
+        'PURCHASING': 'LIM',
+        'CAD': 'CHAI',
+        'CAM': 'ALVIN',
+        'CNC': 'AH SOON',
+        'EDM': 'TAN',
+        'PROJECT': 'EDMOND',
+        'POLISHING': 'AH BOON',
+        'PRODUCTION': 'KAN',
+        'MOULD MAKER': 'KONG',
+        'QC': 'VIVIAN',
+        'INJECTION TRIAL': 'JASON'
     };
 
-    const EMPLOYEES_DB = [
-        { dept: 'ADMIN', name: 'KISTINNA ANAQIN', id: '316' },
-        { dept: 'ADMIN', name: 'TAN KYLE', id: '328' },
-        { dept: 'PURCHASING', name: 'THILAGAH', id: '212' },
-        { dept: 'CAD', name: 'CHAN KENG LEONG', id: '2' },
-        { dept: 'CAD', name: 'ADARSH', id: '305' },
-        { dept: 'CAD', name: 'SOH GIM BOON', id: '274' },
-        { dept: 'CAM', name: 'CHAN KENG LEONG', id: '2' },
-        { dept: 'CAM', name: 'HAN AYE AYE', id: '28' },
-        { dept: 'CAM', name: 'MD KANCHAN', id: '60' },
-        { dept: 'CAM', name: 'KHAU LIANG YU', id: '269' },
-        { dept: 'CAM', name: 'NAY LIANG YU', id: '300' },
-        { dept: 'CAM', name: 'MA LIK CHAN', id: '307' },
-        { dept: 'CNC', name: 'CHAN KENG LEONG', id: '2' },
-        { dept: 'CNC', name: 'SA MASAN BA', id: '27' },
-        { dept: 'CNC', name: 'BHARAT', id: '290' },
-        { dept: 'CNC', name: 'DHAN BAHADUR', id: '291' },
-        { dept: 'CNC', name: 'MILAN', id: '294' },
-        { dept: 'CNC', name: 'MANUPRASAD', id: '315' },
-        { dept: 'CNC', name: 'MD FADHIL NOOR', id: '325' },
-        { dept: 'EDM', name: 'CHONG FAT KEONG', id: '3' },
-        { dept: 'EDM', name: 'TEE NYEIN AUNG', id: '302' },
-        { dept: 'EDM', name: 'KAYW ZIN HEIN', id: '306' },
-        { dept: 'EDM', name: 'YUVANNESH', id: '318' },
-        { dept: 'PROJECT', name: 'CHONG FAT KEONG', id: '3' },
-        { dept: 'PROJECT', name: 'MD ZAINUL', id: '257' },
-        { dept: 'PROJECT', name: 'NUR SYAHIRAH', id: '262' },
-        { dept: 'POLISHING', name: 'CHONG FAT KEONG', id: '3' },
-        { dept: 'POLISHING', name: 'MD SHOPON', id: '19' },
-        { dept: 'POLISHING', name: 'MIN THU', id: '299' },
-        { dept: 'PRODUCTION', name: 'CHONG FAT KEONG', id: '3' },
-        { dept: 'PRODUCTION', name: 'MD SHAHABUDIN', id: '20' },
-        { dept: 'PRODUCTION', name: 'MD ALAMGIR', id: '68' },
-        { dept: 'PRODUCTION', name: 'SHAING THU AUNG', id: '301' },
-        { dept: 'MOULD MAKER', name: 'MD JAHIR', id: '69' },
-        { dept: 'MOULD MAKER', name: 'MD JAHANGIR', id: '72' },
-        { dept: 'MOULD MAKER', name: 'LEE YOONG HON', id: '272' },
-        { dept: 'MOULD MAKER', name: 'HING YONG HOW', id: '286' },
-        { dept: 'MOULD MAKER', name: 'ZAW MYO HTIKE', id: '303' },
-        { dept: 'MOULD MAKER', name: 'AMARNATH', id: '310' },
-        { dept: 'MOULD MAKER', name: 'JAISON', id: '311' },
-        { dept: 'MOULD MAKER', name: 'VIMALKUMAR', id: '319' },
-        { dept: 'MOULD MAKER', name: 'SARATH', id: '322' },
-        { dept: 'MOULD MAKER', name: 'GOH CHEE KUAN', id: '326' },
-        { dept: 'QC', name: 'TAN KAH CHYE', id: '266' },
-        { dept: 'QC', name: 'NUR LIANA SOFIA', id: '323' },
-        { dept: 'INJECTION TRIAL', name: 'MAHAJI', id: '329' }
-    ];
+    let db = null;
+    let records = [];
 
-    const STORAGE_RECORDS = 'KAIZEN_OT_SUBMISSIONS_V6';
+    // 初始化
+    window.onload = function() {
+        document.getElementById('otDate').valueAsDate = new Date();
+        updateHOD();
+        initFirebase();
+    };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        onDepartmentChange();
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
-        document.getElementById('clearStartDate').value = todayStr;
-        document.getElementById('clearEndDate').value = todayStr;
-        document.getElementById('clearMonthInput').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        document.getElementById('clearYearInput').value = now.getFullYear();
-    });
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-
-        if(tabId === 'myrecords-tab') renderMyRecords();
-        if(tabId === 'archive-tab') renderHRArchive();
+    function updateHOD() {
+        const dept = document.getElementById('deptSelect').value;
+        document.getElementById('displayDept').value = dept;
+        document.getElementById('displayHOD').value = hodMapping[dept] || '';
     }
 
-    function onDepartmentChange() {
-        const dept = document.getElementById('mainDeptSelect').value;
-        document.getElementById('displayDept').innerText = dept;
-        document.getElementById('displayHOD').innerText = HOD_MAP[dept] || '-';
-        document.getElementById('entryTbody').innerHTML = '';
-        
-        updateMemoryDatalists(dept);
-        addRow();
-    }
-
-    function updateMemoryDatalists(currentDept) {
-        const filteredEmps = EMPLOYEES_DB.filter(e => e.dept === currentDept);
-        const namesSet = new Set(filteredEmps.map(e => e.name));
-        const idsSet = new Set(filteredEmps.map(e => e.id));
-        const reasonsSet = new Set(['hil722', 'Normal OT', 'Project Urgent', 'Machine Maintenance', 'Mould Repair']);
-
-        document.getElementById('memory-names').innerHTML = Array.from(namesSet).map(n => `<option value="${n}">`).join('');
-        document.getElementById('memory-ids').innerHTML = Array.from(idsSet).map(i => `<option value="${i}">`).join('');
-        document.getElementById('memory-reasons').innerHTML = Array.from(reasonsSet).map(r => `<option value="${r}">`).join('');
-    }
-
-    function addRow() {
-        const tbody = document.getElementById('entryTbody');
-        const rows = tbody.querySelectorAll('tr');
-        const tr = document.createElement('tr');
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        let name = "", id = "", date = todayStr, startTime = DEFAULT_START_TIME, endTime = DEFAULT_END_TIME, hours = DEFAULT_HOURS, reason = "";
-
-        if (rows.length > 0) {
-            const lastRow = rows[rows.length - 1];
-            name = lastRow.querySelector('.input-name').value;
-            id = lastRow.querySelector('.input-id').value;
-            date = lastRow.querySelector('.input-date').value || todayStr;
-            startTime = lastRow.querySelector('.input-start').value || DEFAULT_START_TIME;
-            endTime = lastRow.querySelector('.input-end').value || DEFAULT_END_TIME;
-            hours = lastRow.querySelector('.input-hours').value || DEFAULT_HOURS;
-            reason = lastRow.querySelector('.input-reason').value;
-        }
-
-        tr.innerHTML = `
-            <td>
-                <input type="text" class="input-name" list="memory-names" value="${name}" placeholder="Type or Select Name" oninput="onNameChange(this);" onchange="onNameChange(this);">
-            </td>
-            <td>
-                <input type="text" class="input-id" list="memory-ids" value="${id}" placeholder="ID" oninput="onIdChange(this);" onchange="onIdChange(this);">
-            </td>
-            <td>
-                <input type="date" class="input-date" value="${date}">
-            </td>
-            <td>
-                <input type="time" class="input-start" value="${startTime}" onchange="calculateHours(this);">
-            </td>
-            <td>
-                <input type="time" class="input-end" value="${endTime}" onchange="calculateHours(this);">
-            </td>
-            <td>
-                <input type="number" step="0.5" class="input-hours" value="${hours}" placeholder="0.0">
-            </td>
-            <td>
-                <input type="text" class="input-reason" list="memory-reasons" value="${reason}" placeholder="Reason / Project No.">
-            </td>
-            <td class="no-print">
-                <button type="button" class="btn btn-danger" style="padding: 4px 8px;" onclick="this.closest('tr').remove();">🗑️</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    function onNameChange(inputEl) {
-        const nameVal = inputEl.value.trim();
-        const row = inputEl.closest('tr');
-        if (!nameVal) return;
-
-        const currentDept = document.getElementById('mainDeptSelect').value;
-        const foundEmp = EMPLOYEES_DB.find(e => e.dept === currentDept && e.name.toLowerCase() === nameVal.toLowerCase());
-        if (foundEmp) {
-            row.querySelector('.input-id').value = foundEmp.id;
+    function calcHours() {
+        const start = document.getElementById('startTime').value;
+        const end = document.getElementById('endTime').value;
+        if(start && end) {
+            let s = new Date(`1970-01-01T${start}:00`);
+            let e = new Date(`1970-01-01T${end}:00`);
+            if(e < s) e.setDate(e.getDate() + 1);
+            let diff = (e - s) / (1000 * 60 * 60);
+            document.getElementById('totalHours').value = diff.toFixed(1);
         }
     }
 
-    function onIdChange(inputEl) {
-        const idVal = inputEl.value.trim();
-        const row = inputEl.closest('tr');
-        if (!idVal) return;
+    // 初始化云数据库
+    function initFirebase() {
+        const apiKey = localStorage.getItem('fb_apiKey');
+        const projectId = localStorage.getItem('fb_projectId');
 
-        const currentDept = document.getElementById('mainDeptSelect').value;
-        const foundEmp = EMPLOYEES_DB.find(e => e.dept === currentDept && e.id === idVal);
-        if (foundEmp) {
-            row.querySelector('.input-name').value = foundEmp.name;
-        }
-    }
-
-    function calculateHours(inputEl) {
-        const row = inputEl.closest('tr');
-        const startTime = row.querySelector('.input-start').value;
-        const endTime = row.querySelector('.input-end').value;
-
-        if (startTime && endTime) {
-            const start = new Date(`1970-01-01T${startTime}:00`);
-            let end = new Date(`1970-01-01T${endTime}:00`);
-            
-            if (end < start) {
-                end.setDate(end.getDate() + 1);
-            }
-            
-            const diffMs = end - start;
-            const diffHrs = (diffMs / (1000 * 60 * 60)).toFixed(1);
-            row.querySelector('.input-hours').value = diffHrs;
-        }
-    }
-
-    function submitData(status) {
-        const currentDept = document.getElementById('mainDeptSelect').value;
-        const hod = HOD_MAP[currentDept];
-        const rows = document.querySelectorAll('#entryTbody tr');
-        let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        let isValid = true;
-
-        rows.forEach(row => {
-            const name = row.querySelector('.input-name').value.trim();
-            const empId = row.querySelector('.input-id').value.trim();
-            const date = row.querySelector('.input-date').value;
-            const startTime = row.querySelector('.input-start').value || '--:--';
-            const endTime = row.querySelector('.input-end').value || '--:--';
-            const hours = row.querySelector('.input-hours').value;
-            const reason = row.querySelector('.input-reason').value;
-
-            if (!name || !hours || !date) {
-                isValid = false;
+        if(apiKey && projectId) {
+            try {
+                if(!firebase.apps.length) {
+                    firebase.initializeApp({ apiKey: apiKey, projectId: projectId });
+                }
+                db = firebase.firestore();
+                document.getElementById('syncBadge').innerText = "🌐 多设备实时同步中 (Cloud)";
+                document.getElementById('syncBadge').className = "sync-status online";
+                
+                // 实时监听数据库变动
+                db.collection("ot_records").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                    records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderTable();
+                });
                 return;
+            } catch(e) {
+                console.error("Firebase init failed:", e);
             }
+        }
+        
+        // 未配置时自动退回本地模式
+        document.getElementById('syncBadge').innerText = "单机模式 (未连接云端)";
+        document.getElementById('syncBadge').className = "sync-status local";
+        loadLocalRecords();
+    }
 
-            const newEntry = {
-                id: 'OT-' + Date.now() + '-' + Math.floor(Math.random()*1000),
-                dept: currentDept,
-                hod: hod,
-                date: date,
-                name: name,
-                empId: empId,
-                startTime: startTime,
-                endTime: endTime,
-                hours: hours,
-                reason: reason || '-',
-                status: status
-            };
+    function loadLocalRecords() {
+        records = JSON.parse(localStorage.getItem('kaizen_ot_data') || '[]');
+        renderTable();
+    }
 
-            const existingIndex = records.findIndex(r => r.date === date && r.name.toLowerCase() === name.toLowerCase());
-            if (existingIndex !== -1) {
-                records[existingIndex] = newEntry;
-            } else {
-                records.push(newEntry);
-            }
-        });
+    // 提交数据
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const newRecord = {
+            date: document.getElementById('otDate').value,
+            dept: document.getElementById('displayDept').value,
+            hod: document.getElementById('displayHOD').value,
+            name: document.getElementById('empName').value,
+            empId: document.getElementById('empId').value,
+            startTime: document.getElementById('startTime').value,
+            endTime: document.getElementById('endTime').value,
+            hours: document.getElementById('totalHours').value,
+            reason: document.getElementById('otReason').value,
+            status: 'Pending',
+            timestamp: new Date().getTime()
+        };
 
-        if (!isValid) {
-            alert('Please complete Employee Name and Hours! / 请填写完整员工姓名与加班时间！');
-            return;
+        if(db) {
+            await db.collection("ot_records").add(newRecord);
+        } else {
+            newRecord.id = 'loc_' + Date.now();
+            records.unshift(newRecord);
+            localStorage.setItem('kaizen_ot_data', JSON.stringify(records));
+            renderTable();
         }
 
-        localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-        
-        alert(`Successfully Submitted as [${status}]! / 上交成功！`);
-        document.getElementById('entryTbody').innerHTML = '';
-        addRow();
+        document.getElementById('otForm').reset();
+        document.getElementById('otDate').valueAsDate = new Date();
+        updateHOD();
+        alert('加班记录已成功提交！');
     }
 
-    function renderMyRecords() {
-        const tbody = document.getElementById('myRecordsTbody');
+    // 渲染表格
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-        const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-
-        records.slice().reverse().forEach(item => {
+        records.forEach(r => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${item.date}</td>
-                <td>${item.dept}</td>
-                <td>${item.hod}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.empId}</td>
-                <td>${item.startTime} - ${item.endTime}</td>
-                <td>${item.hours} hrs</td>
-                <td>${item.reason}</td>
-                <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function renderHRArchive() {
-        const tbody = document.getElementById('hrArchiveTbody');
-        tbody.innerHTML = '';
-        const records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-
-        records.slice().reverse().forEach(item => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${item.date}</td>
-                <td>${item.dept}</td>
-                <td>${item.hod}</td>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.empId}</td>
-                <td>${item.startTime} - ${item.endTime}</td>
-                <td>${item.hours} hrs</td>
-                <td>${item.reason}</td>
-                <td><span class="badge ${item.status === 'CONFIRMED' ? 'badge-confirmed' : 'badge-pending'}">${item.status}</span></td>
-                <td class="no-print" style="display: flex; gap: 4px;">
-                    ${item.status === 'PENDING' ? `<button class="btn btn-confirm" style="padding: 3px 6px; font-size: 0.75rem;" onclick="changeStatus('${item.id}', 'CONFIRMED')">Set CONFIRMED</button>` : ''}
-                    <button class="btn btn-danger" style="padding: 3px 6px; font-size: 0.75rem;" onclick="deleteSingleRecord('${item.id}')">🗑️ Delete</button>
+                <td>${r.date}</td>
+                <td>${r.dept}</td>
+                <td>${r.hod}</td>
+                <td>${r.name}</td>
+                <td>${r.empId}</td>
+                <td>${r.startTime} - ${r.endTime}</td>
+                <td><b>${r.hours}</b> hrs</td>
+                <td style="text-align:left;">${r.reason}</td>
+                <td><span class="badge badge-${r.status.toLowerCase()}">${r.status}</span></td>
+                <td>
+                    <button onclick="updateStatus('${r.id}', 'Approved')" class="btn-success" style="padding:4px 8px; font-size:11px;">Approve</button>
+                    <button onclick="updateStatus('${r.id}', 'Rejected')" class="btn-danger" style="padding:4px 8px; font-size:11px;">Reject</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
-    function changeStatus(id, newStatus) {
-        let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-        records = records.map(r => {
-            if(r.id === id) r.status = newStatus;
-            return r;
+    // 状态更新 (批准/拒绝)
+    async function updateStatus(id, status) {
+        if(db) {
+            await db.collection("ot_records").doc(id).update({ status: status });
+        } else {
+            const index = records.findIndex(r => r.id === id);
+            if(index !== -1) {
+                records[index].status = status;
+                localStorage.setItem('kaizen_ot_data', JSON.stringify(records));
+                renderTable();
+            }
+        }
+    }
+
+    // 清空记录
+    async function clearAllData() {
+        if(!confirm("⚠️ 确定要彻底清空所有加班记录吗？此操作无法撤销！")) return;
+        if(db) {
+            const snapshot = await db.collection("ot_records").get();
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+        } else {
+            records = [];
+            localStorage.removeItem('kaizen_ot_data');
+            renderTable();
+        }
+    }
+
+    // 导出 CSV
+    function exportToCSV() {
+        if(records.length === 0) return alert("暂无记录可导出！");
+        let csv = "\uFEFFDate,Dept,HOD,Name,EmpID,Start,End,Hours,Reason,Status\n";
+        records.forEach(r => {
+            csv += `"${r.date}","${r.dept}","${r.hod}","${r.name}","${r.empId}","${r.startTime}","${r.endTime}","${r.hours}","${r.reason.replace(/"/g, '""')}","${r.status}"\n`;
         });
-        localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-        renderHRArchive();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Kaizen_OT_Records_${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
     }
 
-    function deleteSingleRecord(id) {
-        if(confirm("Delete this single record?\n确定删除这条单笔记录吗？")) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(r => r.id !== id);
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            renderHRArchive();
-        }
+    // 弹窗管理
+    function openConfigModal() {
+        document.getElementById('cfgApiKey').value = localStorage.getItem('fb_apiKey') || '';
+        document.getElementById('cfgProjectId').value = localStorage.getItem('fb_projectId') || '';
+        document.getElementById('configModal').style.display = 'flex';
     }
-
-    /* 按部门删除 */
-    function deleteByDepartment() {
-        const dept = document.getElementById('clearDeptSelect').value;
-        if (confirm(`Delete ALL records for department [${dept}]?\n确定要删除 [${dept}] 部门的所有记录吗？`)) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(r => r.dept !== dept);
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`All records for [${dept}] have been deleted!\n已成功删除 [${dept}] 部门的所有记录！`);
-        }
-    }
-
-    /* 按指定员工姓名或工号删除 */
-    function deleteByEmployee() {
-        const inputVal = document.getElementById('clearEmpInput').value.trim().toLowerCase();
-        if (!inputVal) {
-            alert("Please enter an Employee Name or ID / 请输入员工姓名或工号！");
-            return;
-        }
-
-        if (confirm(`Delete ALL records for employee [${inputVal}]?\n确定要删除员工 [${inputVal}] 的所有记录吗？`)) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(r => r.name.toLowerCase() !== inputVal && r.empId.toLowerCase() !== inputVal);
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            document.getElementById('clearEmpInput').value = '';
-            alert(`Records for [${inputVal}] have been deleted!\n已成功删除员工 [${inputVal}] 的所有记录！`);
-        }
-    }
-
-    /* 按指定日期范围删除 */
-    function deleteByDateRange() {
-        const startDate = document.getElementById('clearStartDate').value;
-        const endDate = document.getElementById('clearEndDate').value;
-
-        if (!startDate || !endDate) {
-            alert("Please select both Start and End dates / 请选择开始和结束日期！");
-            return;
-        }
-
-        if (confirm(`Delete all records from ${startDate} to ${endDate}?\n确定要删除 ${startDate} 至 ${endDate} 期间的所有记录吗？`)) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(r => r.date < startDate || r.date > endDate);
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`Records between ${startDate} and ${endDate} have been deleted!\n已成功删除指定日期范围内的所有记录！`);
-        }
-    }
-
-    /* 按月份删除 */
-    function deleteByMonth() {
-        const monthVal = document.getElementById('clearMonthInput').value; // YYYY-MM
-        if (!monthVal) {
-            alert("Please select a month / 请选择月份！");
-            return;
-        }
-
-        if (confirm(`Delete ALL records for month [${monthVal}]?\n确定要删除 [${monthVal}] 月份的所有记录吗？`)) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(r => !r.date.startsWith(monthVal));
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`Records for [${monthVal}] have been deleted!\n已成功删除 [${monthVal}] 月份的所有记录！`);
-        }
-    }
-
-    /* 按年份删除 */
-    function deleteByYear() {
-        const yearVal = document.getElementById('clearYearInput').value;
-        if (!yearVal) {
-            alert("Please enter a valid year / 请输入有效年份！");
-            return;
-        }
-
-        if (confirm(`Delete ALL records for year [${yearVal}]?\n确定要删除 [${yearVal}] 年份的所有记录吗？`)) {
-            let records = JSON.parse(localStorage.getItem(STORAGE_RECORDS)) || [];
-            records = records.filter(r => !r.date.startsWith(yearVal));
-            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
-            alert(`Records for year [${yearVal}] have been deleted!\n已成功删除 [${yearVal}] 年份的所有记录！`);
-        }
-    }
-
-    /* 彻底清空所有记录 */
-    function deleteAllRecords() {
-        if (confirm("🚨 WARNING: Are you sure you want to delete ALL records?\n⚠️ 警告：确定要彻底清空全盘所有记录吗？此操作不可逆！")) {
-            localStorage.removeItem(STORAGE_RECORDS);
-            alert("All records have been cleared!\n所有记录已彻底清空！");
+    function closeConfigModal() { document.getElementById('configModal').style.display = 'none'; }
+    function saveFirebaseConfig() {
+        const key = document.getElementById('cfgApiKey').value.trim();
+        const pid = document.getElementById('cfgProjectId').value.trim();
+        if(key && pid) {
+            localStorage.setItem('fb_apiKey', key);
+            localStorage.setItem('fb_projectId', pid);
+            closeConfigModal();
+            location.reload();
+        } else {
+            alert('请填写完整的 API Key 和 Project ID！');
         }
     }
 </script>
