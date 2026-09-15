@@ -1,20 +1,1266 @@
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaizen Mould Technology - Overtime (OT) System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<script>
-  // 替换为你自己的 Firebase 配置
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-  
-  // 初始化 Firebase
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-</script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#0a0f1d'
+                        },
+                        brand: {
+                            blue: '#1e40af',
+                            cyan: '#0284c7',
+                            emerald: '#059669',
+                            amber: '#d97706',
+                            rose: '#e11d48'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { @apply border-b-2 border-blue-600 text-blue-600 font-semibold bg-blue-50/50; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION & HEADER -->
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                    <i class="fa-solid me-1 fa-industry text-blue-800"></i> Kaizen Mould Technology Sdn. Bhd.
+                </h1>
+                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 24/7 Live Sync & Tracking</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="bg-slate-100 border border-slate-200 rounded-lg p-1.5 flex items-center gap-2 text-xs font-semibold">
+                    <span class="text-slate-500 px-1">Access Mode:</span>
+                    <span id="accessModeBadge" class="bg-slate-200 text-slate-700 px-2.5 py-1 rounded font-bold uppercase tracking-wider">STAFF MODE</span>
+                </div>
+
+                <button id="hrLoginBtn" onclick="toggleHRLoginModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-amber-400"></i> <span id="hrLoginBtnText">HR Login</span>
+                </button>
+
+                <button onclick="openConfigModal()" class="text-slate-500 hover:text-slate-800 p-2 rounded-lg hover:bg-slate-100 text-sm transition" title="Firebase Settings">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- DATABASE STATUS BANNER -->
+    <div id="dbStatusBanner" class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-800 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 px-2">
+            <span class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                  <span id="statusPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span id="statusDot" class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span id="dbStatusText"><strong>Database Status:</strong> Running in Local Storage Mode. Connect Firebase to enable real-time 24/7 cross-device syncing!</span>
+            </span>
+            <button onclick="openConfigModal()" class="underline font-bold hover:text-amber-900 whitespace-nowrap">Configure Firebase</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- DEPARTMENT SELECTOR CARD -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div class="md:col-span-6 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <label class="text-sm font-bold text-slate-700 whitespace-nowrap">Select Department:</label>
+                    <select id="departmentSelect" onchange="handleDepartmentChange()" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option value="PURCHASING">PURCHASING DEPARTMENT</option>
+                        <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
+                        <option value="CAD">CAD DEPARTMENT</option>
+                        <option value="CAM">CAM DEPARTMENT</option>
+                        <option value="CNC">CNC DEPARTMENT</option>
+                        <option value="EDM">EDM DEPARTMENT</option>
+                        <option value="PROJECT">PROJECT DEPARTMENT</option>
+                        <option value="POLISHING">POLISHING DEPARTMENT</option>
+                        <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
+                        <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
+                        <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
+                        <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                    </select>
+                </div>
+                <div class="md:col-span-6 bg-blue-50/70 border border-blue-100 rounded-lg p-3 text-right flex flex-col justify-center">
+                    <div class="text-xs text-blue-700 font-semibold uppercase tracking-wide">Department: <strong id="currentDeptDisplay" class="text-blue-900">PURCHASING DEPARTMENT</strong></div>
+                    <div class="text-xs text-slate-600 font-medium mt-0.5">HOD Approval: <strong id="currentHODDisplay" class="text-slate-900 font-bold">KALAISELVI A/P SOORIAMOORTHY</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="border-b border-slate-200 mb-6 bg-white rounded-t-xl px-2 pt-2 shadow-sm">
+            <nav class="flex flex-wrap gap-2" aria-label="Tabs">
+                <button onclick="switchTab('submit')" id="tabBtnSubmit" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                    <i class="fa-solid fa-pen-to-square"></i> Submit OT
+                </button>
+                <button onclick="switchTab('mySubmissions')" id="tabBtnMySubmissions" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                    <i class="fa-solid fa-user-clock"></i> My Submissions
+                </button>
+                <button onclick="switchTab('hrArchive')" id="tabBtnHrArchive" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive & Report <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
+                </button>
+                <button onclick="switchTab('clearRecords')" id="tabBtnClearRecords" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                    <i class="fa-solid fa-trash-can text-rose-600"></i> Clear Records <span class="bg-rose-100 text-rose-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- TAB 1: SUBMIT OT SECTION -->
+        <div id="tabSubmit" class="tab-content space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form
+                        </h2>
+                        <p class="text-xs text-slate-500">Auto-memory active: selecting an employee auto-populates previous records.</p>
+                    </div>
+                    <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-indigo-600"></i> Auto-Load Department Team
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-3 w-1/5">Employee Name</th>
+                                <th class="p-3 w-28">Emp ID</th>
+                                <th class="p-3 w-36">Date</th>
+                                <th class="p-3 w-28">Start Time</th>
+                                <th class="p-3 w-28">End Time</th>
+                                <th class="p-3 w-20">Hours</th>
+                                <th class="p-3">Purpose & Reason</th>
+                                <th class="p-3 w-12 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otTableBody" class="divide-y divide-slate-100">
+                            <!-- Dynamic Rows Injected Here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                    <button onclick="addNewRow()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i> Add Row
+                    </button>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="submitOT('PENDING')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-hourglass-start"></i> Save PENDING
+                        </button>
+                        <button onclick="submitOT('APPROVED')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Confirm Submission
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MY SUBMISSIONS SECTION -->
+        <div id="tabMySubmissions" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> My Personal Submissions History
+                        </h2>
+                        <p class="text-xs text-slate-500">View submitted OT records. Request modifications directly for HR approval.</p>
+                    </div>
+                </div>
+
+                <!-- FILTER CONTROLS -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Year Filter:</label>
+                        <select id="myFilterYear" onchange="renderMySubmissionsTable()" class="w-full bg-white border border-slate-300 rounded p-1.5">
+                            <option value="ALL">All Years</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Month Filter:</label>
+                        <select id="myFilterMonth" onchange="renderMySubmissionsTable()" class="w-full bg-white border border-slate-300 rounded p-1.5">
+                            <option value="ALL">All Months</option>
+                            <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
+                            <option value="04">Apr</option><option value="05">May</option><option value="06">Jun</option>
+                            <option value="07">Jul</option><option value="08">Aug</option><option value="09" selected>Sep</option>
+                            <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Specific Date:</label>
+                        <input type="date" id="myFilterDate" onchange="renderMySubmissionsTable()" class="w-full bg-white border border-slate-300 rounded p-1.5">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-semibold text-slate-600 mb-1">Search Name / ID:</label>
+                        <input type="text" id="myFilterSearch" onkeyup="renderMySubmissionsTable()" placeholder="Type Name or Emp ID..." class="w-full bg-white border border-slate-300 rounded p-1.5">
+                    </div>
+                </div>
+
+                <!-- SUBMISSIONS TABLE -->
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse min-w-[900px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-2.5">Date</th>
+                                <th class="p-2.5">Dept</th>
+                                <th class="p-2.5">HOD</th>
+                                <th class="p-2.5">Name</th>
+                                <th class="p-2.5">ID</th>
+                                <th class="p-2.5">Time</th>
+                                <th class="p-2.5">Hours</th>
+                                <th class="p-2.5">Reason</th>
+                                <th class="p-2.5">Status</th>
+                                <th class="p-2.5 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mySubmissionsBody" class="divide-y divide-slate-100">
+                            <!-- Injected Dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: HR ARCHIVE & REPORT (HR ONLY) -->
+        <div id="tabHrArchive" class="tab-content hidden space-y-6">
+            <!-- HR NOTIFICATIONS FOR EDIT REQUESTS -->
+            <div id="hrEditRequestsContainer" class="hidden bg-amber-50 border border-amber-300 rounded-xl p-4 shadow-sm">
+                <h3 class="text-sm font-bold text-amber-900 flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-bell text-amber-600 animate-bounce"></i> Pending HR Modification Requests
+                </h3>
+                <div id="hrEditRequestsList" class="space-y-2 text-xs">
+                    <!-- Pending Requests Rendered Here -->
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-blue-800"></i> HR Global Master Archive & Live Monitor
+                        </h2>
+                        <p class="text-xs text-slate-500">24/7 Real-time record monitor across all mobile phones, tablets & desktop PCs.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv text-emerald-600"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FILTER CONTROLS FOR HR -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Filter Dept:</label>
+                        <select id="hrFilterDept" onchange="renderHRArchiveTable()" class="w-full bg-white border border-slate-300 rounded p-1.5">
+                            <option value="ALL">All Departments</option>
+                            <option value="PURCHASING">PURCHASING DEPARTMENT</option>
+                            <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
+                            <option value="CAD">CAD DEPARTMENT</option>
+                            <option value="CAM">CAM DEPARTMENT</option>
+                            <option value="CNC">CNC DEPARTMENT</option>
+                            <option value="EDM">EDM DEPARTMENT</option>
+                            <option value="PROJECT">PROJECT DEPARTMENT</option>
+                            <option value="POLISHING">POLISHING DEPARTMENT</option>
+                            <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
+                            <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
+                            <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
+                            <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Filter Year/Month:</label>
+                        <input type="month" id="hrFilterMonth" onchange="renderHRArchiveTable()" class="w-full bg-white border border-slate-300 rounded p-1.5">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Filter Specific Date:</label>
+                        <input type="date" id="hrFilterDate" onchange="renderHRArchiveTable()" class="w-full bg-white border border-slate-300 rounded p-1.5">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-semibold text-slate-600 mb-1">Search Employee / ID:</label>
+                        <input type="text" id="hrFilterSearch" onkeyup="renderHRArchiveTable()" placeholder="Search Name or Emp ID..." class="w-full bg-white border border-slate-300 rounded p-1.5">
+                    </div>
+                </div>
+
+                <!-- HR GLOBAL TABLE -->
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse min-w-[1000px]">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                                <th class="p-2.5">Date</th>
+                                <th class="p-2.5">Dept</th>
+                                <th class="p-2.5">Employee Name (ID)</th>
+                                <th class="p-2.5">Device Type</th>
+                                <th class="p-2.5">OT Hours</th>
+                                <th class="p-2.5">Reason</th>
+                                <th class="p-2.5">Status</th>
+                                <th class="p-2.5 text-center">HR Approval</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hrArchiveBody" class="divide-y divide-slate-100">
+                            <!-- Injected Dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: CLEAR RECORDS (HR ONLY) -->
+        <div id="tabClearRecords" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-broom text-rose-600"></i> Clear & Wipe Records Management (HR Exclusive)
+                    </h2>
+                    <p class="text-xs text-slate-500">Selective deletion tools for purging obsolete records or resetting system data.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- SECTION 1: SELECTIVE CLEAR BY FILTERS -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-blue-600"></i> Selective Batch Clean
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Delete By Department:</label>
+                            <div class="flex gap-2">
+                                <select id="clearDeptSelect" class="bg-white border border-slate-300 text-xs rounded-lg p-2 w-full">
+                                    <option value="PURCHASING">PURCHASING DEPARTMENT</option>
+                                    <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
+                                    <option value="CAD">CAD DEPARTMENT</option>
+                                    <option value="CAM">CAM DEPARTMENT</option>
+                                    <option value="CNC">CNC DEPARTMENT</option>
+                                    <option value="EDM">EDM DEPARTMENT</option>
+                                    <option value="PROJECT">PROJECT DEPARTMENT</option>
+                                    <option value="POLISHING">POLISHING DEPARTMENT</option>
+                                    <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
+                                    <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
+                                    <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
+                                    <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                                </select>
+                                <button onclick="clearRecordsByDept()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition whitespace-nowrap">Delete Dept</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Delete By Employee Name or ID:</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="clearEmpInput" placeholder="Enter Emp Name or ID" class="bg-white border border-slate-300 text-xs rounded-lg p-2 w-full">
+                                <button onclick="clearRecordsByEmp()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition whitespace-nowrap">Delete Staff</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Delete By Specific Date:</label>
+                            <div class="flex gap-2">
+                                <input type="date" id="clearDateInput" class="bg-white border border-slate-300 text-xs rounded-lg p-2 w-full">
+                                <button onclick="clearRecordsByDate()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition whitespace-nowrap">Delete Date</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: MASTER CLEAR ALL -->
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold text-rose-900 uppercase tracking-wider flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Master Database Reset
+                            </h3>
+                            <p class="text-xs text-rose-700 leading-relaxed">
+                                Warning: Performing a master clear will permanently erase <strong>ALL</strong> overtime submission records stored in both Firebase and local device caches.
+                            </p>
+                        </div>
+                        <div class="pt-6">
+                            <button onclick="clearAllSystemRecords()" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-radiation"></i> CLEAR ALL SYSTEM OT RECORDS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto text-center text-xs text-slate-500">
+        <p>© 2026 Kaizen Mould Technology Sdn. Bhd. All rights reserved. • Overtime Management & Tracking System</p>
+    </footer>
+
+    <!-- MODAL 1: HR LOGIN MODAL -->
+    <div id="hrLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-slate-200">
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2 text-amber-600 text-lg">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">HR Master Authentication</h3>
+                <p class="text-xs text-slate-500 mt-1">Enter HR Access Key to manage global records.</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="hrPasscodeInput" placeholder="Enter HR Passcode (Default: 1234)" class="w-full border border-slate-300 rounded-lg p-2.5 text-xs text-center font-bold tracking-widest focus:ring-2 focus:ring-amber-500">
+                <button onclick="verifyHRPasscode()" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-lg shadow transition">Unlock HR Access</button>
+                <button onclick="toggleHRLoginModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold py-2 rounded-lg transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EDIT REQUEST MODAL (FOR STAFF) -->
+    <div id="editRequestModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
+            <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-blue-600"></i> Request Record Modification
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Changes will be sent to HR for verification before taking effect.</p>
+            <input type="hidden" id="editRecordId">
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold block text-slate-700 mb-1">New Start Time:</label>
+                    <input type="time" id="editStartTime" class="w-full border border-slate-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="font-semibold block text-slate-700 mb-1">New End Time:</label>
+                    <input type="time" id="editEndTime" class="w-full border border-slate-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="font-semibold block text-slate-700 mb-1">New Hours:</label>
+                    <input type="number" step="0.5" id="editHours" class="w-full border border-slate-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="font-semibold block text-slate-700 mb-1">Reason for Change:</label>
+                    <textarea id="editReason" rows="2" class="w-full border border-slate-300 rounded p-2" placeholder="Explain modification reason..."></textarea>
+                </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <button onclick="submitEditRequest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">Submit To HR</button>
+                <button onclick="closeEditModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2 rounded-lg text-xs transition">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: FIREBASE CONFIG MODAL -->
+    <div id="configModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-200">
+            <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-cloud text-blue-600"></i> Configure Firebase Realtime Database
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Paste your Firebase Project credentials to enable live 24/7 cross-device syncing.</p>
+
+            <div class="space-y-2 text-xs">
+                <textarea id="firebaseConfigJson" rows="6" class="w-full font-mono text-[11px] border border-slate-300 rounded-lg p-2.5 bg-slate-50" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "your-app.firebaseapp.com",
+  "databaseURL": "https://your-app-default-rtdb.firebaseio.com",
+  "projectId": "your-app",
+  "storageBucket": "your-app.appspot.com",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <button onclick="saveFirebaseConfig()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs transition">Save & Initialize</button>
+                <button onclick="closeConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2.5 rounded-lg text-xs transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // MASTER DATA STRUCTURE FOR KAIZEN MOULD TECHNOLOGY
+        const DEPARTMENTS_DATA = {
+            "PURCHASING": {
+                name: "PURCHASING DEPARTMENT",
+                hod: "KALAISELVI A/P SOORIAMOORTHY",
+                staff: [
+                    { id: "212", name: "THILAGAH A/P KRISHNAN" }
+                ]
+            },
+            "ADMIN_HR": {
+                name: "ADMIN & HR DEPARTMENT",
+                hod: "KALAISELVI A/P SOORIAMOORTHY",
+                staff: [
+                    { id: "108", name: "KALAISELVI A/P SOORIAMOORTHY" },
+                    { id: "316", name: "KISTINNA ANAQIN" },
+                    { id: "328", name: "TAN KYLE" }
+                ]
+            },
+            "CAD": {
+                name: "CAD DEPARTMENT",
+                hod: "CHAN KENG LEONG",
+                staff: [
+                    { id: "2", name: "CHAN KENG LEONG" },
+                    { id: "274", name: "SOH GIM BOON" },
+                    { id: "305", name: "ADARSH DAMODARAN" }
+                ]
+            },
+            "CAM": {
+                name: "CAM DEPARTMENT",
+                hod: "CHAN KENG LEONG",
+                staff: [
+                    { id: "28", name: "HAN AYE" },
+                    { id: "60", name: "MD KANCHAN" },
+                    { id: "269", name: "KHAU LIANG YU" },
+                    { id: "300", name: "NAY MYO ZAW" },
+                    { id: "307", name: "MA LIK CHAN" }
+                ]
+            },
+            "CNC": {
+                name: "CNC DEPARTMENT",
+                hod: "CHAN KENG LEONG",
+                staff: [
+                    { id: "27", name: "SA MASAN BA" },
+                    { id: "290", name: "BHARAT BOHARA" },
+                    { id: "291", name: "BOHARA DHAN BAHADUR" },
+                    { id: "294", name: "BOHARA MILAN" },
+                    { id: "325", name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI" }
+                ]
+            },
+            "EDM": {
+                name: "EDM DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                staff: [
+                    { id: "3", name: "CHONG FAT KEONG" },
+                    { id: "302", name: "TEE NYEIN AUNG" },
+                    { id: "306", name: "KAYW ZIN HEIN" },
+                    { id: "309", name: "JOSHWIN SANTHOSH POILIL THAZHATH" },
+                    { id: "318", name: "YUVANNESH A/L MAYADEVAN" }
+                ]
+            },
+            "PROJECT": {
+                name: "PROJECT DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                staff: [
+                    { id: "257", name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL" },
+                    { id: "262", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI" }
+                ]
+            },
+            "POLISHING": {
+                name: "POLISHING DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                staff: [
+                    { id: "19", name: "MD SHOPON" },
+                    { id: "299", name: "MIN THU" }
+                ]
+            },
+            "PRODUCTION": {
+                name: "PRODUCTION DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                staff: [
+                    { id: "20", name: "MD SHAHA BUDIN" },
+                    { id: "68", name: "MD ALAMGIR" },
+                    { id: "301", name: "SHAING THU AUNG" }
+                ]
+            },
+            "INJECTION_TRIAL": {
+                name: "INJECTION TRIAL DEPARTMENT",
+                hod: "CHONG FAT KEONG",
+                staff: [
+                    { id: "329", name: "MAHAJI" }
+                ]
+            },
+            "MOULD_MAKER": {
+                name: "MOULD MAKER DEPARTMENT",
+                hod: "LEE YOONG HON",
+                staff: [
+                    { id: "15", name: "LEE YOONG HON" },
+                    { id: "69", name: "MD JAHIR" },
+                    { id: "72", name: "MD JAHANGIR ALAM" },
+                    { id: "286", name: "HING YONG HOW" },
+                    { id: "303", name: "ZAW MYO HTIKE" },
+                    { id: "310", name: "AMARNATH SIVADAS" },
+                    { id: "311", name: "JAISON CHRISTOPHER" },
+                    { id: "319", name: "VIMALKUMAR PUTHIYA VALAPPIL" },
+                    { id: "322", name: "SARATH SASIDHARAKAIMAL" },
+                    { id: "326", name: "GOH CHEE KUAN" }
+                ]
+            },
+            "QC": {
+                name: "QUALITY CONTROL (QC) DEPARTMENT",
+                hod: "TAN KAH CHYE",
+                staff: [
+                    { id: "266", name: "TAN KAH CHYE" },
+                    { id: "323", name: "NUR LIANASOFIA PUTRI BINTI KATENI" }
+                ]
+            }
+        };
+
+        // GLOBAL APP STATE
+        let isHR = false;
+        let firebaseDB = null;
+        let allRecords = [];
+        let editRequests = [];
+        const HR_PASSCODE = "1234";
+
+        // DEVICE DETECTION LOGIC
+        function detectDeviceType() {
+            const ua = navigator.userAgent;
+            if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet 📱";
+            if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle/i.test(ua)) return "Mobile 📱";
+            return "Desktop 💻";
+        }
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebaseFromStorage();
+            handleDepartmentChange();
+            addNewRow();
+            switchTab('submit');
+            setInterval(syncLocalAndRemoteData, 3000);
+        });
+
+        // FIREBASE SYNC
+        function initFirebaseFromStorage() {
+            const configStr = localStorage.getItem('kmt_firebase_config');
+            if (configStr) {
+                try {
+                    const config = JSON.parse(configStr);
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(config);
+                    }
+                    firebaseDB = firebase.database();
+                    
+                    document.getElementById('dbStatusBanner').className = "bg-emerald-50 border-b border-emerald-200 px-4 py-2 text-xs text-emerald-800 flex items-center justify-between";
+                    document.getElementById('statusDot').className = "relative inline-flex rounded-full h-2 w-2 bg-emerald-500";
+                    document.getElementById('statusPing').className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                    document.getElementById('dbStatusText').innerHTML = "<strong>Database Connected:</strong> Live 24/7 Firebase Realtime Database active across all devices.";
+                    
+                    listenToFirebaseData();
+                } catch(e) {
+                    console.error("Firebase Config Error:", e);
+                }
+            } else {
+                loadLocalRecords();
+            }
+        }
+
+        function listenToFirebaseData() {
+            if (!firebaseDB) return;
+            firebaseDB.ref('ot_records').on('value', (snapshot) => {
+                const val = snapshot.val();
+                allRecords = val ? Object.keys(val).map(k => ({ firebaseId: k, ...val[k] })) : [];
+                localStorage.setItem('kmt_local_ot_records', JSON.stringify(allRecords));
+                renderAllTables();
+            });
+
+            firebaseDB.ref('edit_requests').on('value', (snapshot) => {
+                const val = snapshot.val();
+                editRequests = val ? Object.keys(val).map(k => ({ requestId: k, ...val[k] })) : [];
+                renderHREditRequests();
+            });
+        }
+
+        function syncLocalAndRemoteData() {
+            if (!firebaseDB) {
+                loadLocalRecords();
+                renderAllTables();
+            }
+        }
+
+        function loadLocalRecords() {
+            const localData = localStorage.getItem('kmt_local_ot_records');
+            allRecords = localData ? JSON.parse(localData) : [];
+        }
+
+        function saveRecords() {
+            localStorage.setItem('kmt_local_ot_records', JSON.stringify(allRecords));
+            renderAllTables();
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabKey) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+            if (tabKey === 'submit') {
+                document.getElementById('tabBtnSubmit').classList.add('tab-active');
+                document.getElementById('tabSubmit').classList.remove('hidden');
+            } else if (tabKey === 'mySubmissions') {
+                document.getElementById('tabBtnMySubmissions').classList.add('tab-active');
+                document.getElementById('tabMySubmissions').classList.remove('hidden');
+                renderMySubmissionsTable();
+            } else if (tabKey === 'hrArchive') {
+                if (!isHR) {
+                    toggleHRLoginModal();
+                    return;
+                }
+                document.getElementById('tabBtnHrArchive').classList.add('tab-active');
+                document.getElementById('tabHrArchive').classList.remove('hidden');
+                renderHRArchiveTable();
+            } else if (tabKey === 'clearRecords') {
+                if (!isHR) {
+                    toggleHRLoginModal();
+                    return;
+                }
+                document.getElementById('tabBtnClearRecords').classList.add('tab-active');
+                document.getElementById('tabClearRecords').classList.remove('hidden');
+            }
+        }
+
+        // DEPARTMENT & HOD SELECTION
+        function handleDepartmentChange() {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const deptObj = DEPARTMENTS_DATA[deptKey];
+            if (deptObj) {
+                document.getElementById('currentDeptDisplay').innerText = deptObj.name;
+                document.getElementById('currentHODDisplay').innerText = deptObj.hod;
+                
+                // Refresh existing row dropdowns
+                document.querySelectorAll('.emp-select').forEach(select => {
+                    populateEmpDropdown(select, deptKey);
+                });
+            }
+        }
+
+        function populateEmpDropdown(selectElement, deptKey) {
+            const deptObj = DEPARTMENTS_DATA[deptKey];
+            const currentVal = selectElement.value;
+            selectElement.innerHTML = `<option value="">Select Employee</option>`;
+            if (deptObj && deptObj.staff) {
+                deptObj.staff.forEach(emp => {
+                    selectElement.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
+                });
+            }
+            selectElement.value = currentVal;
+        }
+
+        // DYNAMIC ENTRY ROWS
+        function addNewRow(empId = "", dateVal = "2026-09-15", startVal = "17:00", endVal = "21:00", hoursVal = "4.0", reasonVal = "") {
+            const tbody = document.getElementById('otTableBody');
+            const deptKey = document.getElementById('departmentSelect').value;
+            const rowId = "row_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
+
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+            tr.className = "hover:bg-slate-50 transition";
+            tr.innerHTML = `
+                <td class="p-2">
+                    <select onchange="onEmpSelected('${rowId}')" class="emp-select w-full bg-white border border-slate-300 rounded p-1.5 text-xs font-medium">
+                        <option value="">Select Employee</option>
+                    </select>
+                </td>
+                <td class="p-2">
+                    <input type="text" readonly class="emp-id-input w-full bg-slate-100 border border-slate-300 rounded p-1.5 text-xs text-center font-bold text-slate-600" value="${empId}">
+                </td>
+                <td class="p-2">
+                    <input type="date" class="date-input w-full bg-white border border-slate-300 rounded p-1.5 text-xs" value="${dateVal}">
+                </td>
+                <td class="p-2">
+                    <input type="time" onchange="autoCalcHours('${rowId}')" class="start-time-input w-full bg-white border border-slate-300 rounded p-1.5 text-xs" value="${startVal}">
+                </td>
+                <td class="p-2">
+                    <input type="time" onchange="autoCalcHours('${rowId}')" class="end-time-input w-full bg-white border border-slate-300 rounded p-1.5 text-xs" value="${endVal}">
+                </td>
+                <td class="p-2">
+                    <input type="number" step="0.5" class="hours-input w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-center font-bold" value="${hoursVal}">
+                </td>
+                <td class="p-2">
+                    <input type="text" placeholder="Reason / Project Name" class="reason-input w-full bg-white border border-slate-300 rounded p-1.5 text-xs" value="${reasonVal}">
+                </td>
+                <td class="p-2 text-center">
+                    <button onclick="removeRow('${rowId}')" class="text-rose-500 hover:text-rose-700 p-1 rounded" title="Delete Row"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+            populateEmpDropdown(tr.querySelector('.emp-select'), deptKey);
+            if (empId) {
+                tr.querySelector('.emp-select').value = empId;
+            }
+        }
+
+        function removeRow(rowId) {
+            const tbody = document.getElementById('otTableBody');
+            if (tbody.children.length > 1) {
+                document.getElementById(rowId).remove();
+            } else {
+                alert("At least one row is required.");
+            }
+        }
+
+        function loadWholeTeam() {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const deptObj = DEPARTMENTS_DATA[deptKey];
+            if (deptObj && deptObj.staff.length > 0) {
+                document.getElementById('otTableBody').innerHTML = "";
+                deptObj.staff.forEach(emp => {
+                    addNewRow(emp.id);
+                });
+            }
+        }
+
+        // AUTO-MEMORY & CALCULATIONS
+        function onEmpSelected(rowId) {
+            const tr = document.getElementById(rowId);
+            const empId = tr.querySelector('.emp-select').value;
+            const empIdInput = tr.querySelector('.emp-id-input');
+            empIdInput.value = empId;
+
+            // Search memory from past records
+            const pastRecord = allRecords.find(r => r.empId === empId);
+            if (pastRecord) {
+                tr.querySelector('.start-time-input').value = pastRecord.startTime || "17:00";
+                tr.querySelector('.end-time-input').value = pastRecord.endTime || "21:00";
+                tr.querySelector('.hours-input').value = pastRecord.hours || "4.0";
+                if (!tr.querySelector('.reason-input').value) {
+                    tr.querySelector('.reason-input').value = pastRecord.reason || "";
+                }
+            }
+        }
+
+        function autoCalcHours(rowId) {
+            const tr = document.getElementById(rowId);
+            const start = tr.querySelector('.start-time-input').value;
+            const end = tr.querySelector('.end-time-input').value;
+            if (start && end) {
+                let [sH, sM] = start.split(':').map(Number);
+                let [eH, eM] = end.split(':').map(Number);
+                let diff = (eH + eM/60) - (sH + sM/60);
+                if (diff < 0) diff += 24;
+                tr.querySelector('.hours-input').value = diff.toFixed(1);
+            }
+        }
+
+        // SUBMIT OT LOGIC
+        function submitOT(statusType) {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const deptObj = DEPARTMENTS_DATA[deptKey];
+            const rows = document.querySelectorAll('#otTableBody tr');
+            const device = detectDeviceType();
+
+            let submittedCount = 0;
+
+            rows.forEach(tr => {
+                const empSelect = tr.querySelector('.emp-select');
+                const empId = tr.querySelector('.emp-id-input').value;
+                const empName = empSelect.options[empSelect.selectedIndex]?.text || "";
+                const dateVal = tr.querySelector('.date-input').value;
+                const startTime = tr.querySelector('.start-time-input').value;
+                const endTime = tr.querySelector('.end-time-input').value;
+                const hours = tr.querySelector('.hours-input').value;
+                const reason = tr.querySelector('.reason-input').value;
+
+                if (empId && dateVal) {
+                    const record = {
+                        id: "rec_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+                        deptKey: deptKey,
+                        deptName: deptObj.name,
+                        hodName: deptObj.hod,
+                        empId: empId,
+                        empName: empName,
+                        date: dateVal,
+                        startTime: startTime,
+                        endTime: endTime,
+                        hours: hours,
+                        reason: reason || "Normal OT",
+                        status: statusType,
+                        device: device,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    if (firebaseDB) {
+                        firebaseDB.ref('ot_records').push(record);
+                    } else {
+                        allRecords.unshift(record);
+                    }
+                    submittedCount++;
+                }
+            });
+
+            if (submittedCount > 0) {
+                if (!firebaseDB) saveRecords();
+                alert(`Successfully submitted ${submittedCount} overtime record(s)!`);
+                switchTab('mySubmissions');
+            } else {
+                alert("Please select at least one employee and valid date.");
+            }
+        }
+
+        // RENDER TABLES
+        function renderAllTables() {
+            renderMySubmissionsTable();
+            if (isHR) {
+                renderHRArchiveTable();
+                renderHREditRequests();
+            }
+        }
+
+        function renderMySubmissionsTable() {
+            const tbody = document.getElementById('mySubmissionsBody');
+            tbody.innerHTML = "";
+
+            const yr = document.getElementById('myFilterYear').value;
+            const mo = document.getElementById('myFilterMonth').value;
+            const dt = document.getElementById('myFilterDate').value;
+            const q = document.getElementById('myFilterSearch').value.toLowerCase();
+
+            const filtered = allRecords.filter(r => {
+                if (yr !== 'ALL' && !r.date.startsWith(yr)) return false;
+                if (mo !== 'ALL' && r.date.split('-')[1] !== mo) return false;
+                if (dt && r.date !== dt) return false;
+                if (q && !r.empName.toLowerCase().includes(q) && !r.empId.toLowerCase().includes(q)) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-4 text-slate-400">No submissions found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold">${r.date}</td>
+                    <td class="p-2.5">${r.deptName}</td>
+                    <td class="p-2.5 text-slate-500">${r.hodName}</td>
+                    <td class="p-2.5 font-semibold text-blue-900">${r.empName}</td>
+                    <td class="p-2.5 font-bold">${r.empId}</td>
+                    <td class="p-2.5">${r.startTime} - ${r.endTime}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${r.hours}h</td>
+                    <td class="p-2.5 text-slate-600">${r.reason}</td>
+                    <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status==='APPROVED'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${r.status}</span>
+                    </td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="openEditModal('${r.firebaseId || r.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-1.5 rounded text-xs font-bold transition">✏️ Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderHRArchiveTable() {
+            const tbody = document.getElementById('hrArchiveBody');
+            tbody.innerHTML = "";
+
+            const dept = document.getElementById('hrFilterDept').value;
+            const mo = document.getElementById('hrFilterMonth').value;
+            const dt = document.getElementById('hrFilterDate').value;
+            const q = document.getElementById('hrFilterSearch').value.toLowerCase();
+
+            const filtered = allRecords.filter(r => {
+                if (dept !== 'ALL' && r.deptKey !== dept) return false;
+                if (mo && !r.date.startsWith(mo)) return false;
+                if (dt && r.date !== dt) return false;
+                if (q && !r.empName.toLowerCase().includes(q) && !r.empId.toLowerCase().includes(q)) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-slate-400">No records found in HR database.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold">${r.date}</td>
+                    <td class="p-2.5">${r.deptName}</td>
+                    <td class="p-2.5 font-bold text-slate-900">${r.empName} <span class="text-slate-400 font-normal">(${r.empId})</span></td>
+                    <td class="p-2.5"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">${r.device || 'Desktop 💻'}</span></td>
+                    <td class="p-2.5 font-bold text-blue-700">${r.hours}h (${r.startTime}-${r.endTime})</td>
+                    <td class="p-2.5">${r.reason}</td>
+                    <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status==='APPROVED'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${r.status}</span>
+                    </td>
+                    <td class="p-2.5 text-center flex items-center justify-center gap-1">
+                        <button onclick="toggleApproveRecord('${r.firebaseId || r.id}')" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 p-1.5 rounded font-bold text-[10px]">Approve</button>
+                        <button onclick="deleteSingleRecord('${r.firebaseId || r.id}')" class="bg-rose-50 text-rose-700 hover:bg-rose-100 p-1.5 rounded font-bold text-[10px]">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // EDIT REQUEST WORKFLOW
+        function openEditModal(recordId) {
+            const rec = allRecords.find(r => (r.firebaseId === recordId || r.id === recordId));
+            if (!rec) return;
+            document.getElementById('editRecordId').value = recordId;
+            document.getElementById('editStartTime').value = rec.startTime;
+            document.getElementById('editEndTime').value = rec.endTime;
+            document.getElementById('editHours').value = rec.hours;
+            document.getElementById('editReason').value = rec.reason;
+            document.getElementById('editRequestModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editRequestModal').classList.add('hidden');
+        }
+
+        function submitEditRequest() {
+            const recId = document.getElementById('editRecordId').value;
+            const rec = allRecords.find(r => (r.firebaseId === recId || r.id === recId));
+            if (!rec) return;
+
+            const reqPayload = {
+                originalRecordId: recId,
+                empName: rec.empName,
+                empId: rec.empId,
+                date: rec.date,
+                newStartTime: document.getElementById('editStartTime').value,
+                newEndTime: document.getElementById('editEndTime').value,
+                newHours: document.getElementById('editHours').value,
+                newReason: document.getElementById('editReason').value,
+                timestamp: new Date().toISOString()
+            };
+
+            if (firebaseDB) {
+                firebaseDB.ref('edit_requests').push(reqPayload);
+            } else {
+                editRequests.push({ requestId: "req_" + Date.now(), ...reqPayload });
+            }
+
+            alert("Modification request submitted to HR for approval.");
+            closeEditModal();
+            renderHREditRequests();
+        }
+
+        function renderHREditRequests() {
+            const container = document.getElementById('hrEditRequestsContainer');
+            const list = document.getElementById('hrEditRequestsList');
+            if (!container || !list) return;
+
+            if (editRequests.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            list.innerHTML = "";
+
+            editRequests.forEach(req => {
+                const div = document.createElement('div');
+                div.className = "bg-white border border-amber-200 rounded p-2.5 flex items-center justify-between gap-2";
+                div.innerHTML = `
+                    <div>
+                        <strong>${req.empName} (${req.empId})</strong> requests edit for <strong>${req.date}</strong>: 
+                        Change time to ${req.newStartTime}-${req.newEndTime} (${req.newHours}h). Reason: "${req.newReason}"
+                    </div>
+                    <div class="flex gap-1 whitespace-nowrap">
+                        <button onclick="approveEditRequest('${req.requestId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded text-[10px]">Approve</button>
+                        <button onclick="rejectEditRequest('${req.requestId}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-2 py-1 rounded text-[10px]">Reject</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function approveEditRequest(reqId) {
+            const req = editRequests.find(r => r.requestId === reqId);
+            if (!req) return;
+
+            // Update main record
+            if (firebaseDB) {
+                firebaseDB.ref('ot_records/' + req.originalRecordId).update({
+                    startTime: req.newStartTime,
+                    endTime: req.newEndTime,
+                    hours: req.newHours,
+                    reason: req.newReason
+                });
+                firebaseDB.ref('edit_requests/' + reqId).remove();
+            } else {
+                const idx = allRecords.findIndex(r => r.id === req.originalRecordId);
+                if (idx !== -1) {
+                    allRecords[idx].startTime = req.newStartTime;
+                    allRecords[idx].endTime = req.newEndTime;
+                    allRecords[idx].hours = req.newHours;
+                    allRecords[idx].reason = req.newReason;
+                    saveRecords();
+                }
+                editRequests = editRequests.filter(r => r.requestId !== reqId);
+            }
+            alert("Edit request approved.");
+            renderAllTables();
+        }
+
+        function rejectEditRequest(reqId) {
+            if (firebaseDB) {
+                firebaseDB.ref('edit_requests/' + reqId).remove();
+            } else {
+                editRequests = editRequests.filter(r => r.requestId !== reqId);
+            }
+            alert("Edit request rejected.");
+            renderHREditRequests();
+        }
+
+        // HR CLEARING LOGIC
+        function clearRecordsByDept() {
+            const deptKey = document.getElementById('clearDeptSelect').value;
+            if (!confirm(`Delete all records for ${deptKey}?`)) return;
+
+            if (firebaseDB) {
+                allRecords.forEach(r => {
+                    if (r.deptKey === deptKey && r.firebaseId) {
+                        firebaseDB.ref('ot_records/' + r.firebaseId).remove();
+                    }
+                });
+            } else {
+                allRecords = allRecords.filter(r => r.deptKey !== deptKey);
+                saveRecords();
+            }
+            alert("Selected department records deleted.");
+        }
+
+        function clearRecordsByEmp() {
+            const query = document.getElementById('clearEmpInput').value.trim().toLowerCase();
+            if (!query) return alert("Enter employee name or ID.");
+            if (!confirm(`Delete all records matching '${query}'?`)) return;
+
+            if (firebaseDB) {
+                allRecords.forEach(r => {
+                    if ((r.empName.toLowerCase().includes(query) || r.empId.toLowerCase().includes(query)) && r.firebaseId) {
+                        firebaseDB.ref('ot_records/' + r.firebaseId).remove();
+                    }
+                });
+            } else {
+                allRecords = allRecords.filter(r => !r.empName.toLowerCase().includes(query) && !r.empId.toLowerCase().includes(query));
+                saveRecords();
+            }
+            alert("Employee records deleted.");
+        }
+
+        function clearRecordsByDate() {
+            const dt = document.getElementById('clearDateInput').value;
+            if (!dt) return alert("Select a date.");
+            if (!confirm(`Delete all records for date ${dt}?`)) return;
+
+            if (firebaseDB) {
+                allRecords.forEach(r => {
+                    if (r.date === dt && r.firebaseId) {
+                        firebaseDB.ref('ot_records/' + r.firebaseId).remove();
+                    }
+                });
+            } else {
+                allRecords = allRecords.filter(r => r.date !== dt);
+                saveRecords();
+            }
+            alert("Date records deleted.");
+        }
+
+        function clearAllSystemRecords() {
+            if (!confirm("CRITICAL WARNING: Wipe entire system overtime records?")) return;
+            if (firebaseDB) {
+                firebaseDB.ref('ot_records').remove();
+            } else {
+                allRecords = [];
+                saveRecords();
+            }
+            alert("All records permanently cleared.");
+        }
+
+        function deleteSingleRecord(idKey) {
+            if (!confirm("Delete this record?")) return;
+            if (firebaseDB) {
+                firebaseDB.ref('ot_records/' + idKey).remove();
+            } else {
+                allRecords = allRecords.filter(r => (r.firebaseId !== idKey && r.id !== idKey));
+                saveRecords();
+            }
+        }
+
+        function toggleApproveRecord(idKey) {
+            const rec = allRecords.find(r => (r.firebaseId === idKey || r.id === idKey));
+            if (!rec) return;
+            const newStatus = rec.status === 'APPROVED' ? 'PENDING' : 'APPROVED';
+
+            if (firebaseDB) {
+                firebaseDB.ref('ot_records/' + idKey).update({ status: newStatus });
+            } else {
+                rec.status = newStatus;
+                saveRecords();
+            }
+        }
+
+        // HR LOGIN MODAL LOGIC
+        function toggleHRLoginModal() {
+            const modal = document.getElementById('hrLoginModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function verifyHRPasscode() {
+            const input = document.getElementById('hrPasscodeInput').value;
+            if (input === HR_PASSCODE) {
+                isHR = true;
+                document.getElementById('accessModeBadge').innerText = "HR MASTER MODE";
+                document.getElementById('accessModeBadge').className = "bg-amber-400 text-slate-900 px-2.5 py-1 rounded font-extrabold uppercase tracking-wider";
+                document.getElementById('hrLoginBtnText').innerText = "HR Logged In";
+                toggleHRLoginModal();
+                alert("HR Master Authenticated!");
+                switchTab('hrArchive');
+            } else {
+                alert("Incorrect HR Passcode.");
+            }
+        }
+
+        // CONFIG MODAL LOGIC
+        function openConfigModal() {
+            document.getElementById('configModal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.add('hidden');
+        }
+
+        function saveFirebaseConfig() {
+            const val = document.getElementById('firebaseConfigJson').value.trim();
+            try {
+                JSON.parse(val);
+                localStorage.setItem('kmt_firebase_config', val);
+                alert("Firebase configuration saved. Reloading...");
+                location.reload();
+            } catch(e) {
+                alert("Invalid JSON format. Please check your credentials.");
+            }
+        }
+
+        // EXPORT TO CSV
+        function exportToCSV() {
+            if (allRecords.length === 0) return alert("No records to export.");
+            let csv = "Date,Department,HOD,Employee Name,Emp ID,Start Time,End Time,Hours,Reason,Status,Device\n";
+            allRecords.forEach(r => {
+                csv += `"${r.date}","${r.deptName}","${r.hodName}","${r.empName}","${r.empId}","${r.startTime}","${r.endTime}","${r.hours}","${r.reason}","${r.status}","${r.device || 'Desktop'}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `KMT_OT_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            a.click();
+        }
+    </script>
+</body>
+</html>
