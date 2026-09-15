@@ -312,19 +312,117 @@
 
     <!-- SYSTEM SCRIPT -->
     <script>
+        // HOD 名字与工号已全部加入到各自部门的员工下拉选择列表中
         const deptMap = {
-            "CAD": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "SOH GIM BOON", id: "274" }, { name: "ADARSH DAMODARAN", id: "305" }] },
-            "CAM": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "HAN AYE", id: "28" }, { name: "MD KANCHAN", id: "60" }, { name: "KHAU LIANG YU", id: "269" }, { name: "NAY MYO ZAW", id: "300" }, { name: "MA LIK CHAN", id: "307" }] },
-            "CNC": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "SA MASAN BA", id: "27" }, { name: "BHARAT BOHARA", id: "290" }, { name: "BOHARA DHAN BAHADUR", id: "291" }, { name: "BOHARA MILAN", id: "294" }, { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }] },
-            "EDM": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "TEE NYEIN AUNG", id: "302" }, { name: "KAYW ZIN HEIN", id: "306" }, { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" }, { name: "YUVANNESH A/L MAYADEVAN", id: "318" }] },
-            "PROJECT": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" }, { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }] },
-            "POLISHING": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MD SHOPON", id: "19" }, { name: "MIN THU", id: "299" }] },
-            "PRODUCTION": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MD SHAHA BUDIN", id: "20" }, { name: "MD ALAMGIR", id: "68" }, { name: "SHAING THU AUNG", id: "301" }] },
-            "INJECTION_TRIAL": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MAHAJI", id: "329" }] },
-            "MOULD_MAKER": { hod: "LEE YOONG HON (ID: 15)", staff: [{ name: "MD JAHIR", id: "69" }, { name: "MD JAHANGIR ALAM", id: "72" }, { name: "HING YONG HOW", id: "286" }, { name: "ZAW MYO HTIKE", id: "303" }, { name: "AMARNATH SIVADAS", id: "310" }, { name: "JAISON CHRISTOPHER", id: "311" }, { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" }, { name: "SARATH SASIDHARAKAIMAL", id: "322" }, { name: "GOH CHEE KUAN", id: "326" }] },
-            "QC": { hod: "TAN KAH CHYE (ID: 266)", staff: [{ name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }] },
-            "ADMIN_HR": { hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", staff: [{ name: "KISTINNA ANAQIN", id: "316" }, { name: "TAN KYLE", id: "328" }] },
-            "PURCHASING": { hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", staff: [{ name: "THILAGAH A/P KRISHNAN", id: "212" }] }
+            "CAD": { 
+                hod: "CHAN KENG LEONG (ID: 2)", 
+                staff: [
+                    { name: "CHAN KENG LEONG", id: "2" }, // HOD
+                    { name: "SOH GIM BOON", id: "274" }, 
+                    { name: "ADARSH DAMODARAN", id: "305" }
+                ] 
+            },
+            "CAM": { 
+                hod: "CHAN KENG LEONG (ID: 2)", 
+                staff: [
+                    { name: "CHAN KENG LEONG", id: "2" }, // HOD
+                    { name: "HAN AYE", id: "28" }, 
+                    { name: "MD KANCHAN", id: "60" }, 
+                    { name: "KHAU LIANG YU", id: "269" }, 
+                    { name: "NAY MYO ZAW", id: "300" }, 
+                    { name: "MA LIK CHAN", id: "307" }
+                ] 
+            },
+            "CNC": { 
+                hod: "CHAN KENG LEONG (ID: 2)", 
+                staff: [
+                    { name: "CHAN KENG LEONG", id: "2" }, // HOD
+                    { name: "SA MASAN BA", id: "27" }, 
+                    { name: "BHARAT BOHARA", id: "290" }, 
+                    { name: "BOHARA DHAN BAHADUR", id: "291" }, 
+                    { name: "BOHARA MILAN", id: "294" }, 
+                    { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }
+                ] 
+            },
+            "EDM": { 
+                hod: "CHONG FAT KEONG (ID: 3)", 
+                staff: [
+                    { name: "CHONG FAT KEONG", id: "3" }, // HOD
+                    { name: "TEE NYEIN AUNG", id: "302" }, 
+                    { name: "KAYW ZIN HEIN", id: "306" }, 
+                    { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" }, 
+                    { name: "YUVANNESH A/L MAYADEVAN", id: "318" }
+                ] 
+            },
+            "PROJECT": { 
+                hod: "CHONG FAT KEONG (ID: 3)", 
+                staff: [
+                    { name: "CHONG FAT KEONG", id: "3" }, // HOD
+                    { name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" }, 
+                    { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }
+                ] 
+            },
+            "POLISHING": { 
+                hod: "CHONG FAT KEONG (ID: 3)", 
+                staff: [
+                    { name: "CHONG FAT KEONG", id: "3" }, // HOD
+                    { name: "MD SHOPON", id: "19" }, 
+                    { name: "MIN THU", id: "299" }
+                ] 
+            },
+            "PRODUCTION": { 
+                hod: "CHONG FAT KEONG (ID: 3)", 
+                staff: [
+                    { name: "CHONG FAT KEONG", id: "3" }, // HOD
+                    { name: "MD SHAHA BUDIN", id: "20" }, 
+                    { name: "MD ALAMGIR", id: "68" }, 
+                    { name: "SHAING THU AUNG", id: "301" }
+                ] 
+            },
+            "INJECTION_TRIAL": { 
+                hod: "CHONG FAT KEONG (ID: 3)", 
+                staff: [
+                    { name: "CHONG FAT KEONG", id: "3" }, // HOD
+                    { name: "MAHAJI", id: "329" }
+                ] 
+            },
+            "MOULD_MAKER": { 
+                hod: "LEE YOONG HON (ID: 15)", 
+                staff: [
+                    { name: "LEE YOONG HON", id: "15" }, // HOD
+                    { name: "MD JAHIR", id: "69" }, 
+                    { name: "MD JAHANGIR ALAM", id: "72" }, 
+                    { name: "HING YONG HOW", id: "286" }, 
+                    { name: "ZAW MYO HTIKE", id: "303" }, 
+                    { name: "AMARNATH SIVADAS", id: "310" }, 
+                    { name: "JAISON CHRISTOPHER", id: "311" }, 
+                    { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" }, 
+                    { name: "SARATH SASIDHARAKAIMAL", id: "322" }, 
+                    { name: "GOH CHEE KUAN", id: "326" }
+                ] 
+            },
+            "QC": { 
+                hod: "TAN KAH CHYE (ID: 266)", 
+                staff: [
+                    { name: "TAN KAH CHYE", id: "266" }, // HOD
+                    { name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }
+                ] 
+            },
+            "ADMIN_HR": { 
+                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", 
+                staff: [
+                    { name: "KALAISELVI A/P SOORIAMOORTHY", id: "108" }, // HOD
+                    { name: "KISTINNA ANAQIN", id: "316" }, 
+                    { name: "TAN KYLE", id: "328" }
+                ] 
+            },
+            "PURCHASING": { 
+                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", 
+                staff: [
+                    { name: "KALAISELVI A/P SOORIAMOORTHY", id: "108" }, // HOD
+                    { name: "THILAGAH A/P KRISHNAN", id: "212" }
+                ] 
+            }
         };
 
         let isHR = false;
@@ -584,8 +682,7 @@
                     return;
                 }
 
-                // CSV 表头
-                let csvContent = "\uFEFF"; // UTF-8 BOM，确保 Excel 打开中文不乱码
+                let csvContent = "\uFEFF"; // UTF-8 BOM
                 csvContent += "Department (部门),Employee Name (姓名),Employee ID (工号),Date (日期),Start Time (开始时间),End Time (结束时间),OT Hours (加班时数),Purpose & Reason (原因用途),Status (状态)\n";
 
                 Object.values(data).forEach(item => {
@@ -597,15 +694,14 @@
                         `"${item.startTime || ''}"`,
                         `"${item.endTime || ''}"`,
                         `"${item.hours || '0'}"`,
-                        `"${(item.reason || '').replace(/"/g, '""')}"`, // 转义英文双引号
+                        `"${(item.reason || '').replace(/"/g, '""')}"`,
                         `"${item.status || ''}"`
                     ];
                     csvContent += row.join(",") + "\n";
                 });
 
-                // 自动创建二进制文件并触发下载
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
+                const url = URL.URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 const todayStr = new Date().toISOString().split('T')[0];
                 
@@ -638,7 +734,6 @@
                 btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded";
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
             } else {
-                // Calculate hours & save to Firebase
                 const start = document.getElementById(`edit_start_${key}`).value;
                 const end = document.getElementById(`edit_end_${key}`).value;
                 let hours = '0.0';
