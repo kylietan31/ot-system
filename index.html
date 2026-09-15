@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaizen Mould Technology - Daily Overtime Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase App & Realtime Database for Live Cross-Device Syncing -->
+    <!-- Firebase Realtime Database for Live Cross-Device Syncing -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
@@ -27,22 +27,14 @@
         <div class="bg-white p-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
             <div class="text-center md:text-left">
                 <h1 class="text-2xl font-bold text-blue-950">Kaizen Mould Technology Sdn. Bhd.</h1>
-                <p class="text-xs text-slate-500 mt-1" id="subHeader">Daily Overtime Management System / 每日加班管理系统</p>
+                <p class="text-xs text-slate-500 mt-1">Daily Overtime Management System</p>
             </div>
             <div class="flex items-center gap-4">
                 <!-- HR Portal Switcher -->
                 <div class="flex items-center gap-2 bg-slate-100 p-2 rounded-lg border border-slate-300">
                     <span class="text-xs font-bold text-slate-600">Access Mode:</span>
-                    <span id="roleBadge" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700">STAFF / 员工模式</span>
-                    <button onclick="toggleHRMode()" id="btnHRToggle" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-3 py-1 rounded text-xs shadow transition">🔒 HR Login / HR部门专属登入</button>
-                </div>
-                <!-- Language Selector -->
-                <div class="flex items-center gap-2">
-                    <select id="langSelect" onchange="switchLanguage(this.value)" class="border border-slate-300 rounded px-2 py-1 text-xs bg-slate-50 focus:outline-none">
-                        <option value="zh">中文 (Chinese)</option>
-                        <option value="en">English</option>
-                        <option value="ms">Bahasa Melayu</option>
-                    </select>
+                    <span id="roleBadge" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700">STAFF MODE</span>
+                    <button onclick="toggleHRMode()" id="btnHRToggle" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-3 py-1 rounded text-xs shadow transition">🔒 HR Login</button>
                 </div>
             </div>
         </div>
@@ -50,7 +42,7 @@
         <!-- Department Control Panel -->
         <div class="bg-blue-50/50 p-4 m-6 rounded-lg border border-blue-100 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
             <div class="flex items-center gap-3 w-full md:w-auto">
-                <label class="text-sm font-bold text-blue-900 whitespace-nowrap" id="lblSelectDept">Select Department / 选择部门:</label>
+                <label class="text-sm font-bold text-blue-900 whitespace-nowrap">Select Department:</label>
                 <select id="deptSelect" onchange="onDeptChange()" class="bg-white border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-2 focus:ring-blue-500 w-full md:w-80 font-bold">
                     <option value="CAD">CAD DEPARTMENT</option>
                     <option value="CAM">CAM DEPARTMENT</option>
@@ -67,24 +59,24 @@
                 </select>
             </div>
             <div class="text-right text-xs text-slate-600">
-                <div><span id="lblDept">Department / 部门:</span> <strong id="currentDeptDisplay" class="text-blue-900 font-bold">ADMIN DEPARTMENT</strong></div>
-                <div><span id="lblHod">HOD Approval / 部门主管:</span> <strong id="currentHodDisplay" class="text-slate-900 font-bold">KALAISELVI A/P SOORIAMOORTHY</strong></div>
+                <div>Department: <strong id="currentDeptDisplay" class="text-blue-900 font-bold">ADMIN DEPARTMENT</strong></div>
+                <div>HOD Approval: <strong id="currentHodDisplay" class="text-slate-900 font-bold">KALAISELVI A/P SOORIAMOORTHY</strong></div>
             </div>
         </div>
 
         <!-- Navigation Tabs -->
         <div class="px-6 flex flex-wrap gap-2 border-b border-slate-200 no-print">
             <button onclick="switchTab('submit')" id="tab-submit" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-blue-900 text-white flex items-center gap-2">
-                📝 <span id="navSubmit">Submit OT / 登记上交</span>
+                📝 Submit OT
             </button>
             <button onclick="switchTab('myrecords')" id="tab-myrecords" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
-                👤 <span id="navRecords">My Records / 个人上交记录</span>
+                👤 My Submissions
             </button>
             <button onclick="switchTab('archive')" id="tab-archive" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
-                📁 <span id="navArchive">HR Archive & Report / 全公司月度汇总与报告 (HR Only)</span>
+                📁 HR Archive & Report (HR Only)
             </button>
             <button onclick="switchTab('clear')" id="tab-clear" class="px-4 py-2.5 font-bold text-sm rounded-t-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2">
-                🗑️ <span id="navClear">Clear Records / 清理记录 (HR Only)</span>
+                🗑️ Clear Records (HR Only)
             </button>
         </div>
 
@@ -94,30 +86,28 @@
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                            <th class="p-3" id="thEmp">Employee / 姓名</th>
-                            <th class="p-3" id="thId">Emp ID / 工号</th>
-                            <th class="p-3" id="thDate">Date / 日期</th>
-                            <th class="p-3" id="thStart">Start Time / 开始</th>
-                            <th class="p-3" id="thEnd">End Time / 结束</th>
-                            <th class="p-3" id="thHours">Hours / 小时</th>
-                            <th class="p-3" id="thReason">Purpose & Reason / 原因</th>
-                            <th class="p-3 text-center" id="thAction">Action / 操作</th>
+                            <th class="p-3">Employee Name</th>
+                            <th class="p-3">Emp ID</th>
+                            <th class="p-3">Date</th>
+                            <th class="p-3">Start Time</th>
+                            <th class="p-3">End Time</th>
+                            <th class="p-3">Hours</th>
+                            <th class="p-3">Purpose & Reason</th>
+                            <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="inputRowsBody">
-                        <!-- Dynamic Input Rows -->
-                    </tbody>
+                    <tbody id="inputRowsBody"></tbody>
                 </table>
             </div>
             <div class="flex flex-wrap gap-3">
                 <button onclick="addInputRow()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
-                    ➕ <span id="btnAddRow">Add Row / 添加新行</span>
+                    ➕ Add Row
                 </button>
                 <button onclick="submitRecords('SUBMITTED')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1 shadow">
-                    ✅ <span id="btnConfirm">Confirm Submission / 确认上交</span>
+                    ✅ Confirm Submission
                 </button>
                 <button onclick="submitRecords('PENDING')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1 shadow">
-                    ⏳ <span id="btnPending">Save PENDING / PENDING 上交</span>
+                    ⏳ Save PENDING
                 </button>
             </div>
         </div>
@@ -125,24 +115,24 @@
         <!-- TAB 2: MY RECORDS -->
         <div id="view-myrecords" class="p-6 hidden">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-lg text-slate-800" id="titleMyRecords">My Submissions / 个人上交记录</h3>
+                <h3 class="font-bold text-lg text-slate-800">My Submissions</h3>
                 <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 no-print">
-                    🖨️ <span id="btnPrint1">Save PDF / Print / 保存与打印</span>
+                    🖨️ Save PDF / Print
                 </button>
             </div>
             <div class="overflow-x-auto border border-slate-200 rounded-lg">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                            <th class="p-3">Date / 日期</th>
-                            <th class="p-3">Dept / 部门</th>
-                            <th class="p-3">HOD / 主管</th>
-                            <th class="p-3">Name / 姓名</th>
-                            <th class="p-3">ID / 工号</th>
-                            <th class="p-3">Time / 时间段</th>
-                            <th class="p-3">Hours / 小时</th>
-                            <th class="p-3">Reason / 原因</th>
-                            <th class="p-3">Status / 状态</th>
+                            <th class="p-3">Date</th>
+                            <th class="p-3">Dept</th>
+                            <th class="p-3">HOD</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Time</th>
+                            <th class="p-3">Hours</th>
+                            <th class="p-3">Reason</th>
+                            <th class="p-3">Status</th>
                             <th class="p-3 text-center no-print">Action</th>
                         </tr>
                     </thead>
@@ -151,31 +141,31 @@
             </div>
         </div>
 
-        <!-- TAB 3: HR ARCHIVE & REPORT (HR ONLY EXCLUSIVE VIEW) -->
+        <!-- TAB 3: HR ARCHIVE & REPORT (HR ONLY) -->
         <div id="view-archive" class="p-6 hidden">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h3 class="font-bold text-lg text-slate-800" id="titleArchive">HR Global Archive & Report / 全公司加班总汇与报告</h3>
-                    <p class="text-xs text-rose-600 font-bold">🔒 只有 HR 登入才可以查看全公司所有设备/员工上交的完整记录与修改请求。</p>
+                    <h3 class="font-bold text-lg text-slate-800">HR Global Archive & Company Report</h3>
+                    <p class="text-xs text-rose-600 font-bold">🔒 Restricted: Only HR can view all company submissions and approve edit requests across devices.</p>
                 </div>
                 <button onclick="window.print()" class="bg-blue-900 hover:bg-blue-950 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 no-print">
-                    🖨️ <span id="btnPrint2">Export Report / 导出总报告打印</span>
+                    🖨️ Export Report / Print
                 </button>
             </div>
             <div class="overflow-x-auto border border-slate-200 rounded-lg">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                            <th class="p-3">Date / 日期</th>
-                            <th class="p-3">Dept / 部门</th>
-                            <th class="p-3">HOD / 主管</th>
-                            <th class="p-3">Name / 姓名</th>
-                            <th class="p-3">ID / 工号</th>
-                            <th class="p-3">Time / 时间段</th>
-                            <th class="p-3">Hours / 小时</th>
-                            <th class="p-3">Reason / 原因</th>
-                            <th class="p-3">Status / 状态</th>
-                            <th class="p-3 text-center no-print">HR Approval / 审核</th>
+                            <th class="p-3">Date</th>
+                            <th class="p-3">Dept</th>
+                            <th class="p-3">HOD</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Time</th>
+                            <th class="p-3">Hours</th>
+                            <th class="p-3">Reason</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 text-center no-print">HR Approval</th>
                         </tr>
                     </thead>
                     <tbody id="archiveTableBody"></tbody>
@@ -185,10 +175,10 @@
 
         <!-- TAB 4: CLEAR RECORDS (HR ONLY) -->
         <div id="view-clear" class="p-6 space-y-6 hidden">
-            <h3 class="font-bold text-xl text-rose-600 border-b pb-2" id="titleClear">Clear Records Management / 清理记录管理 (HR 独家权限)</h3>
+            <h3 class="font-bold text-xl text-rose-600 border-b pb-2">Clear Records Management (HR Exclusive)</h3>
             
             <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
-                <h4 class="font-bold text-sm text-slate-700">🏢 1. Delete By Specific Department / 按指定部门删除</h4>
+                <h4 class="font-bold text-sm text-slate-700">🏢 1. Delete By Specific Department</h4>
                 <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
                     <select id="clearDeptSelect" class="border border-slate-300 rounded p-2 text-sm w-full md:w-64 font-medium">
                         <option value="CAD">CAD DEPARTMENT</option>
@@ -204,82 +194,67 @@
                         <option value="ADMIN">ADMIN DEPARTMENT</option>
                         <option value="PURCHASING">PURCHASING DEPARTMENT</option>
                     </select>
-                    <button onclick="clearByDept()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Dept / 删除该部门所有记录</button>
+                    <button onclick="clearByDept()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Dept</button>
                 </div>
             </div>
 
             <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
-                <h4 class="font-bold text-sm text-slate-700">👤 2. Delete By Specific Employee / 按指定员工姓名或工号删除</h4>
+                <h4 class="font-bold text-sm text-slate-700">👤 2. Delete By Employee Name / ID</h4>
                 <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
                     <input type="text" id="clearEmpInput" placeholder="Enter Name or ID (e.g. TAN KYLE or 328)" class="border border-slate-300 rounded p-2 text-sm w-full md:w-80">
-                    <button onclick="clearByEmp()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Employee Records / 删除该员工所有记录</button>
+                    <button onclick="clearByEmp()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Employee Records</button>
                 </div>
             </div>
 
             <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
-                <h4 class="font-bold text-sm text-slate-700">📅 3. Delete By Specific Date Range / 按特定日期段删除</h4>
+                <h4 class="font-bold text-sm text-slate-700">📅 3. Delete By Date Range</h4>
                 <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
                     <input type="date" id="clearStartDate" class="border border-slate-300 rounded p-2 text-sm">
                     <span class="text-xs text-slate-400">to</span>
                     <input type="date" id="clearEndDate" class="border border-slate-300 rounded p-2 text-sm">
-                    <button onclick="clearByDateRange()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Range Records / 删除指定段记录</button>
-                </div>
-            </div>
-
-            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
-                <h4 class="font-bold text-sm text-slate-700">🗓️ 4. Delete By Specific Month / 按特定月份删除</h4>
-                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
-                    <input type="month" id="clearMonthInput" class="border border-slate-300 rounded p-2 text-sm">
-                    <button onclick="clearByMonth()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Month / 删除所选月份记录</button>
-                </div>
-            </div>
-
-            <div class="p-4 bg-white border border-slate-200 rounded-lg space-y-3">
-                <h4 class="font-bold text-sm text-slate-700">📆 5. Delete By Specific Year / 按特定年份删除</h4>
-                <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
-                    <input type="number" id="clearYearInput" placeholder="e.g. 2026" class="border border-slate-300 rounded p-2 text-sm w-32">
-                    <button onclick="clearByYear()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Selected Year / 删除所选年份记录</button>
+                    <button onclick="clearByDateRange()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded text-xs">🗑️ Delete Range Records</button>
                 </div>
             </div>
 
             <div class="p-4 bg-rose-50 border border-rose-200 rounded-lg space-y-3">
-                <h4 class="font-bold text-sm text-rose-700">🚨 6. CLEAR ALL RECORDS / 彻底清空所有记录</h4>
-                <p class="text-xs text-rose-500">⚠️ Warning: All saved records will be permanently erased. / 警告：全盘清空后数据无法恢复。</p>
-                <button onclick="clearAll()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-5 py-2.5 rounded text-xs shadow">🚨 CLEAR ALL / 清空全盘数据</button>
+                <h4 class="font-bold text-sm text-rose-700">🚨 4. CLEAR ALL RECORDS</h4>
+                <p class="text-xs text-rose-500">⚠️ Warning: All records across all devices will be permanently erased.</p>
+                <button onclick="clearAll()" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-5 py-2.5 rounded text-xs shadow">🚨 CLEAR ALL DATA</button>
             </div>
         </div>
     </div>
 
-    <!-- HR Approval Modal Popup -->
+    <!-- HR Approval Popup -->
     <div id="hrModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full border border-slate-200 space-y-4">
-            <h3 class="font-bold text-lg text-amber-600 flex items-center gap-2">⚠️ HR Approval Needed / 修改批准提示</h3>
-            <p class="text-sm text-slate-600">有员工申请修改已提交的加班记录，请 HR 确认批准：</p>
+            <h3 class="font-bold text-lg text-amber-600 flex items-center gap-2">⚠️ HR Approval Needed</h3>
+            <p class="text-sm text-slate-600">An employee requested modifications to a submitted record. Approve changes?</p>
             <div id="hrModalDetails" class="bg-slate-50 p-3 rounded text-xs text-slate-700 space-y-1 font-mono"></div>
             <div class="flex justify-end gap-3 pt-2">
-                <button onclick="rejectHODChange()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold px-4 py-2 rounded text-xs">Reject / 拒绝</button>
-                <button onclick="approveHODChange()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded text-xs">Approve / 批准修改</button>
+                <button onclick="rejectHODChange()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold px-4 py-2 rounded text-xs">Reject</button>
+                <button onclick="approveHODChange()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded text-xs">Approve Modification</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Realtime Synchronized Database Endpoint
         const firebaseConfig = {
-            databaseURL: "https://ot-system-default-rtdb.firebaseio.com"
+            databaseURL: "https://kaizen-ot-live-sync-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
         let db = null;
         try {
             if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
             db = firebase.database();
         } catch(e) {
-            console.log("Database initialized.");
+            console.log("Database connection initialized.");
         }
 
         let isHRMode = false;
         let activeRecords = [];
         let pendingApprovalKey = null;
 
-        // Department Member List Specification
+        // Department Structure Configuration
         const deptDatabase = {
             "CAD": { name: "CAD DEPARTMENT", hod: "CHAN KENG LEONG", members: [{ id: "2", name: "CHAN KENG LEONG" }, { id: "274", name: "SOH GIM BOON" }, { id: "305", name: "ADARSH DAMODARAN" }] },
             "CAM": { name: "CAM DEPARTMENT", hod: "CHAN KENG LEONG", members: [{ id: "2", name: "CHAN KENG LEONG" }, { id: "28", name: "HAN AYE" }, { id: "60", name: "MD KANCHAN" }, { id: "269", name: "KHAU LIANG YU" }] },
@@ -295,38 +270,23 @@
             "PURCHASING": { name: "PURCHASING DEPARTMENT", hod: "KALAISELVI A/P SOORIAMOORTHY", members: [{ id: "212", name: "THILAGAH A/P KRISHNAN" }] }
         };
 
-        const i18n = {
-            zh: { subHeader: "Daily Overtime Management System / 每日加班管理系统", lblSelectDept: "Select Department / 选择部门:", lblDept: "Department / 部门:", lblHod: "HOD Approval / 部门主管:", navSubmit: "Submit OT / 登记上交", navRecords: "My Records / 个人上交记录", navArchive: "HR Archive & Report / 全公司月度汇总与报告 (HR Only)", navClear: "Clear Records / 清理记录 (HR Only)", thEmp: "Employee / 姓名", thId: "Emp ID / 工号", thDate: "Date / 日期", thStart: "Start Time / 开始", thEnd: "End Time / 结束", thHours: "Hours / 小时", thReason: "Purpose & Reason / 原因", thAction: "Action / 操作", btnAddRow: "+ Add Row / 添加新行", btnConfirm: "Confirm Submission / 确认上交", btnPending: "Save PENDING / PENDING 上交", titleMyRecords: "My Submissions / 个人上交记录", titleArchive: "HR Global Archive & Report / 全公司加班总汇与报告", titleClear: "Clear Records Management / 清理记录管理", btnPrint1: "Save PDF / Print / 保存与打印", btnPrint2: "Export Report / 导出总报告打印" },
-            en: { subHeader: "Daily Overtime Management System", lblSelectDept: "Select Department:", lblDept: "Department:", lblHod: "HOD Approval:", navSubmit: "Submit OT", navRecords: "My Records", navArchive: "HR Archive & Report", navClear: "Clear Records", thEmp: "Employee Name", thId: "Emp ID", thDate: "Date", thStart: "Start Time", thEnd: "End Time", thHours: "Hours", thReason: "Purpose & Reason", thAction: "Action", btnAddRow: "+ Add Row", btnConfirm: "Confirm Submission", btnPending: "Save PENDING", titleMyRecords: "My Submissions", titleArchive: "HR Global Archive & Report", titleClear: "Clear Records Management", btnPrint1: "Save PDF / Print", btnPrint2: "Export Report" },
-            ms: { subHeader: "Sistem Pengurusan Kerja Lebih Masa Harian", lblSelectDept: "Pilih Jabatan:", lblDept: "Jabatan:", lblHod: "Kelulusan HOD:", navSubmit: "Hantar OT", navRecords: "Rekod Saya", navArchive: "Arkib HR & Laporan", navClear: "Padam Rekod", thEmp: "Nama Pekerja", thId: "ID Pekerja", thDate: "Tarikh", thStart: "Masa Mula", thEnd: "Masa Tamat", thHours: "Jam", thReason: "Tujuan & Sebab", thAction: "Tindakan", btnAddRow: "+ Tambah Baris", btnConfirm: "Sahkan Hantar", btnPending: "Simpan PENDING", titleMyRecords: "Penyerahan Saya", titleArchive: "Arkib HR & Laporan", titleClear: "Pengurusan Padam Rekod", btnPrint1: "Cetak / Simpan PDF", btnPrint2: "Eksport Laporan" }
-        };
-
-        function switchLanguage(lang) {
-            const dict = i18n[lang];
-            for (let key in dict) {
-                const el = document.getElementById(key);
-                if (el) el.innerText = dict[key];
-            }
-        }
-
-        // Toggle HR Access Mode
         function toggleHRMode() {
             if (!isHRMode) {
-                const pwd = prompt("Enter HR Access Password / 输入 HR 部门专属密码:");
+                const pwd = prompt("Enter HR Access Password:");
                 if (pwd === "1234") {
                     isHRMode = true;
                     document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-emerald-200 text-emerald-800";
-                    document.getElementById('roleBadge').innerText = "HR MODE / HR管理员模式";
-                    document.getElementById('btnHRToggle').innerText = "🔓 Exit HR / 退出HR模式";
-                    alert("HR Access Granted! You can now view, edit, and approve all entries across all devices.");
+                    document.getElementById('roleBadge').innerText = "HR MODE ACTIVE";
+                    document.getElementById('btnHRToggle').innerText = "🔓 Exit HR Mode";
+                    alert("HR Access Granted! You now have full visibility of all submissions.");
                 } else {
-                    alert("Access Denied: Incorrect HR Password! / 密码错误，只有 HR 才能访问后台。");
+                    alert("Access Denied: Incorrect Password!");
                 }
             } else {
                 isHRMode = false;
                 document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-slate-200 text-slate-700";
-                document.getElementById('roleBadge').innerText = "STAFF / 员工模式";
-                document.getElementById('btnHRToggle').innerText = "🔒 HR Login / HR部门专属登入";
+                document.getElementById('roleBadge').innerText = "STAFF MODE";
+                document.getElementById('btnHRToggle').innerText = "🔒 HR Login";
             }
             renderMyRecords();
             renderArchive();
@@ -406,7 +366,6 @@
             }
         }
 
-        // Save Records to Cloud and Local Cache
         function submitRecords(status) {
             const rows = document.querySelectorAll('#inputRowsBody tr');
             const deptKey = document.getElementById('deptSelect').value;
@@ -443,23 +402,21 @@
             });
 
             if (newItems.length === 0) {
-                alert("Please select employee and fill in details / 请至少选择员工和填写完整加班内容");
+                alert("Please select employee details completely.");
                 return;
             }
 
-            // 1. Write to Local Storage
             let localData = JSON.parse(localStorage.getItem('kaizen_ot_all') || '[]');
             localData = [...newItems, ...localData];
             localStorage.setItem('kaizen_ot_all', JSON.stringify(localData));
 
-            // 2. Sync to Cloud Realtime DB
             if (db) {
                 newItems.forEach(item => {
                     db.ref('ot_records/' + item._key).set(item);
                 });
             }
 
-            alert(`Successfully submitted ${newItems.length} record(s)! / 成功上交 ${newItems.length} 条记录，已完美保存！`);
+            alert(`Successfully submitted ${newItems.length} record(s)!`);
             document.getElementById('inputRowsBody').innerHTML = '';
             addInputRow();
             loadAndListenData();
@@ -493,7 +450,7 @@
             const tbody = document.getElementById('myRecordsTableBody');
             tbody.innerHTML = '';
             if(activeRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-400">No submission records found / 暂无提交记录</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-400">No submission records found</td></tr>`;
                 return;
             }
             activeRecords.forEach(rec => {
@@ -511,7 +468,7 @@
                     <td class="p-3">${rec.reason || '-'}</td>
                     <td class="p-3"><span class="px-2 py-1 rounded text-xs font-bold ${badgeClass}">${rec.status}</span></td>
                     <td class="p-3 text-center no-print">
-                        <button onclick="requestEdit('${rec._key}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded text-xs">申请修改</button>
+                        <button onclick="requestEdit('${rec._key}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded text-xs">Request Edit</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -523,12 +480,12 @@
             tbody.innerHTML = '';
             
             if (!isHRMode) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-8 text-rose-500 font-bold bg-rose-50/50">🔒 Access Denied: HR Archive & Report is strictly accessible by HR personnel only! <br><span class="text-xs text-slate-500 font-normal">访问受限：全公司汇总报告仅限 HR 部门登录后方可查看与修改。</span></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-8 text-rose-500 font-bold bg-rose-50/50">🔒 Access Denied: HR Archive & Report is strictly accessible by HR personnel only!</td></tr>`;
                 return;
             }
 
             if(activeRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-400">No records found across company / 暂无全公司提交记录</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-400">No company-wide records found</td></tr>`;
                 return;
             }
 
@@ -557,20 +514,20 @@
         }
 
         function requestEdit(key) {
-            const newReason = prompt("Enter requested modification / 请输入你需要修改的加班原因说明:");
+            const newReason = prompt("Enter requested reason modification:");
             if (newReason) {
                 updateRecordStatus(key, { pendingReason: newReason, status: 'PENDING HR APPROVAL' });
-                alert("Edit Request Submitted! Awaiting HR Approval / 修改请求已发给 HR 部门，待批准后方可变更。");
+                alert("Edit request submitted! Awaiting HR approval.");
             }
         }
 
         function hrDirectEdit(key) {
             const rec = activeRecords.find(r => r._key === key);
             if (!rec) return;
-            const newReason = prompt("HR Direct Edit - Reason / HR直接修改原因说明:", rec.reason);
+            const newReason = prompt("HR Direct Edit Reason:", rec.reason);
             if (newReason !== null) {
                 updateRecordStatus(key, { reason: newReason, status: 'APPROVED' });
-                alert("HR Updated Record Successfully / HR 已成功编辑并更新该条数据！");
+                alert("Record updated successfully!");
             }
         }
 
@@ -602,19 +559,19 @@
             const rec = activeRecords.find(r => r._key === pendingApprovalKey);
             updateRecordStatus(pendingApprovalKey, { reason: rec.pendingReason, status: 'APPROVED', pendingReason: null });
             document.getElementById('hrModal').classList.add('hidden');
-            alert("HR Approved Modification / HR 已批准修改！");
+            alert("Modification approved!");
         }
 
         function rejectHODChange() {
             if (!pendingApprovalKey) return;
             updateRecordStatus(pendingApprovalKey, { status: 'SUBMITTED', pendingReason: null });
             document.getElementById('hrModal').classList.add('hidden');
-            alert("HR Rejected Modification / HR 已拒绝修改。");
+            alert("Modification rejected.");
         }
 
         function deleteSingleRecord(key) {
             if (!isHRMode) return alert("Only HR can delete records!");
-            if (confirm("Are you sure you want to delete this record? / 确定要删除该条记录吗？")) {
+            if (confirm("Are you sure you want to delete this record?")) {
                 activeRecords = activeRecords.filter(r => r._key !== key);
                 localStorage.setItem('kaizen_ot_all', JSON.stringify(activeRecords));
                 if (db) db.ref('ot_records/' + key).remove();
@@ -625,7 +582,7 @@
 
         function switchTab(tab) {
             if ((tab === 'archive' || tab === 'clear') && !isHRMode) {
-                alert("🔒 Access Restricted: HR Portal & Global Reports are ONLY accessible in HR Mode! / 访问受限：全公司汇总报告与清理功能只有 HR 登入后才可以进入！");
+                alert("🔒 Access Restricted: HR Portal & Global Reports are ONLY accessible in HR Mode!");
                 return;
             }
             ['submit', 'myrecords', 'archive', 'clear'].forEach(t => {
@@ -648,7 +605,7 @@
                 activeRecords = activeRecords.filter(r => r.deptKey !== deptKey);
                 localStorage.setItem('kaizen_ot_all', JSON.stringify(activeRecords));
                 if (db) db.ref('ot_records').set(activeRecords.reduce((acc, cur) => ({ ...acc, [cur._key]: cur }), {}));
-                alert("Records cleared / 部门记录已清理");
+                alert("Records cleared.");
                 loadAndListenData();
             }
         }
@@ -656,12 +613,12 @@
         function clearByEmp() {
             if (!isHRMode) return alert("Only HR Mode allowed!");
             const val = document.getElementById('clearEmpInput').value.trim().toLowerCase();
-            if (!val) return alert("Please enter name or ID / 请输入姓名或工号");
+            if (!val) return alert("Please enter name or ID.");
             if (confirm(`Delete records for employee matching: ${val}?`)) {
                 activeRecords = activeRecords.filter(r => !r.empName.toLowerCase().includes(val) && r.empId.toString() !== val);
                 localStorage.setItem('kaizen_ot_all', JSON.stringify(activeRecords));
                 if (db) db.ref('ot_records').set(activeRecords.reduce((acc, cur) => ({ ...acc, [cur._key]: cur }), {}));
-                alert("Employee records cleared / 员工记录已清理");
+                alert("Employee records cleared.");
                 loadAndListenData();
             }
         }
@@ -670,49 +627,23 @@
             if (!isHRMode) return alert("Only HR Mode allowed!");
             const start = document.getElementById('clearStartDate').value;
             const end = document.getElementById('clearEndDate').value;
-            if (!start || !end) return alert("Select both dates / 请选择完整日期范围");
+            if (!start || !end) return alert("Select both dates.");
             if (confirm(`Delete records from ${start} to ${end}?`)) {
                 activeRecords = activeRecords.filter(r => !(r.date >= start && r.date <= end));
                 localStorage.setItem('kaizen_ot_all', JSON.stringify(activeRecords));
                 if (db) db.ref('ot_records').set(activeRecords.reduce((acc, cur) => ({ ...acc, [cur._key]: cur }), {}));
-                alert("Date range records cleared / 指定日期段记录已清理");
-                loadAndListenData();
-            }
-        }
-
-        function clearByMonth() {
-            if (!isHRMode) return alert("Only HR Mode allowed!");
-            const month = document.getElementById('clearMonthInput').value;
-            if (!month) return alert("Select month / 请选择月份");
-            if (confirm(`Delete records for month: ${month}?`)) {
-                activeRecords = activeRecords.filter(r => !r.date.startsWith(month));
-                localStorage.setItem('kaizen_ot_all', JSON.stringify(activeRecords));
-                if (db) db.ref('ot_records').set(activeRecords.reduce((acc, cur) => ({ ...acc, [cur._key]: cur }), {}));
-                alert("Monthly records cleared / 月度记录已清理");
-                loadAndListenData();
-            }
-        }
-
-        function clearByYear() {
-            if (!isHRMode) return alert("Only HR Mode allowed!");
-            const year = document.getElementById('clearYearInput').value;
-            if (!year) return alert("Enter year / 请输入年份");
-            if (confirm(`Delete records for year: ${year}?`)) {
-                activeRecords = activeRecords.filter(r => !r.date.startsWith(year));
-                localStorage.setItem('kaizen_ot_all', JSON.stringify(activeRecords));
-                if (db) db.ref('ot_records').set(activeRecords.reduce((acc, cur) => ({ ...acc, [cur._key]: cur }), {}));
-                alert("Yearly records cleared / 年份记录已清理");
+                alert("Date range records cleared.");
                 loadAndListenData();
             }
         }
 
         function clearAll() {
             if (!isHRMode) return alert("Only HR Mode allowed!");
-            if (confirm("🚨 WARNING: Are you sure you want to permanently erase ALL records? / 警告：确定要彻底清空全盘记录吗？")) {
+            if (confirm("🚨 WARNING: Permanently erase ALL records?")) {
                 activeRecords = [];
                 localStorage.removeItem('kaizen_ot_all');
                 if (db) db.ref('ot_records').remove();
-                alert("All records cleared / 所有的记录已全盘清空");
+                alert("All records cleared.");
                 loadAndListenData();
             }
         }
