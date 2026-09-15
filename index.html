@@ -268,12 +268,25 @@
                 </div>
             </div>
 
-            <!-- HR VIEW TABLE -->
+            <!-- HR VIEW TABLE & EXPORT REPORT BAR -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-bold text-slate-900">HR Live Data Monitor (HR 24小时实时接收数据中心)</h3>
-                    <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-semibold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">HR Live Data Monitor (HR 24小时实时接收数据中心)</h3>
+                        <p class="text-xs text-slate-500">Full record overview for monthly payroll check and archives. (可直接导出为 Excel 报表作算薪与考勤归档)。</p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <!-- EXPORT TO EXCEL BUTTON -->
+                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel text-sm"></i> Export to Excel / Muat Turun Excel / 导出 Excel 报表
+                        </button>
+                        <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Refresh
+                        </button>
+                    </div>
                 </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
@@ -558,6 +571,49 @@
                         hrBody.appendChild(tr);
                     }
                 });
+            });
+        }
+
+        // EXPORT HR DATA TO EXCEL / CSV REPORT
+        function exportToExcel() {
+            if(!db) return;
+            db.ref('ot_records').once('value', snapshot => {
+                const data = snapshot.val();
+                if(!data) {
+                    alert('No OT records available to export! / 暂无任何加班数据可供导出！');
+                    return;
+                }
+
+                // CSV 表头
+                let csvContent = "\uFEFF"; // UTF-8 BOM，确保 Excel 打开中文不乱码
+                csvContent += "Department (部门),Employee Name (姓名),Employee ID (工号),Date (日期),Start Time (开始时间),End Time (结束时间),OT Hours (加班时数),Purpose & Reason (原因用途),Status (状态)\n";
+
+                Object.values(data).forEach(item => {
+                    const row = [
+                        `"${item.dept || ''}"`,
+                        `"${item.name || ''}"`,
+                        `"${item.empId || ''}"`,
+                        `"${item.date || ''}"`,
+                        `"${item.startTime || ''}"`,
+                        `"${item.endTime || ''}"`,
+                        `"${item.hours || '0'}"`,
+                        `"${(item.reason || '').replace(/"/g, '""')}"`, // 转义英文双引号
+                        `"${item.status || ''}"`
+                    ];
+                    csvContent += row.join(",") + "\n";
+                });
+
+                // 自动创建二进制文件并触发下载
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                const todayStr = new Date().toISOString().split('T')[0];
+                
+                link.setAttribute("href", url);
+                link.setAttribute("download", `Kaizen_OT_Report_${todayStr}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
         }
 
