@@ -41,7 +41,7 @@
                 <h1 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-industry text-blue-800"></i> Kaizen Mould Technology Sdn. Bhd.
                 </h1>
-                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • Live Sync & Tracking</p>
+                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 24/7 Live Sync & Tracking</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -194,26 +194,25 @@
 
     <!-- SYSTEM SCRIPT & FIREBASE INTEGRATION -->
     <script>
-        // HOD & Dept Mapping Data (Complete 12 Departments)
+        // HOD & Dept Mapping Data (Complete 12 Departments with Employee Data Support)
         const deptMap = {
             "PURCHASING": { hod: "KALAISELVI A/P SOORIAMOORTHY", staff: [{name:"Kalaiselvi", id:"P01"}] },
-            "ADMIN_HR": { hod: "ADMIN & HR HOD", staff: [{name:"HR Staff", id:"A01"}] },
-            "CAD": { hod: "CAD HOD", staff: [{name:"CAD Designer", id:"C01"}] },
-            "CAM": { hod: "CAM HOD", staff: [{name:"CAM Programmer", id:"CM01"}] },
-            "CNC": { hod: "CNC HOD", staff: [{name:"CNC Operator", id:"CN01"}] },
-            "EDM": { hod: "EDM HOD", staff: [{name:"EDM Specialist", id:"E01"}] },
-            "PROJECT": { hod: "PROJECT MANAGER", staff: [{name:"Project Engineer", id:"PR01"}] },
-            "POLISHING": { hod: "POLISHING HOD", staff: [{name:"Polisher", id:"PL01"}] },
-            "PRODUCTION": { hod: "PRODUCTION MANAGER", staff: [{name:"Production Staff", id:"PD01"}] },
-            "INJECTION_TRIAL": { hod: "INJECTION HOD", staff: [{name:"Trial Technician", id:"IT01"}] },
-            "MOULD_MAKER": { hod: "MOULD HOD", staff: [{name:"Mould Maker", id:"MM01"}] },
-            "QC": { hod: "QC MANAGER", staff: [{name:"QC Inspector", id:"QC01"}] }
+            "ADMIN_HR": { hod: "ADMIN & HR HOD", staff: [{name:"Tan Kyle", id:"KY01"}] },
+            "CAD": { hod: "CAD HOD", staff: [{name:"CAD Staff 1", id:"C01"}] },
+            "CAM": { hod: "CAM HOD", staff: [{name:"CAM Staff 1", id:"CM01"}] },
+            "CNC": { hod: "CNC HOD", staff: [{name:"CNC Staff 1", id:"CN01"}] },
+            "EDM": { hod: "EDM HOD", staff: [{name:"EDM Staff 1", id:"E01"}] },
+            "PROJECT": { hod: "PROJECT MANAGER", staff: [{name:"Project Staff 1", id:"PR01"}] },
+            "POLISHING": { hod: "POLISHING HOD", staff: [{name:"Polishing Staff 1", id:"PL01"}] },
+            "PRODUCTION": { hod: "PRODUCTION MANAGER", staff: [{name:"Production Staff 1", id:"PD01"}] },
+            "INJECTION_TRIAL": { hod: "INJECTION HOD", staff: [{name:"Injection Staff 1", id:"IT01"}] },
+            "MOULD_MAKER": { hod: "MOULD HOD", staff: [{name:"Mould Maker Staff 1", id:"MM01"}] },
+            "QC": { hod: "QC MANAGER", staff: [{name:"QC Staff 1", id:"QC01"}] }
         };
 
         let isHR = false;
         let db = null;
 
-        // Auto Firebase Preset Keys
         const defaultFirebaseConfig = {
             apiKey: "AIzaSyCHOFXk24RMB3vVyGIV1BIm-hTr9fgjmPM",
             authDomain: "kaizen-ot.firebaseapp.com",
