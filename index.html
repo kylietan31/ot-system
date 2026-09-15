@@ -97,7 +97,7 @@
                     <i class="fa-solid fa-user-clock"></i> View All Submissions
                 </button>
                 <button onclick="switchTab('hrArchive')" id="tabBtnHrArchive" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
-                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
+                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive & Delete <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
                 </button>
             </nav>
         </div>
@@ -153,7 +153,7 @@
             </div>
         </div>
 
-        <!-- OTHER TABS -->
+        <!-- VIEW SUBMISSIONS TAB -->
         <div id="tabMySubmissions" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex justify-between items-center mb-4">
@@ -172,6 +172,7 @@
                                 <th class="p-2">Hours</th>
                                 <th class="p-2">Reason</th>
                                 <th class="p-2">Status</th>
+                                <th class="p-2 text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody id="submissionsTableBody" class="divide-y divide-slate-100"></tbody>
@@ -180,119 +181,129 @@
             </div>
         </div>
 
-        <div id="tabHrArchive" class="tab-content hidden">
+        <!-- HR ARCHIVE & DELETE CONTROLS TAB -->
+        <div id="tabHrArchive" class="tab-content hidden space-y-6">
+            <!-- DELETE & FILTER CONTROL PANEL -->
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center gap-2 text-rose-800 font-extrabold text-base mb-1">
+                    <i class="fa-solid fa-trash-can"></i> Advanced Data Delete Center (数据删除管理中心)
+                </div>
+                <p class="text-xs text-rose-600 mb-4">可以选择特定部门、名字、工号或日期时间精确删除，也可以一键删除所有数据。</p>
+
+                <!-- FILTER FORM FOR DELETE -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">部门 (Department)</label>
+                        <select id="delDept" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                            <option value="">-- 所有部门 (All) --</option>
+                            <option value="CAD">CAD</option>
+                            <option value="CAM">CAM</option>
+                            <option value="CNC">CNC</option>
+                            <option value="EDM">EDM</option>
+                            <option value="PROJECT">PROJECT</option>
+                            <option value="POLISHING">POLISHING</option>
+                            <option value="PRODUCTION">PRODUCTION</option>
+                            <option value="INJECTION_TRIAL">INJECTION TRIAL</option>
+                            <option value="MOULD_MAKER">MOULD MAKER</option>
+                            <option value="QC">QC</option>
+                            <option value="ADMIN_HR">ADMIN & HR</option>
+                            <option value="PURCHASING">PURCHASING</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">员工名字 / 工号</label>
+                        <input type="text" id="delNameOrId" placeholder="Name or ID" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">年份 (Year)</label>
+                        <input type="number" id="delYear" placeholder="e.g. 2026" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">月份 (Month)</label>
+                        <select id="delMonth" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                            <option value="">-- 所有月份 --</option>
+                            <option value="01">01 月</option>
+                            <option value="02">02 月</option>
+                            <option value="03">03 月</option>
+                            <option value="04">04 月</option>
+                            <option value="05">05 月</option>
+                            <option value="06">06 月</option>
+                            <option value="07">07 月</option>
+                            <option value="08">08 月</option>
+                            <option value="09">09 月</option>
+                            <option value="10">10 月</option>
+                            <option value="11">11 月</option>
+                            <option value="12">12 月</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">指定具体日期</label>
+                        <input type="date" id="delSpecificDate" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="deleteFilteredData()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2 px-3 rounded shadow transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-filter-circle-xmark"></i> 删除符合条件的数据
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-rose-200 flex justify-between items-center flex-wrap gap-2">
+                    <span class="text-xs font-bold text-rose-800">⚠️ 危险区域 (Danger Zone):</span>
+                    <button onclick="clearAllData()" class="bg-red-800 hover:bg-red-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1">
+                        <i class="fa-solid fa-skull-crossbones"></i> 一键清空所有数据 (Delete Entire Database)
+                    </button>
+                </div>
+            </div>
+
+            <!-- HR VIEW TABLE -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="text-sm font-bold text-slate-900 mb-3">HR Master Control & Management</h3>
-                <p class="text-xs text-slate-500 mb-4">Logged in as HR Master. You have full access to view, clear, and export records.</p>
-                <div class="flex gap-3 mb-4">
-                    <button onclick="clearAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-2 rounded-lg"><i class="fa-solid fa-trash"></i> Clear Database Records</button>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-slate-900">HR Live Data Monitor</h3>
+                    <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-semibold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-slate-700">
+                                <th class="p-2">Dept</th>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">ID</th>
+                                <th class="p-2">Date</th>
+                                <th class="p-2">Time</th>
+                                <th class="p-2">Hours</th>
+                                <th class="p-2">Reason</th>
+                                <th class="p-2">Status</th>
+                                <th class="p-2 text-center">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hrRecordsTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- SYSTEM SCRIPT & FIREBASE INTEGRATION -->
+    <!-- SYSTEM SCRIPT -->
     <script>
-        // 按照你提供的图片表格 100% 精确匹配的数据源（41 位员工 + 各部门 HOD 及其 ID）
         const deptMap = {
-            "CAD": {
-                hod: "CHAN KENG LEONG (ID: 2)",
-                staff: [
-                    { name: "SOH GIM BOON", id: "274" },
-                    { name: "ADARSH DAMODARAN", id: "305" }
-                ]
-            },
-            "CAM": {
-                hod: "CHAN KENG LEONG (ID: 2)",
-                staff: [
-                    { name: "HAN AYE", id: "28" },
-                    { name: "MD KANCHAN", id: "60" },
-                    { name: "KHAU LIANG YU", id: "269" },
-                    { name: "NAY MYO ZAW", id: "300" },
-                    { name: "MA LIK CHAN", id: "307" }
-                ]
-            },
-            "CNC": {
-                hod: "CHAN KENG LEONG (ID: 2)",
-                staff: [
-                    { name: "SA MASAN BA", id: "27" },
-                    { name: "BHARAT BOHARA", id: "290" },
-                    { name: "BOHARA DHAN BAHADUR", id: "291" },
-                    { name: "BOHARA MILAN", id: "294" },
-                    { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }
-                ]
-            },
-            "EDM": {
-                hod: "CHONG FAT KEONG (ID: 3)",
-                staff: [
-                    { name: "TEE NYEIN AUNG", id: "302" },
-                    { name: "KAYW ZIN HEIN", id: "306" },
-                    { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" },
-                    { name: "YUVANNESH A/L MAYADEVAN", id: "318" }
-                ]
-            },
-            "PROJECT": {
-                hod: "CHONG FAT KEONG (ID: 3)",
-                staff: [
-                    { name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" },
-                    { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }
-                ]
-            },
-            "POLISHING": {
-                hod: "CHONG FAT KEONG (ID: 3)",
-                staff: [
-                    { name: "MD SHOPON", id: "19" },
-                    { name: "MIN THU", id: "299" }
-                ]
-            },
-            "PRODUCTION": {
-                hod: "CHONG FAT KEONG (ID: 3)",
-                staff: [
-                    { name: "MD SHAHA BUDIN", id: "20" },
-                    { name: "MD ALAMGIR", id: "68" },
-                    { name: "SHAING THU AUNG", id: "301" }
-                ]
-            },
-            "INJECTION_TRIAL": {
-                hod: "CHONG FAT KEONG (ID: 3)",
-                staff: [
-                    { name: "MAHAJI", id: "329" }
-                ]
-            },
-            "MOULD_MAKER": {
-                hod: "LEE YOONG HON (ID: 15)",
-                staff: [
-                    { name: "MD JAHIR", id: "69" },
-                    { name: "MD JAHANGIR ALAM", id: "72" },
-                    { name: "HING YONG HOW", id: "286" },
-                    { name: "ZAW MYO HTIKE", id: "303" },
-                    { name: "AMARNATH SIVADAS", id: "310" },
-                    { name: "JAISON CHRISTOPHER", id: "311" },
-                    { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" },
-                    { name: "SARATH SASIDHARAKAIMAL", id: "322" },
-                    { name: "GOH CHEE KUAN", id: "326" }
-                ]
-            },
-            "QC": {
-                hod: "TAN KAH CHYE (ID: 266)",
-                staff: [
-                    { name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }
-                ]
-            },
-            "ADMIN_HR": {
-                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)",
-                staff: [
-                    { name: "KISTINNA ANAQIN", id: "316" },
-                    { name: "TAN KYLE", id: "328" }
-                ]
-            },
-            "PURCHASING": {
-                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)",
-                staff: [
-                    { name: "THILAGAH A/P KRISHNAN", id: "212" }
-                ]
-            }
+            "CAD": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "SOH GIM BOON", id: "274" }, { name: "ADARSH DAMODARAN", id: "305" }] },
+            "CAM": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "HAN AYE", id: "28" }, { name: "MD KANCHAN", id: "60" }, { name: "KHAU LIANG YU", id: "269" }, { name: "NAY MYO ZAW", id: "300" }, { name: "MA LIK CHAN", id: "307" }] },
+            "CNC": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "SA MASAN BA", id: "27" }, { name: "BHARAT BOHARA", id: "290" }, { name: "BOHARA DHAN BAHADUR", id: "291" }, { name: "BOHARA MILAN", id: "294" }, { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }] },
+            "EDM": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "TEE NYEIN AUNG", id: "302" }, { name: "KAYW ZIN HEIN", id: "306" }, { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" }, { name: "YUVANNESH A/L MAYADEVAN", id: "318" }] },
+            "PROJECT": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" }, { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }] },
+            "POLISHING": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MD SHOPON", id: "19" }, { name: "MIN THU", id: "299" }] },
+            "PRODUCTION": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MD SHAHA BUDIN", id: "20" }, { name: "MD ALAMGIR", id: "68" }, { name: "SHAING THU AUNG", id: "301" }] },
+            "INJECTION_TRIAL": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MAHAJI", id: "329" }] },
+            "MOULD_MAKER": { hod: "LEE YOONG HON (ID: 15)", staff: [{ name: "MD JAHIR", id: "69" }, { name: "MD JAHANGIR ALAM", id: "72" }, { name: "HING YONG HOW", id: "286" }, { name: "ZAW MYO HTIKE", id: "303" }, { name: "AMARNATH SIVADAS", id: "310" }, { name: "JAISON CHRISTOPHER", id: "311" }, { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" }, { name: "SARATH SASIDHARAKAIMAL", id: "322" }, { name: "GOH CHEE KUAN", id: "326" }] },
+            "QC": { hod: "TAN KAH CHYE (ID: 266)", staff: [{ name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }] },
+            "ADMIN_HR": { hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", staff: [{ name: "KISTINNA ANAQIN", id: "316" }, { name: "TAN KYLE", id: "328" }] },
+            "PURCHASING": { hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", staff: [{ name: "THILAGAH A/P KRISHNAN", id: "212" }] }
         };
 
         let isHR = false;
@@ -326,7 +337,6 @@
             document.getElementById('currentDeptDisplay').innerText = deptKey.replace('_', ' ') + ' DEPARTMENT';
             document.getElementById('currentHODDisplay').innerText = data.hod || '-';
 
-            // 清空当前行重新加载
             document.getElementById('otTableBody').innerHTML = '';
             addNewRow(false);
         }
@@ -380,7 +390,6 @@
             `;
             tbody.appendChild(tr);
 
-            // 如果复制了之前的选择，自动选中名字
             if(defaultVal.name) {
                 const selectEl = tr.querySelector('.emp-name');
                 selectEl.value = defaultVal.name;
@@ -460,24 +469,29 @@
             if(dataArr.length === 0) { alert('Please select at least one employee.'); return; }
 
             dataArr.forEach(item => db.ref('ot_records').push(item));
-            alert(`Successfully submitted ${dataArr.length} record(s) to Firebase! Status: ${status}`);
+            alert(`Successfully submitted ${dataArr.length} record(s)! Status: ${status}`);
             document.getElementById('otTableBody').innerHTML = '';
             addNewRow(false);
         }
 
+        // FETCH & DISPLAY DATA WITH SINGLE DELETE BUTTON
         function fetchRecords() {
             if(!db) return;
             db.ref('ot_records').once('value', snapshot => {
                 const data = snapshot.val();
-                const tbody = document.getElementById('submissionsTableBody');
-                tbody.innerHTML = '';
+                const subBody = document.getElementById('submissionsTableBody');
+                const hrBody = document.getElementById('hrRecordsTableBody');
+                if(subBody) subBody.innerHTML = '';
+                if(hrBody) hrBody.innerHTML = '';
+
                 if(!data) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No records found.</td></tr>';
+                    if(subBody) subBody.innerHTML = '<tr><td colspan="9" class="p-3 text-center text-slate-400">No records found.</td></tr>';
+                    if(hrBody) hrBody.innerHTML = '<tr><td colspan="9" class="p-3 text-center text-slate-400">No records found.</td></tr>';
                     return;
                 }
-                Object.values(data).reverse().forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
+
+                Object.entries(data).reverse().forEach(([key, item]) => {
+                    const rowHtml = `
                         <td class="p-2 font-semibold text-slate-700">${item.dept}</td>
                         <td class="p-2 font-bold">${item.name}</td>
                         <td class="p-2">${item.empId}</td>
@@ -486,10 +500,121 @@
                         <td class="p-2 font-bold text-blue-600">${item.hours} hrs</td>
                         <td class="p-2 text-slate-500">${item.reason}</td>
                         <td class="p-2"><span class="px-2 py-0.5 text-[10px] rounded font-bold ${item.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status}</span></td>
+                        <td class="p-2 text-center">
+                            <button onclick="deleteSingleRecord('${key}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold px-2 py-1 rounded hover:bg-rose-50" title="Delete this entry">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
                     `;
-                    tbody.appendChild(tr);
+
+                    if(subBody) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = rowHtml;
+                        subBody.appendChild(tr);
+                    }
+
+                    if(hrBody) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = rowHtml;
+                        hrBody.appendChild(tr);
+                    }
                 });
             });
+        }
+
+        // DELETE SINGLE RECORD BY KEY
+        function deleteSingleRecord(key) {
+            if(!db) return;
+            if(confirm('确定要删除此条 OT 记录吗？ (Are you sure you want to delete this entry?)')) {
+                db.ref('ot_records/' + key).remove()
+                    .then(() => {
+                        alert('记录已成功删除！');
+                        fetchRecords();
+                    })
+                    .catch(err => alert('Delete failed: ' + err.message));
+            }
+        }
+
+        // FILTERED DELETE FUNCTIONALITY
+        function deleteFilteredData() {
+            if(!isHR) { alert('只有 HR 模式才可以执行批量删除操作！'); return; }
+            if(!db) return;
+
+            const targetDept = document.getElementById('delDept').value.trim();
+            const targetNameOrId = document.getElementById('delNameOrId').value.trim().toLowerCase();
+            const targetYear = document.getElementById('delYear').value.trim();
+            const targetMonth = document.getElementById('delMonth').value.trim();
+            const targetDate = document.getElementById('delSpecificDate').value;
+
+            if(!targetDept && !targetNameOrId && !targetYear && !targetMonth && !targetDate) {
+                alert('请至少选择或填写一个删除筛选条件！（如果想删掉全部，请使用下面的“一键清空所有数据”按钮）');
+                return;
+            }
+
+            db.ref('ot_records').once('value', snapshot => {
+                const data = snapshot.val();
+                if(!data) { alert('数据库目前没有数据！'); return; }
+
+                let deleteKeys = [];
+
+                Object.entries(data).forEach(([key, item]) => {
+                    let match = true;
+
+                    // Filter Department
+                    if(targetDept && item.dept !== targetDept) match = false;
+
+                    // Filter Name or Emp ID
+                    if(targetNameOrId) {
+                        const nameMatch = item.name && item.name.toLowerCase().includes(targetNameOrId);
+                        const idMatch = item.empId && item.empId.toLowerCase().includes(targetNameOrId);
+                        if(!nameMatch && !idMatch) match = false;
+                    }
+
+                    // Filter Date Logic
+                    if(item.date) {
+                        const parts = item.date.split('-'); // YYYY-MM-DD
+                        const y = parts[0];
+                        const m = parts[1];
+
+                        if(targetYear && y !== targetYear) match = false;
+                        if(targetMonth && m !== targetMonth) match = false;
+                        if(targetDate && item.date !== targetDate) match = false;
+                    }
+
+                    if(match) {
+                        deleteKeys.push(key);
+                    }
+                });
+
+                if(deleteKeys.length === 0) {
+                    alert('没有找到符合筛选条件的 OT 记录。');
+                    return;
+                }
+
+                if(confirm(`找到 ${deleteKeys.length} 条符合条件的记录。\n确认要彻底删除这 ${deleteKeys.length} 条数据吗？`)) {
+                    let updates = {};
+                    deleteKeys.forEach(k => updates['ot_records/' + k] = null);
+
+                    db.ref().update(updates)
+                        .then(() => {
+                            alert(`成功删除了 ${deleteKeys.length} 条记录！`);
+                            fetchRecords();
+                        })
+                        .catch(err => alert('删除失败: ' + err.message));
+                }
+            });
+        }
+
+        // CLEAR ENTIRE DATABASE
+        function clearAllData() {
+            if(!isHR) { alert('只有 HR 模式才可以清空数据库！'); return; }
+            if(confirm('🚨 极其危险操作！\n确认要【清空删完所有数据】吗？此操作不可恢复！')) {
+                db.ref('ot_records').remove()
+                    .then(() => {
+                        alert('所有数据已被彻底清空！');
+                        fetchRecords();
+                    });
+            }
         }
 
         function switchTab(tabName) {
@@ -508,6 +633,7 @@
                 if(isHR) {
                     document.getElementById('tabHrArchive').classList.remove('hidden');
                     document.getElementById('tabBtnHrArchive').classList.add('tab-active');
+                    fetchRecords();
                 }
             }
         }
@@ -522,27 +648,18 @@
                 document.getElementById('accessModeBadge').innerText = 'STAFF MODE';
                 document.getElementById('accessModeBadge').className = 'bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold';
                 document.getElementById('hrLoginBtnText').innerText = 'HR Login';
-                alert('Logged out of HR Master Mode.');
+                alert('已退出 HR Master 模式。');
             } else {
-                const pass = prompt('Enter HR Master Passcode:');
+                const pass = prompt('请输入 HR Master 密码:');
                 if(pass === '1234') {
                     isHR = true;
                     document.getElementById('accessModeBadge').innerText = 'HR MASTER MODE';
                     document.getElementById('accessModeBadge').className = 'bg-amber-500 text-white px-2 py-0.5 rounded font-bold';
                     document.getElementById('hrLoginBtnText').innerText = 'HR Logout';
-                    alert('HR Master Mode Unlocked!');
+                    alert('HR Master 权限解锁成功！');
                 } else if(pass !== null) {
-                    alert('Incorrect Passcode.');
+                    alert('密码不正确！');
                 }
-            }
-        }
-
-        function clearAllData() {
-            if(!isHR) { alert('HR Mode Required.'); return; }
-            if(confirm('Are you sure you want to delete ALL records from Firebase?')) {
-                db.ref('ot_records').remove();
-                alert('All records cleared!');
-                fetchRecords();
             }
         }
     </script>
