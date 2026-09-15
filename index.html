@@ -63,11 +63,9 @@
         <!-- DEPARTMENT SELECTOR CARD -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-6 flex items-center gap-3">
+                <div class="md:col-span-7 flex items-center gap-3">
                     <label class="text-sm font-bold text-slate-700 whitespace-nowrap">Select Department:</label>
                     <select id="departmentSelect" onchange="handleDepartmentChange()" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm font-semibold rounded-lg block w-full p-2.5">
-                        <option value="PURCHASING">PURCHASING DEPARTMENT</option>
-                        <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
                         <option value="CAD">CAD DEPARTMENT</option>
                         <option value="CAM">CAM DEPARTMENT</option>
                         <option value="CNC">CNC DEPARTMENT</option>
@@ -78,11 +76,13 @@
                         <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
                         <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
                         <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                        <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
+                        <option value="PURCHASING">PURCHASING DEPARTMENT</option>
                     </select>
                 </div>
-                <div class="md:col-span-6 bg-blue-50/70 border border-blue-100 rounded-lg p-3 text-right">
-                    <div class="text-xs text-blue-700 font-semibold uppercase">Department: <strong id="currentDeptDisplay" class="text-blue-900">PURCHASING DEPARTMENT</strong></div>
-                    <div class="text-xs text-slate-600 font-medium mt-0.5">HOD Approval: <strong id="currentHODDisplay" class="text-slate-900 font-bold">KALAISELVI A/P SOORIAMOORTHY</strong></div>
+                <div class="md:col-span-5 bg-blue-50/70 border border-blue-100 rounded-lg p-3 text-right">
+                    <div class="text-xs text-blue-700 font-semibold uppercase">Selected Dept: <strong id="currentDeptDisplay" class="text-blue-900">CAD DEPARTMENT</strong></div>
+                    <div class="text-xs text-slate-600 font-medium mt-0.5">HOD / Manager: <strong id="currentHODDisplay" class="text-slate-900 font-bold">CHAN KENG LEONG (ID: 2)</strong></div>
                 </div>
             </div>
         </div>
@@ -110,7 +110,7 @@
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form
                         </h2>
-                        <p class="text-xs text-slate-500">Auto-memory active. Fill in data or auto-load whole team.</p>
+                        <p class="text-xs text-slate-500">Auto-memory active. Select staff or load entire department team automatically.</p>
                     </div>
                     <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <i class="fa-solid fa-bolt text-indigo-600"></i> ⚡ Auto-Load Department Team
@@ -121,7 +121,7 @@
                     <table class="w-full text-left text-xs border-collapse min-w-[850px]">
                         <thead>
                             <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
-                                <th class="p-3 w-1/5">Employee Name</th>
+                                <th class="p-3 w-1/4">Employee Name</th>
                                 <th class="p-3 w-28">Emp ID</th>
                                 <th class="p-3 w-36">Date</th>
                                 <th class="p-3 w-28">Start Time</th>
@@ -194,20 +194,105 @@
 
     <!-- SYSTEM SCRIPT & FIREBASE INTEGRATION -->
     <script>
-        // HOD & Dept Mapping Data (Complete 12 Departments with Employee Data Support)
+        // 按照你提供的图片表格 100% 精确匹配的数据源（41 位员工 + 各部门 HOD 及其 ID）
         const deptMap = {
-            "PURCHASING": { hod: "KALAISELVI A/P SOORIAMOORTHY", staff: [{name:"Kalaiselvi", id:"P01"}] },
-            "ADMIN_HR": { hod: "ADMIN & HR HOD", staff: [{name:"Tan Kyle", id:"KY01"}] },
-            "CAD": { hod: "CAD HOD", staff: [{name:"CAD Staff 1", id:"C01"}] },
-            "CAM": { hod: "CAM HOD", staff: [{name:"CAM Staff 1", id:"CM01"}] },
-            "CNC": { hod: "CNC HOD", staff: [{name:"CNC Staff 1", id:"CN01"}] },
-            "EDM": { hod: "EDM HOD", staff: [{name:"EDM Staff 1", id:"E01"}] },
-            "PROJECT": { hod: "PROJECT MANAGER", staff: [{name:"Project Staff 1", id:"PR01"}] },
-            "POLISHING": { hod: "POLISHING HOD", staff: [{name:"Polishing Staff 1", id:"PL01"}] },
-            "PRODUCTION": { hod: "PRODUCTION MANAGER", staff: [{name:"Production Staff 1", id:"PD01"}] },
-            "INJECTION_TRIAL": { hod: "INJECTION HOD", staff: [{name:"Injection Staff 1", id:"IT01"}] },
-            "MOULD_MAKER": { hod: "MOULD HOD", staff: [{name:"Mould Maker Staff 1", id:"MM01"}] },
-            "QC": { hod: "QC MANAGER", staff: [{name:"QC Staff 1", id:"QC01"}] }
+            "CAD": {
+                hod: "CHAN KENG LEONG (ID: 2)",
+                staff: [
+                    { name: "SOH GIM BOON", id: "274" },
+                    { name: "ADARSH DAMODARAN", id: "305" }
+                ]
+            },
+            "CAM": {
+                hod: "CHAN KENG LEONG (ID: 2)",
+                staff: [
+                    { name: "HAN AYE", id: "28" },
+                    { name: "MD KANCHAN", id: "60" },
+                    { name: "KHAU LIANG YU", id: "269" },
+                    { name: "NAY MYO ZAW", id: "300" },
+                    { name: "MA LIK CHAN", id: "307" }
+                ]
+            },
+            "CNC": {
+                hod: "CHAN KENG LEONG (ID: 2)",
+                staff: [
+                    { name: "SA MASAN BA", id: "27" },
+                    { name: "BHARAT BOHARA", id: "290" },
+                    { name: "BOHARA DHAN BAHADUR", id: "291" },
+                    { name: "BOHARA MILAN", id: "294" },
+                    { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }
+                ]
+            },
+            "EDM": {
+                hod: "CHONG FAT KEONG (ID: 3)",
+                staff: [
+                    { name: "TEE NYEIN AUNG", id: "302" },
+                    { name: "KAYW ZIN HEIN", id: "306" },
+                    { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" },
+                    { name: "YUVANNESH A/L MAYADEVAN", id: "318" }
+                ]
+            },
+            "PROJECT": {
+                hod: "CHONG FAT KEONG (ID: 3)",
+                staff: [
+                    { name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" },
+                    { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }
+                ]
+            },
+            "POLISHING": {
+                hod: "CHONG FAT KEONG (ID: 3)",
+                staff: [
+                    { name: "MD SHOPON", id: "19" },
+                    { name: "MIN THU", id: "299" }
+                ]
+            },
+            "PRODUCTION": {
+                hod: "CHONG FAT KEONG (ID: 3)",
+                staff: [
+                    { name: "MD SHAHA BUDIN", id: "20" },
+                    { name: "MD ALAMGIR", id: "68" },
+                    { name: "SHAING THU AUNG", id: "301" }
+                ]
+            },
+            "INJECTION_TRIAL": {
+                hod: "CHONG FAT KEONG (ID: 3)",
+                staff: [
+                    { name: "MAHAJI", id: "329" }
+                ]
+            },
+            "MOULD_MAKER": {
+                hod: "LEE YOONG HON (ID: 15)",
+                staff: [
+                    { name: "MD JAHIR", id: "69" },
+                    { name: "MD JAHANGIR ALAM", id: "72" },
+                    { name: "HING YONG HOW", id: "286" },
+                    { name: "ZAW MYO HTIKE", id: "303" },
+                    { name: "AMARNATH SIVADAS", id: "310" },
+                    { name: "JAISON CHRISTOPHER", id: "311" },
+                    { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" },
+                    { name: "SARATH SASIDHARAKAIMAL", id: "322" },
+                    { name: "GOH CHEE KUAN", id: "326" }
+                ]
+            },
+            "QC": {
+                hod: "TAN KAH CHYE (ID: 266)",
+                staff: [
+                    { name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }
+                ]
+            },
+            "ADMIN_HR": {
+                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)",
+                staff: [
+                    { name: "KISTINNA ANAQIN", id: "316" },
+                    { name: "TAN KYLE", id: "328" }
+                ]
+            },
+            "PURCHASING": {
+                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)",
+                staff: [
+                    { name: "THILAGAH A/P KRISHNAN", id: "212" }
+                ]
+            }
         };
 
         let isHR = false;
@@ -237,13 +322,27 @@
 
         function handleDepartmentChange() {
             const deptKey = document.getElementById('departmentSelect').value;
-            const data = deptMap[deptKey] || { hod: "MANAGER", staff: [] };
+            const data = deptMap[deptKey] || { hod: "-", staff: [] };
             document.getElementById('currentDeptDisplay').innerText = deptKey.replace('_', ' ') + ' DEPARTMENT';
-            document.getElementById('currentHODDisplay').innerText = data.hod;
+            document.getElementById('currentHODDisplay').innerText = data.hod || '-';
+
+            // 清空当前行重新加载
+            document.getElementById('otTableBody').innerHTML = '';
+            addNewRow(false);
+        }
+
+        function getStaffOptions(selectedDeptKey) {
+            const staffList = deptMap[selectedDeptKey]?.staff || [];
+            let options = '<option value="">-- Select Employee --</option>';
+            staffList.forEach(s => {
+                options += `<option value="${s.name}" data-id="${s.id}">${s.name} (ID: ${s.id})</option>`;
+            });
+            return options;
         }
 
         function addNewRow(duplicatePrevious = false) {
             const tbody = document.getElementById('otTableBody');
+            const deptKey = document.getElementById('departmentSelect').value;
             const rowId = 'row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             const today = new Date().toISOString().split('T')[0];
 
@@ -266,16 +365,35 @@
             tr.id = rowId;
             tr.className = "hover:bg-slate-50 transition";
             tr.innerHTML = `
-                <td class="p-2"><input type="text" class="emp-name w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs font-semibold" value="${defaultVal.name}" placeholder="Name"></td>
-                <td class="p-2"><input type="text" class="emp-id w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.id}" placeholder="ID"></td>
+                <td class="p-2">
+                    <select onchange="onEmployeeSelect(this, '${rowId}')" class="emp-name w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs font-semibold">
+                        ${getStaffOptions(deptKey)}
+                    </select>
+                </td>
+                <td class="p-2"><input type="text" class="emp-id w-full bg-slate-100 border border-slate-200 rounded p-1.5 text-xs font-bold text-slate-700 text-center" value="${defaultVal.id}" readonly placeholder="ID"></td>
                 <td class="p-2"><input type="date" class="emp-date w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.date}"></td>
                 <td class="p-2"><input type="time" class="emp-start w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.start}" onchange="calcHours('${rowId}')"></td>
                 <td class="p-2"><input type="time" class="emp-end w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.end}" onchange="calcHours('${rowId}')"></td>
                 <td class="p-2"><input type="text" class="emp-hours w-full bg-slate-100 border border-slate-200 rounded p-1.5 text-xs font-bold text-blue-700 text-center" value="${defaultVal.hours}" readonly></td>
-                <td class="p-2"><input type="text" class="emp-reason w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.reason}" placeholder="OT Purpose"></td>
+                <td class="p-2"><input type="text" class="emp-reason w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.reason}" placeholder="OT Purpose / Reason"></td>
                 <td class="p-2 text-center"><button onclick="deleteRow('${rowId}')" class="text-rose-500 hover:text-rose-700 font-bold"><i class="fa-solid fa-xmark"></i></button></td>
             `;
             tbody.appendChild(tr);
+
+            // 如果复制了之前的选择，自动选中名字
+            if(defaultVal.name) {
+                const selectEl = tr.querySelector('.emp-name');
+                selectEl.value = defaultVal.name;
+            }
+        }
+
+        function onEmployeeSelect(selectEl, rowId) {
+            const selectedOption = selectEl.options[selectEl.selectedIndex];
+            const empId = selectedOption.getAttribute('data-id') || '';
+            const tr = document.getElementById(rowId);
+            if(tr) {
+                tr.querySelector('.emp-id').value = empId;
+            }
         }
 
         function deleteRow(rowId) {
@@ -300,12 +418,17 @@
         function loadWholeTeam() {
             const deptKey = document.getElementById('departmentSelect').value;
             const staffList = deptMap[deptKey]?.staff || [];
+            if(staffList.length === 0) {
+                alert('No staff members registered under this department.');
+                return;
+            }
             document.getElementById('otTableBody').innerHTML = '';
             staffList.forEach(s => {
                 addNewRow(false);
                 const tbody = document.getElementById('otTableBody');
                 const lastRow = tbody.lastElementChild;
-                lastRow.querySelector('.emp-name').value = s.name;
+                const selectEl = lastRow.querySelector('.emp-name');
+                selectEl.value = s.name;
                 lastRow.querySelector('.emp-id').value = s.id;
             });
         }
@@ -334,7 +457,7 @@
                 }
             });
 
-            if(dataArr.length === 0) { alert('Please enter at least one employee.'); return; }
+            if(dataArr.length === 0) { alert('Please select at least one employee.'); return; }
 
             dataArr.forEach(item => db.ref('ot_records').push(item));
             alert(`Successfully submitted ${dataArr.length} record(s) to Firebase! Status: ${status}`);
