@@ -1,54 +1,752 @@
-// 示例：动态渲染提交记录
-function renderSubmissions(dataList) {
-  const tbody = document.getElementById('submissionTableBody');
-  tbody.innerHTML = '';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaizen Mould Technology - Overtime (OT) System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-  dataList.forEach((item, index) => {
-    const tr = document.createElement('tr');
-    tr.id = `row-${index}`;
-    tr.innerHTML = `
-      <td><input type="text" class="form-control form-control-sm" value="${item.empName}" readonly id="name-${index}"></td>
-      <td><input type="text" class="form-control form-control-sm" value="${item.empId}" readonly id="id-${index}"></td>
-      <td><input type="date" class="form-control form-control-sm" value="${item.date}" readonly id="date-${index}"></td>
-      <td><input type="time" class="form-control form-control-sm" value="${item.startTime}" readonly id="start-${index}"></td>
-      <td><input type="time" class="form-control form-control-sm" value="${item.endTime}" readonly id="end-${index}"></td>
-      <td><input type="number" class="form-control form-control-sm" value="${item.hours}" readonly id="hours-${index}"></td>
-      <td><input type="text" class="form-control form-control-sm" value="${item.reason}" readonly id="reason-${index}"></td>
-      <td><span class="badge ${item.status === 'CONFIRMED' ? 'bg-success' : 'bg-warning'}">${item.status}</span></td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary" id="btn-edit-${index}" onclick="toggleEdit(${index})">
-          <i class="bi bi-pencil"></i> Edit
-        </button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 700; background-color: rgba(239, 246, 255, 0.5); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
 
-// 切换编辑 / 保存状态
-function toggleEdit(index) {
-  const rowInputs = document.querySelectorAll(`#row-${index} input`);
-  const editBtn = document.getElementById(`btn-edit-${index}`);
-  
-  const isEditing = editBtn.classList.contains('btn-success');
+    <!-- HEADER -->
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-industry text-blue-800"></i> Kaizen Mould Technology Sdn. Bhd.
+                </h1>
+                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 24/7 Live Sync & Tracking (24小时实时同步系统)</p>
+            </div>
 
-  if (!isEditing) {
-    // 开启编辑模式：移除 readonly
-    rowInputs.forEach(input => input.removeAttribute('readonly'));
-    editBtn.className = 'btn btn-sm btn-success';
-    editBtn.innerHTML = '<i class="bi bi-check-lg"></i> Save';
-  } else {
-    // 保存修改：加上 readonly 并更新数据/写回数据库
-    rowInputs.forEach(input => input.setAttribute('readonly', true));
-    editBtn.className = 'btn btn-sm btn-outline-primary';
-    editBtn.innerHTML = '<i class="bi bi-pencil"></i> Edit';
-    
-    // 可以在这里触发保存至后台/Google Sheet/LocalStorage 的函数
-    saveRowData(index);
-  }
-}
+            <div class="flex items-center gap-3">
+                <div class="bg-slate-100 border border-slate-200 rounded-lg p-1.5 flex items-center gap-2 text-xs font-semibold">
+                    <span class="text-slate-500">Access / Status:</span>
+                    <span id="accessModeBadge" class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">STAFF MODE (员工模式)</span>
+                </div>
 
-function saveRowData(index) {
-  console.log(`Row ${index} updated successfully!`);
-  // 执行 Sync / Update 逻辑...
-}
+                <button id="hrLoginBtn" onclick="toggleHRLoginModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-amber-400"></i> <span id="hrLoginBtnText">HR Login (HR 登录)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- DEPARTMENT SELECTOR CARD -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div class="md:col-span-7 flex items-center gap-3">
+                    <label class="text-sm font-bold text-slate-700 whitespace-nowrap">Select Dept / Pilih Jabatan / 选择部门:</label>
+                    <select id="departmentSelect" onchange="handleDepartmentChange()" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm font-semibold rounded-lg block w-full p-2.5">
+                        <option value="CAD">CAD DEPARTMENT</option>
+                        <option value="CAM">CAM DEPARTMENT</option>
+                        <option value="CNC">CNC DEPARTMENT</option>
+                        <option value="EDM">EDM DEPARTMENT</option>
+                        <option value="PROJECT">PROJECT DEPARTMENT</option>
+                        <option value="POLISHING">POLISHING DEPARTMENT</option>
+                        <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
+                        <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
+                        <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
+                        <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
+                        <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
+                        <option value="PURCHASING">PURCHASING DEPARTMENT</option>
+                    </select>
+                </div>
+                <div class="md:col-span-5 bg-blue-50/70 border border-blue-100 rounded-lg p-3 text-right">
+                    <div class="text-xs text-blue-700 font-semibold uppercase">Selected Dept: <strong id="currentDeptDisplay" class="text-blue-900">CAD DEPARTMENT</strong></div>
+                    <div class="text-xs text-slate-600 font-medium mt-0.5">HOD / Manager (主管/经理): <strong id="currentHODDisplay" class="text-slate-900 font-bold">CHAN KENG LEONG (ID: 2)</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS NAV -->
+        <div class="border-b border-slate-200 mb-6 bg-white rounded-t-xl px-2 pt-2 shadow-sm">
+            <nav class="flex flex-wrap gap-2">
+                <button onclick="switchTab('submit')" id="tabBtnSubmit" class="tab-btn tab-active px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 transition">
+                    <i class="fa-solid fa-pen-to-square"></i> Submit OT / Hantar OT / 提交 OT
+                </button>
+                <button onclick="switchTab('mySubmissions')" id="tabBtnMySubmissions" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                    <i class="fa-solid fa-user-clock"></i> View All Submissions / Ubah & Edit / 查看与修改记录
+                </button>
+                <button onclick="switchTab('hrArchive')" id="tabBtnHrArchive" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive & Delete <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- SUBMIT OT SECTION -->
+        <div id="tabSubmit" class="tab-content space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form (加班表格)
+                        </h2>
+                        <p class="text-xs text-slate-500">Auto-memory active. Select staff or load entire department team automatically.</p>
+                    </div>
+                    <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-indigo-600"></i> ⚡ Auto-Load Team (载入全员)
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse min-w-[850px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-3 w-1/4">Name / Nama / 姓名</th>
+                                <th class="p-3 w-28">Emp ID / 工号</th>
+                                <th class="p-3 w-36">Date / Tarikh / 日期</th>
+                                <th class="p-3 w-28">Start / 开始</th>
+                                <th class="p-3 w-28">End / 结束</th>
+                                <th class="p-3 w-20">Hours / 小时</th>
+                                <th class="p-3">Purpose & Reason / 原因用途</th>
+                                <th class="p-3 w-12 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otTableBody" class="divide-y divide-slate-100">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                    <button onclick="addNewRow(true)" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i> Add Row (Duplicate / 复制上一行)
+                    </button>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="submitOT('PENDING')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-hourglass-start"></i> Save PENDING (暂存)
+                        </button>
+                        <button onclick="submitOT('APPROVED')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Confirm Submission (确认提交)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW ALL SUBMISSIONS TAB (WITH INLINE EDIT & SUBMIT OPTIONS) -->
+        <div id="tabMySubmissions" class="tab-content hidden space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">All Submitted OT Logs (所有加班记录与编辑)</h3>
+                        <p class="text-xs text-slate-500">24/7 Live Sync across mobile & PC. Click Edit to change records anytime. (全天候 24 小时实时同步，支持随时修改编辑)。</p>
+                    </div>
+                    <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-rotate"></i> Refresh Sync (刷新同步)
+                    </button>
+                </div>
+
+                <div id="submissionsTableContainer" class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse min-w-[950px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-slate-700 font-bold">
+                                <th class="p-2 w-28">Dept / 部门</th>
+                                <th class="p-2 w-44">Name / 姓名</th>
+                                <th class="p-2 w-20">ID / 工号</th>
+                                <th class="p-2 w-32">Date / 日期</th>
+                                <th class="p-2 w-36">Time / 时间</th>
+                                <th class="p-2 w-20 text-center">Hours / 时数</th>
+                                <th class="p-2">Reason / 原因</th>
+                                <th class="p-2 w-24">Status / 状态</th>
+                                <th class="p-2 w-40 text-center">Actions / 操作 (Edit/Submit/Pending)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissionsTableBody" class="divide-y divide-slate-100">
+                            <!-- Injected Dynamically with Editable Inputs -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- HR ARCHIVE & DELETE CONTROLS TAB -->
+        <div id="tabHrArchive" class="tab-content hidden space-y-6">
+            <!-- DELETE & FILTER CONTROL PANEL -->
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center gap-2 text-rose-800 font-extrabold text-base mb-1">
+                    <i class="fa-solid fa-trash-can"></i> Advanced Data Delete Center (数据删除管理中心)
+                </div>
+                <p class="text-xs text-rose-600 mb-4">Delete records by Department, Name, Emp ID, Year, Month or Exact Date. (可按部门、名字、工号、年份、月份或具体日期精确删除数据)。</p>
+
+                <!-- FILTER FORM FOR DELETE -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Dept / 部门</label>
+                        <select id="delDept" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                            <option value="">-- All / 所有部门 --</option>
+                            <option value="CAD">CAD</option>
+                            <option value="CAM">CAM</option>
+                            <option value="CNC">CNC</option>
+                            <option value="EDM">EDM</option>
+                            <option value="PROJECT">PROJECT</option>
+                            <option value="POLISHING">POLISHING</option>
+                            <option value="PRODUCTION">PRODUCTION</option>
+                            <option value="INJECTION_TRIAL">INJECTION TRIAL</option>
+                            <option value="MOULD_MAKER">MOULD MAKER</option>
+                            <option value="QC">QC</option>
+                            <option value="ADMIN_HR">ADMIN & HR</option>
+                            <option value="PURCHASING">PURCHASING</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Name / ID / 名字工号</label>
+                        <input type="text" id="delNameOrId" placeholder="Name or ID" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Year / 年份</label>
+                        <input type="number" id="delYear" placeholder="e.g. 2026" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Month / 月份</label>
+                        <select id="delMonth" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                            <option value="">-- All Months --</option>
+                            <option value="01">01 月</option>
+                            <option value="02">02 月</option>
+                            <option value="03">03 月</option>
+                            <option value="04">04 月</option>
+                            <option value="05">05 月</option>
+                            <option value="06">06 月</option>
+                            <option value="07">07 月</option>
+                            <option value="08">08 月</option>
+                            <option value="09">09 月</option>
+                            <option value="10">10 月</option>
+                            <option value="11">11 月</option>
+                            <option value="12">12 月</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Exact Date / 具体日期</label>
+                        <input type="date" id="delSpecificDate" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
+                    </div>
+
+                    <div class="flex items-end">
+                        <button onclick="deleteFilteredData()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2 px-3 rounded shadow transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-filter-circle-xmark"></i> Delete Match (条件删除)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-rose-200 flex justify-between items-center flex-wrap gap-2">
+                    <span class="text-xs font-bold text-rose-800">⚠️ Danger Zone (危险区域):</span>
+                    <button onclick="clearAllData()" class="bg-red-800 hover:bg-red-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1">
+                        <i class="fa-solid fa-skull-crossbones"></i> Delete All Records (一键彻底清空数据库)
+                    </button>
+                </div>
+            </div>
+
+            <!-- HR VIEW TABLE -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-slate-900">HR Live Data Monitor (HR 24小时实时接收数据中心)</h3>
+                    <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-semibold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-slate-700 font-bold">
+                                <th class="p-2">Dept</th>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">ID</th>
+                                <th class="p-2">Date</th>
+                                <th class="p-2">Time</th>
+                                <th class="p-2">Hours</th>
+                                <th class="p-2">Reason</th>
+                                <th class="p-2">Status</th>
+                                <th class="p-2 text-center">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hrRecordsTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SYSTEM SCRIPT -->
+    <script>
+        const deptMap = {
+            "CAD": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "SOH GIM BOON", id: "274" }, { name: "ADARSH DAMODARAN", id: "305" }] },
+            "CAM": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "HAN AYE", id: "28" }, { name: "MD KANCHAN", id: "60" }, { name: "KHAU LIANG YU", id: "269" }, { name: "NAY MYO ZAW", id: "300" }, { name: "MA LIK CHAN", id: "307" }] },
+            "CNC": { hod: "CHAN KENG LEONG (ID: 2)", staff: [{ name: "SA MASAN BA", id: "27" }, { name: "BHARAT BOHARA", id: "290" }, { name: "BOHARA DHAN BAHADUR", id: "291" }, { name: "BOHARA MILAN", id: "294" }, { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }] },
+            "EDM": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "TEE NYEIN AUNG", id: "302" }, { name: "KAYW ZIN HEIN", id: "306" }, { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" }, { name: "YUVANNESH A/L MAYADEVAN", id: "318" }] },
+            "PROJECT": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" }, { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }] },
+            "POLISHING": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MD SHOPON", id: "19" }, { name: "MIN THU", id: "299" }] },
+            "PRODUCTION": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MD SHAHA BUDIN", id: "20" }, { name: "MD ALAMGIR", id: "68" }, { name: "SHAING THU AUNG", id: "301" }] },
+            "INJECTION_TRIAL": { hod: "CHONG FAT KEONG (ID: 3)", staff: [{ name: "MAHAJI", id: "329" }] },
+            "MOULD_MAKER": { hod: "LEE YOONG HON (ID: 15)", staff: [{ name: "MD JAHIR", id: "69" }, { name: "MD JAHANGIR ALAM", id: "72" }, { name: "HING YONG HOW", id: "286" }, { name: "ZAW MYO HTIKE", id: "303" }, { name: "AMARNATH SIVADAS", id: "310" }, { name: "JAISON CHRISTOPHER", id: "311" }, { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" }, { name: "SARATH SASIDHARAKAIMAL", id: "322" }, { name: "GOH CHEE KUAN", id: "326" }] },
+            "QC": { hod: "TAN KAH CHYE (ID: 266)", staff: [{ name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }] },
+            "ADMIN_HR": { hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", staff: [{ name: "KISTINNA ANAQIN", id: "316" }, { name: "TAN KYLE", id: "328" }] },
+            "PURCHASING": { hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", staff: [{ name: "THILAGAH A/P KRISHNAN", id: "212" }] }
+        };
+
+        let isHR = false;
+        let db = null;
+
+        const defaultFirebaseConfig = {
+            apiKey: "AIzaSyCHOFXk24RMB3vVyGIV1BIm-hTr9fgjmPM",
+            authDomain: "kaizen-ot.firebaseapp.com",
+            databaseURL: "https://kaizen-ot-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "kaizen-ot",
+            storageBucket: "kaizen-ot.firebasestorage.app",
+            messagingSenderId: "9111966135",
+            appId: "1:9111966135:web:330a378c37f2cffe941832"
+        };
+
+        window.onload = function() {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(defaultFirebaseConfig);
+                }
+                db = firebase.database();
+                
+                // Realtime Listener to ensure HR side updates automatically 24/7
+                db.ref('ot_records').on('value', () => {
+                    fetchRecords();
+                });
+            } catch(e) { console.log(e); }
+
+            handleDepartmentChange();
+            addNewRow(false);
+        };
+
+        function handleDepartmentChange() {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const data = deptMap[deptKey] || { hod: "-", staff: [] };
+            document.getElementById('currentDeptDisplay').innerText = deptKey.replace('_', ' ') + ' DEPARTMENT';
+            document.getElementById('currentHODDisplay').innerText = data.hod || '-';
+
+            document.getElementById('otTableBody').innerHTML = '';
+            addNewRow(false);
+        }
+
+        function getStaffOptions(selectedDeptKey) {
+            const staffList = deptMap[selectedDeptKey]?.staff || [];
+            let options = '<option value="">-- Select Employee / 选择员工 --</option>';
+            staffList.forEach(s => {
+                options += `<option value="${s.name}" data-id="${s.id}">${s.name} (ID: ${s.id})</option>`;
+            });
+            return options;
+        }
+
+        function addNewRow(duplicatePrevious = false) {
+            const tbody = document.getElementById('otTableBody');
+            const deptKey = document.getElementById('departmentSelect').value;
+            const rowId = 'row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            const today = new Date().toISOString().split('T')[0];
+
+            let defaultVal = { name: '', id: '', date: today, start: '18:00', end: '20:00', hours: '2.0', reason: '' };
+
+            if (duplicatePrevious && tbody.children.length > 0) {
+                const lastRow = tbody.lastElementChild;
+                defaultVal = {
+                    name: lastRow.querySelector('.emp-name')?.value || '',
+                    id: lastRow.querySelector('.emp-id')?.value || '',
+                    date: lastRow.querySelector('.emp-date')?.value || today,
+                    start: lastRow.querySelector('.emp-start')?.value || '18:00',
+                    end: lastRow.querySelector('.emp-end')?.value || '20:00',
+                    hours: lastRow.querySelector('.emp-hours')?.value || '2.0',
+                    reason: lastRow.querySelector('.emp-reason')?.value || ''
+                };
+            }
+
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+            tr.className = "hover:bg-slate-50 transition";
+            tr.innerHTML = `
+                <td class="p-2">
+                    <select onchange="onEmployeeSelect(this, '${rowId}')" class="emp-name w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs font-semibold">
+                        ${getStaffOptions(deptKey)}
+                    </select>
+                </td>
+                <td class="p-2"><input type="text" class="emp-id w-full bg-slate-100 border border-slate-200 rounded p-1.5 text-xs font-bold text-slate-700 text-center" value="${defaultVal.id}" readonly placeholder="ID"></td>
+                <td class="p-2"><input type="date" class="emp-date w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.date}"></td>
+                <td class="p-2"><input type="time" class="emp-start w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.start}" onchange="calcHours('${rowId}')"></td>
+                <td class="p-2"><input type="time" class="emp-end w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.end}" onchange="calcHours('${rowId}')"></td>
+                <td class="p-2"><input type="text" class="emp-hours w-full bg-slate-100 border border-slate-200 rounded p-1.5 text-xs font-bold text-blue-700 text-center" value="${defaultVal.hours}" readonly></td>
+                <td class="p-2"><input type="text" class="emp-reason w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.reason}" placeholder="Reason / 原因用途"></td>
+                <td class="p-2 text-center"><button onclick="deleteRow('${rowId}')" class="text-rose-500 hover:text-rose-700 font-bold"><i class="fa-solid fa-xmark"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+
+            if(defaultVal.name) {
+                const selectEl = tr.querySelector('.emp-name');
+                selectEl.value = defaultVal.name;
+            }
+        }
+
+        function onEmployeeSelect(selectEl, rowId) {
+            const selectedOption = selectEl.options[selectEl.selectedIndex];
+            const empId = selectedOption.getAttribute('data-id') || '';
+            const tr = document.getElementById(rowId);
+            if(tr) {
+                tr.querySelector('.emp-id').value = empId;
+            }
+        }
+
+        function deleteRow(rowId) {
+            const row = document.getElementById(rowId);
+            if(row) row.remove();
+        }
+
+        function calcHours(rowId) {
+            const tr = document.getElementById(rowId);
+            if(!tr) return;
+            const start = tr.querySelector('.emp-start').value;
+            const end = tr.querySelector('.emp-end').value;
+            if(start && end) {
+                const s = new Date(`1970-01-01T${start}:00`);
+                const e = new Date(`1970-01-01T${end}:00`);
+                let diff = (e - s) / (1000 * 60 * 60);
+                if(diff < 0) diff += 24;
+                tr.querySelector('.emp-hours').value = diff.toFixed(1);
+            }
+        }
+
+        function loadWholeTeam() {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const staffList = deptMap[deptKey]?.staff || [];
+            if(staffList.length === 0) {
+                alert('No staff members registered under this department.');
+                return;
+            }
+            document.getElementById('otTableBody').innerHTML = '';
+            staffList.forEach(s => {
+                addNewRow(false);
+                const tbody = document.getElementById('otTableBody');
+                const lastRow = tbody.lastElementChild;
+                const selectEl = lastRow.querySelector('.emp-name');
+                selectEl.value = s.name;
+                lastRow.querySelector('.emp-id').value = s.id;
+            });
+        }
+
+        function submitOT(status) {
+            if(!db) { alert('Database not initialized!'); return; }
+            const dept = document.getElementById('departmentSelect').value;
+            const rows = document.querySelectorAll('#otTableBody tr');
+            let dataArr = [];
+
+            rows.forEach(r => {
+                const name = r.querySelector('.emp-name').value;
+                if(name) {
+                    dataArr.push({
+                        dept: dept,
+                        name: name,
+                        empId: r.querySelector('.emp-id').value,
+                        date: r.querySelector('.emp-date').value,
+                        startTime: r.querySelector('.emp-start').value,
+                        endTime: r.querySelector('.emp-end').value,
+                        hours: r.querySelector('.emp-hours').value,
+                        reason: r.querySelector('.emp-reason').value,
+                        status: status,
+                        timestamp: Date.now()
+                    });
+                }
+            });
+
+            if(dataArr.length === 0) { alert('Please select at least one employee.'); return; }
+
+            dataArr.forEach(item => db.ref('ot_records').push(item));
+            alert(`Submitted ${dataArr.length} record(s)! / 已成功提交记录到云端！`);
+            document.getElementById('otTableBody').innerHTML = '';
+            addNewRow(false);
+        }
+
+        // FETCH RECORDS WITH EDIT & INLINE SUBMIT/PENDING OPTIONS FOR ALL USERS
+        function fetchRecords() {
+            if(!db) return;
+            db.ref('ot_records').once('value', snapshot => {
+                const data = snapshot.val();
+                const subBody = document.getElementById('submissionsTableBody');
+                const hrBody = document.getElementById('hrRecordsTableBody');
+                if(subBody) subBody.innerHTML = '';
+                if(hrBody) hrBody.innerHTML = '';
+
+                if(!data) {
+                    if(subBody) subBody.innerHTML = '<tr><td colspan="9" class="p-3 text-center text-slate-400">No records found. / 暂无提交记录</td></tr>';
+                    if(hrBody) hrBody.innerHTML = '<tr><td colspan="9" class="p-3 text-center text-slate-400">No records found. / 暂无提交记录</td></tr>';
+                    return;
+                }
+
+                Object.entries(data).reverse().forEach(([key, item]) => {
+                    if(subBody) {
+                        const tr = document.createElement('tr');
+                        tr.id = `sub_row_${key}`;
+                        tr.className = "hover:bg-slate-50 transition";
+                        tr.innerHTML = `
+                            <td class="p-2 font-semibold text-slate-700">${item.dept}</td>
+                            <td class="p-2"><input type="text" id="edit_name_${key}" class="w-full bg-transparent border-none p-1 font-bold text-slate-800" value="${item.name}" readonly></td>
+                            <td class="p-2"><input type="text" id="edit_id_${key}" class="w-20 bg-transparent border-none p-1 text-slate-600" value="${item.empId}" readonly></td>
+                            <td class="p-2"><input type="date" id="edit_date_${key}" class="bg-transparent border-none p-1 text-slate-700" value="${item.date}" readonly></td>
+                            <td class="p-2 flex items-center gap-1">
+                                <input type="time" id="edit_start_${key}" class="bg-transparent border-none p-1" value="${item.startTime}" readonly>
+                                <span>-</span>
+                                <input type="time" id="edit_end_${key}" class="bg-transparent border-none p-1" value="${item.endTime}" readonly>
+                            </td>
+                            <td class="p-2 font-bold text-blue-600 text-center"><input type="text" id="edit_hours_${key}" class="w-12 text-center bg-transparent border-none font-bold text-blue-600" value="${item.hours}" readonly></td>
+                            <td class="p-2"><input type="text" id="edit_reason_${key}" class="w-full bg-transparent border-none p-1 text-slate-600" value="${item.reason || ''}" readonly></td>
+                            <td class="p-2">
+                                <span class="px-2 py-0.5 text-[10px] rounded font-bold ${item.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status}</span>
+                            </td>
+                            <td class="p-2 text-center flex items-center justify-center gap-1">
+                                <button id="edit_btn_${key}" onclick="toggleInlineEdit('${key}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2 py-1 rounded">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </button>
+                                <button onclick="updateRecordStatus('${key}', 'PENDING')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-[11px] font-bold px-2 py-1 rounded" title="Set PENDING">
+                                    Pending
+                                </button>
+                                <button onclick="updateRecordStatus('${key}', 'APPROVED')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[11px] font-bold px-2 py-1 rounded" title="Submit/Approve">
+                                    Submit
+                                </button>
+                            </td>
+                        `;
+                        subBody.appendChild(tr);
+                    }
+
+                    if(hrBody) {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-2 font-semibold text-slate-700">${item.dept}</td>
+                            <td class="p-2 font-bold">${item.name}</td>
+                            <td class="p-2">${item.empId}</td>
+                            <td class="p-2">${item.date}</td>
+                            <td class="p-2">${item.startTime} - ${item.endTime}</td>
+                            <td class="p-2 font-bold text-blue-600">${item.hours} hrs</td>
+                            <td class="p-2 text-slate-500">${item.reason || ''}</td>
+                            <td class="p-2"><span class="px-2 py-0.5 text-[10px] rounded font-bold ${item.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status}</span></td>
+                            <td class="p-2 text-center">
+                                <button onclick="deleteSingleRecord('${key}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold px-2 py-1 rounded hover:bg-rose-50">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        hrBody.appendChild(tr);
+                    }
+                });
+            });
+        }
+
+        // TOGGLE INLINE EDIT IN VIEW ALL SUBMISSIONS
+        function toggleInlineEdit(key) {
+            const btn = document.getElementById(`edit_btn_${key}`);
+            const isEditing = btn.innerHTML.includes('Save');
+
+            const fields = [
+                `edit_name_${key}`, `edit_id_${key}`, `edit_date_${key}`,
+                `edit_start_${key}`, `edit_end_${key}`, `edit_reason_${key}`
+            ];
+
+            if(!isEditing) {
+                fields.forEach(fId => {
+                    const el = document.getElementById(fId);
+                    if(el) {
+                        el.removeAttribute('readonly');
+                        el.classList.add('bg-white', 'border', 'border-slate-300', 'rounded');
+                    }
+                });
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-2 py-1 rounded";
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Save';
+            } else {
+                // Calculate hours & save to Firebase
+                const start = document.getElementById(`edit_start_${key}`).value;
+                const end = document.getElementById(`edit_end_${key}`).value;
+                let hours = '0.0';
+                if(start && end) {
+                    const s = new Date(`1970-01-01T${start}:00`);
+                    const e = new Date(`1970-01-01T${end}:00`);
+                    let diff = (e - s) / (1000 * 60 * 60);
+                    if(diff < 0) diff += 24;
+                    hours = diff.toFixed(1);
+                }
+
+                const updatedData = {
+                    name: document.getElementById(`edit_name_${key}`).value,
+                    empId: document.getElementById(`edit_id_${key}`).value,
+                    date: document.getElementById(`edit_date_${key}`).value,
+                    startTime: start,
+                    endTime: end,
+                    hours: hours,
+                    reason: document.getElementById(`edit_reason_${key}`).value
+                };
+
+                db.ref('ot_records/' + key).update(updatedData)
+                    .then(() => {
+                        alert('Record updated successfully! / 记录已更新成功！');
+                        fetchRecords();
+                    })
+                    .catch(err => alert('Update failed: ' + err.message));
+            }
+        }
+
+        // UPDATE STATUS TO SUBMITTED / PENDING
+        function updateRecordStatus(key, newStatus) {
+            if(!db) return;
+            db.ref('ot_records/' + key).update({ status: newStatus })
+                .then(() => {
+                    fetchRecords();
+                });
+        }
+
+        function deleteSingleRecord(key) {
+            if(!db) return;
+            if(confirm('Are you sure you want to delete this entry? / 确定删除此记录？')) {
+                db.ref('ot_records/' + key).remove()
+                    .then(() => {
+                        fetchRecords();
+                    });
+            }
+        }
+
+        function deleteFilteredData() {
+            if(!isHR) { alert('HR Mode Required for Batch Deletion! / 仅限 HR 模式删除！'); return; }
+            if(!db) return;
+
+            const targetDept = document.getElementById('delDept').value.trim();
+            const targetNameOrId = document.getElementById('delNameOrId').value.trim().toLowerCase();
+            const targetYear = document.getElementById('delYear').value.trim();
+            const targetMonth = document.getElementById('delMonth').value.trim();
+            const targetDate = document.getElementById('delSpecificDate').value;
+
+            if(!targetDept && !targetNameOrId && !targetYear && !targetMonth && !targetDate) {
+                alert('Please select at least one delete filter criterion!');
+                return;
+            }
+
+            db.ref('ot_records').once('value', snapshot => {
+                const data = snapshot.val();
+                if(!data) { alert('Database is empty!'); return; }
+
+                let deleteKeys = [];
+
+                Object.entries(data).forEach(([key, item]) => {
+                    let match = true;
+
+                    if(targetDept && item.dept !== targetDept) match = false;
+                    if(targetNameOrId) {
+                        const nameMatch = item.name && item.name.toLowerCase().includes(targetNameOrId);
+                        const idMatch = item.empId && item.empId.toLowerCase().includes(targetNameOrId);
+                        if(!nameMatch && !idMatch) match = false;
+                    }
+
+                    if(item.date) {
+                        const parts = item.date.split('-');
+                        const y = parts[0];
+                        const m = parts[1];
+
+                        if(targetYear && y !== targetYear) match = false;
+                        if(targetMonth && m !== targetMonth) match = false;
+                        if(targetDate && item.date !== targetDate) match = false;
+                    }
+
+                    if(match) deleteKeys.push(key);
+                });
+
+                if(deleteKeys.length === 0) {
+                    alert('No matching records found to delete.');
+                    return;
+                }
+
+                if(confirm(`Found ${deleteKeys.length} matching record(s). Confirm deletion?`)) {
+                    let updates = {};
+                    deleteKeys.forEach(k => updates['ot_records/' + k] = null);
+                    db.ref().update(updates).then(() => {
+                        alert(`Successfully deleted ${deleteKeys.length} record(s)!`);
+                        fetchRecords();
+                    });
+                }
+            });
+        }
+
+        function clearAllData() {
+            if(!isHR) { alert('HR Mode Required! / 仅限 HR 模式操作！'); return; }
+            if(confirm('🚨 Confirm deleting ENTIRE database? / 确定彻底清空所有数据？')) {
+                db.ref('ot_records').remove().then(() => {
+                    alert('Database Cleared!');
+                    fetchRecords();
+                });
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active'));
+
+            if(tabName === 'submit') {
+                document.getElementById('tabSubmit').classList.remove('hidden');
+                document.getElementById('tabBtnSubmit').classList.add('tab-active');
+            } else if(tabName === 'mySubmissions') {
+                document.getElementById('tabMySubmissions').classList.remove('hidden');
+                document.getElementById('tabBtnMySubmissions').classList.add('tab-active');
+                fetchRecords();
+            } else if(tabName === 'hrArchive') {
+                if(!isHR) { checkHRPasscode(); }
+                if(isHR) {
+                    document.getElementById('tabHrArchive').classList.remove('hidden');
+                    document.getElementById('tabBtnHrArchive').classList.add('tab-active');
+                    fetchRecords();
+                }
+            }
+        }
+
+        function toggleHRLoginModal() {
+            checkHRPasscode();
+        }
+
+        function checkHRPasscode() {
+            if(isHR) {
+                isHR = false;
+                document.getElementById('accessModeBadge').innerText = 'STAFF MODE (员工模式)';
+                document.getElementById('accessModeBadge').className = 'bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold';
+                document.getElementById('hrLoginBtnText').innerText = 'HR Login (HR 登录)';
+                alert('Logged out of HR Mode.');
+            } else {
+                const pass = prompt('Enter HR Master Passcode:');
+                if(pass === '1234') {
+                    isHR = true;
+                    document.getElementById('accessModeBadge').innerText = 'HR MASTER MODE (HR 主控模式)';
+                    document.getElementById('accessModeBadge').className = 'bg-amber-500 text-white px-2 py-0.5 rounded font-bold';
+                    document.getElementById('hrLoginBtnText').innerText = 'HR Logout (HR 退出)';
+                    alert('HR Master Mode Unlocked!');
+                } else if(pass !== null) {
+                    alert('Incorrect Passcode.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
