@@ -41,7 +41,7 @@
                 <h1 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-industry text-blue-800"></i> Kaizen Mould Technology Sdn. Bhd.
                 </h1>
-                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 24/7 Live Sync & Tracking</p>
+                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • Live Sync & Tracking</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -52,10 +52,6 @@
 
                 <button id="hrLoginBtn" onclick="toggleHRLoginModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
                     <i class="fa-solid fa-lock text-amber-400"></i> <span id="hrLoginBtnText">HR Login</span>
-                </button>
-
-                <button onclick="openConfigModal()" class="text-slate-500 hover:text-slate-800 p-2 text-sm" title="Firebase Settings">
-                    <i class="fa-solid fa-gear"></i>
                 </button>
             </div>
         </div>
@@ -94,17 +90,14 @@
         <!-- TABS NAV -->
         <div class="border-b border-slate-200 mb-6 bg-white rounded-t-xl px-2 pt-2 shadow-sm">
             <nav class="flex flex-wrap gap-2">
-                <button onclick="switchTab('submit')" id="tabBtnSubmit" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
+                <button onclick="switchTab('submit')" id="tabBtnSubmit" class="tab-btn tab-active px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 transition">
                     <i class="fa-solid fa-pen-to-square"></i> Submit OT
                 </button>
                 <button onclick="switchTab('mySubmissions')" id="tabBtnMySubmissions" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
-                    <i class="fa-solid fa-user-clock"></i> My Submissions
+                    <i class="fa-solid fa-user-clock"></i> View All Submissions
                 </button>
                 <button onclick="switchTab('hrArchive')" id="tabBtnHrArchive" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
-                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive & Report <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
-                </button>
-                <button onclick="switchTab('clearRecords')" id="tabBtnClearRecords" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
-                    <i class="fa-solid fa-trash-can text-rose-600"></i> Clear Records <span class="bg-rose-100 text-rose-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
+                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">HR Only</span>
                 </button>
             </nav>
         </div>
@@ -117,9 +110,9 @@
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form
                         </h2>
-                        <p class="text-xs text-slate-500">Auto-memory & smart replication active. Direct duplicate from previous row on Add Row.</p>
+                        <p class="text-xs text-slate-500">Auto-memory active. Fill in data or auto-load whole team.</p>
                     </div>
-                    <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5" title="Loads all staff belonging to the chosen department into the table">
+                    <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <i class="fa-solid fa-bolt text-indigo-600"></i> ⚡ Auto-Load Department Team
                     </button>
                 </div>
@@ -139,7 +132,7 @@
                             </tr>
                         </thead>
                         <tbody id="otTableBody" class="divide-y divide-slate-100">
-                            <!-- Rows injected dynamically -->
+                            <!-- Dynamic Rows -->
                         </tbody>
                     </table>
                 </div>
@@ -160,6 +153,276 @@
             </div>
         </div>
 
+        <!-- OTHER TABS -->
+        <div id="tabMySubmissions" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-slate-900">Submitted OT Logs</h3>
+                    <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded font-semibold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </div>
+                <div id="submissionsTableContainer" class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-slate-700">
+                                <th class="p-2">Dept</th>
+                                <th class="p-2">Name</th>
+                                <th class="p-2">ID</th>
+                                <th class="p-2">Date</th>
+                                <th class="p-2">Time</th>
+                                <th class="p-2">Hours</th>
+                                <th class="p-2">Reason</th>
+                                <th class="p-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissionsTableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabHrArchive" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-sm font-bold text-slate-900 mb-3">HR Master Control & Management</h3>
+                <p class="text-xs text-slate-500 mb-4">Logged in as HR Master. You have full access to view, clear, and export records.</p>
+                <div class="flex gap-3 mb-4">
+                    <button onclick="clearAllData()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-2 rounded-lg"><i class="fa-solid fa-trash"></i> Clear Database Records</button>
+                </div>
+            </div>
+        </div>
+
     </main>
+
+    <!-- SYSTEM SCRIPT & FIREBASE INTEGRATION -->
+    <script>
+        // HOD & Dept Mapping Data (Complete 12 Departments)
+        const deptMap = {
+            "PURCHASING": { hod: "KALAISELVI A/P SOORIAMOORTHY", staff: [{name:"Kalaiselvi", id:"P01"}] },
+            "ADMIN_HR": { hod: "ADMIN & HR HOD", staff: [{name:"HR Staff", id:"A01"}] },
+            "CAD": { hod: "CAD HOD", staff: [{name:"CAD Designer", id:"C01"}] },
+            "CAM": { hod: "CAM HOD", staff: [{name:"CAM Programmer", id:"CM01"}] },
+            "CNC": { hod: "CNC HOD", staff: [{name:"CNC Operator", id:"CN01"}] },
+            "EDM": { hod: "EDM HOD", staff: [{name:"EDM Specialist", id:"E01"}] },
+            "PROJECT": { hod: "PROJECT MANAGER", staff: [{name:"Project Engineer", id:"PR01"}] },
+            "POLISHING": { hod: "POLISHING HOD", staff: [{name:"Polisher", id:"PL01"}] },
+            "PRODUCTION": { hod: "PRODUCTION MANAGER", staff: [{name:"Production Staff", id:"PD01"}] },
+            "INJECTION_TRIAL": { hod: "INJECTION HOD", staff: [{name:"Trial Technician", id:"IT01"}] },
+            "MOULD_MAKER": { hod: "MOULD HOD", staff: [{name:"Mould Maker", id:"MM01"}] },
+            "QC": { hod: "QC MANAGER", staff: [{name:"QC Inspector", id:"QC01"}] }
+        };
+
+        let isHR = false;
+        let db = null;
+
+        // Auto Firebase Preset Keys
+        const defaultFirebaseConfig = {
+            apiKey: "AIzaSyCHOFXk24RMB3vVyGIV1BIm-hTr9fgjmPM",
+            authDomain: "kaizen-ot.firebaseapp.com",
+            databaseURL: "https://kaizen-ot-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "kaizen-ot",
+            storageBucket: "kaizen-ot.firebasestorage.app",
+            messagingSenderId: "9111966135",
+            appId: "1:9111966135:web:330a378c37f2cffe941832"
+        };
+
+        window.onload = function() {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(defaultFirebaseConfig);
+                }
+                db = firebase.database();
+            } catch(e) { console.log(e); }
+
+            handleDepartmentChange();
+            addNewRow(false);
+        };
+
+        function handleDepartmentChange() {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const data = deptMap[deptKey] || { hod: "MANAGER", staff: [] };
+            document.getElementById('currentDeptDisplay').innerText = deptKey.replace('_', ' ') + ' DEPARTMENT';
+            document.getElementById('currentHODDisplay').innerText = data.hod;
+        }
+
+        function addNewRow(duplicatePrevious = false) {
+            const tbody = document.getElementById('otTableBody');
+            const rowId = 'row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+            const today = new Date().toISOString().split('T')[0];
+
+            let defaultVal = { name: '', id: '', date: today, start: '18:00', end: '20:00', hours: '2.0', reason: '' };
+
+            if (duplicatePrevious && tbody.children.length > 0) {
+                const lastRow = tbody.lastElementChild;
+                defaultVal = {
+                    name: lastRow.querySelector('.emp-name')?.value || '',
+                    id: lastRow.querySelector('.emp-id')?.value || '',
+                    date: lastRow.querySelector('.emp-date')?.value || today,
+                    start: lastRow.querySelector('.emp-start')?.value || '18:00',
+                    end: lastRow.querySelector('.emp-end')?.value || '20:00',
+                    hours: lastRow.querySelector('.emp-hours')?.value || '2.0',
+                    reason: lastRow.querySelector('.emp-reason')?.value || ''
+                };
+            }
+
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+            tr.className = "hover:bg-slate-50 transition";
+            tr.innerHTML = `
+                <td class="p-2"><input type="text" class="emp-name w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs font-semibold" value="${defaultVal.name}" placeholder="Name"></td>
+                <td class="p-2"><input type="text" class="emp-id w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.id}" placeholder="ID"></td>
+                <td class="p-2"><input type="date" class="emp-date w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.date}"></td>
+                <td class="p-2"><input type="time" class="emp-start w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.start}" onchange="calcHours('${rowId}')"></td>
+                <td class="p-2"><input type="time" class="emp-end w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.end}" onchange="calcHours('${rowId}')"></td>
+                <td class="p-2"><input type="text" class="emp-hours w-full bg-slate-100 border border-slate-200 rounded p-1.5 text-xs font-bold text-blue-700 text-center" value="${defaultVal.hours}" readonly></td>
+                <td class="p-2"><input type="text" class="emp-reason w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="${defaultVal.reason}" placeholder="OT Purpose"></td>
+                <td class="p-2 text-center"><button onclick="deleteRow('${rowId}')" class="text-rose-500 hover:text-rose-700 font-bold"><i class="fa-solid fa-xmark"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function deleteRow(rowId) {
+            const row = document.getElementById(rowId);
+            if(row) row.remove();
+        }
+
+        function calcHours(rowId) {
+            const tr = document.getElementById(rowId);
+            if(!tr) return;
+            const start = tr.querySelector('.emp-start').value;
+            const end = tr.querySelector('.emp-end').value;
+            if(start && end) {
+                const s = new Date(`1970-01-01T${start}:00`);
+                const e = new Date(`1970-01-01T${end}:00`);
+                let diff = (e - s) / (1000 * 60 * 60);
+                if(diff < 0) diff += 24;
+                tr.querySelector('.emp-hours').value = diff.toFixed(1);
+            }
+        }
+
+        function loadWholeTeam() {
+            const deptKey = document.getElementById('departmentSelect').value;
+            const staffList = deptMap[deptKey]?.staff || [];
+            document.getElementById('otTableBody').innerHTML = '';
+            staffList.forEach(s => {
+                addNewRow(false);
+                const tbody = document.getElementById('otTableBody');
+                const lastRow = tbody.lastElementChild;
+                lastRow.querySelector('.emp-name').value = s.name;
+                lastRow.querySelector('.emp-id').value = s.id;
+            });
+        }
+
+        function submitOT(status) {
+            if(!db) { alert('Database not initialized!'); return; }
+            const dept = document.getElementById('departmentSelect').value;
+            const rows = document.querySelectorAll('#otTableBody tr');
+            let dataArr = [];
+
+            rows.forEach(r => {
+                const name = r.querySelector('.emp-name').value;
+                if(name) {
+                    dataArr.push({
+                        dept: dept,
+                        name: name,
+                        empId: r.querySelector('.emp-id').value,
+                        date: r.querySelector('.emp-date').value,
+                        startTime: r.querySelector('.emp-start').value,
+                        endTime: r.querySelector('.emp-end').value,
+                        hours: r.querySelector('.emp-hours').value,
+                        reason: r.querySelector('.emp-reason').value,
+                        status: status,
+                        timestamp: Date.now()
+                    });
+                }
+            });
+
+            if(dataArr.length === 0) { alert('Please enter at least one employee.'); return; }
+
+            dataArr.forEach(item => db.ref('ot_records').push(item));
+            alert(`Successfully submitted ${dataArr.length} record(s) to Firebase! Status: ${status}`);
+            document.getElementById('otTableBody').innerHTML = '';
+            addNewRow(false);
+        }
+
+        function fetchRecords() {
+            if(!db) return;
+            db.ref('ot_records').once('value', snapshot => {
+                const data = snapshot.val();
+                const tbody = document.getElementById('submissionsTableBody');
+                tbody.innerHTML = '';
+                if(!data) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400">No records found.</td></tr>';
+                    return;
+                }
+                Object.values(data).reverse().forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-2 font-semibold text-slate-700">${item.dept}</td>
+                        <td class="p-2 font-bold">${item.name}</td>
+                        <td class="p-2">${item.empId}</td>
+                        <td class="p-2">${item.date}</td>
+                        <td class="p-2">${item.startTime} - ${item.endTime}</td>
+                        <td class="p-2 font-bold text-blue-600">${item.hours} hrs</td>
+                        <td class="p-2 text-slate-500">${item.reason}</td>
+                        <td class="p-2"><span class="px-2 py-0.5 text-[10px] rounded font-bold ${item.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active'));
+
+            if(tabName === 'submit') {
+                document.getElementById('tabSubmit').classList.remove('hidden');
+                document.getElementById('tabBtnSubmit').classList.add('tab-active');
+            } else if(tabName === 'mySubmissions') {
+                document.getElementById('tabMySubmissions').classList.remove('hidden');
+                document.getElementById('tabBtnMySubmissions').classList.add('tab-active');
+                fetchRecords();
+            } else if(tabName === 'hrArchive') {
+                if(!isHR) { checkHRPasscode(); }
+                if(isHR) {
+                    document.getElementById('tabHrArchive').classList.remove('hidden');
+                    document.getElementById('tabBtnHrArchive').classList.add('tab-active');
+                }
+            }
+        }
+
+        function toggleHRLoginModal() {
+            checkHRPasscode();
+        }
+
+        function checkHRPasscode() {
+            if(isHR) {
+                isHR = false;
+                document.getElementById('accessModeBadge').innerText = 'STAFF MODE';
+                document.getElementById('accessModeBadge').className = 'bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold';
+                document.getElementById('hrLoginBtnText').innerText = 'HR Login';
+                alert('Logged out of HR Master Mode.');
+            } else {
+                const pass = prompt('Enter HR Master Passcode:');
+                if(pass === '1234') {
+                    isHR = true;
+                    document.getElementById('accessModeBadge').innerText = 'HR MASTER MODE';
+                    document.getElementById('accessModeBadge').className = 'bg-amber-500 text-white px-2 py-0.5 rounded font-bold';
+                    document.getElementById('hrLoginBtnText').innerText = 'HR Logout';
+                    alert('HR Master Mode Unlocked!');
+                } else if(pass !== null) {
+                    alert('Incorrect Passcode.');
+                }
+            }
+        }
+
+        function clearAllData() {
+            if(!isHR) { alert('HR Mode Required.'); return; }
+            if(confirm('Are you sure you want to delete ALL records from Firebase?')) {
+                db.ref('ot_records').remove();
+                alert('All records cleared!');
+                fetchRecords();
+            }
+        }
+    </script>
 </body>
 </html>
