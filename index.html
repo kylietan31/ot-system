@@ -162,7 +162,7 @@
                         <p class="text-xs text-slate-500">24/7 Live Cloud Sync. Click sort buttons to change date order.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <!-- 日期排序按钮组 -->
+                        <!-- 日期排序控制按钮 -->
                         <div class="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-1 text-xs">
                             <span class="px-2 text-slate-500 font-bold">Date Sort:</span>
                             <button onclick="setSortOrder('asc')" id="sortAscBtn" class="px-3 py-1 rounded font-bold text-slate-600 transition">正序 (旧 ➔ 新)</button>
@@ -325,7 +325,6 @@
 
     <!-- SYSTEM SCRIPT -->
     <script>
-        // Firebase 配置连接
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
