@@ -110,7 +110,7 @@
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form (加班表格)
                         </h2>
-                        <p class="text-xs text-slate-500">Auto-memory active. Default start time is automatically set to 5:00 PM (17:00).</p>
+                        <p class="text-xs text-slate-500">Auto-memory active. Default start time is automatically set to 17:00 (下午5点).</p>
                     </div>
                     <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <i class="fa-solid fa-bolt text-indigo-600"></i> ⚡ Auto-Load Team (载入全员)
@@ -202,31 +202,20 @@
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Dept / 部门</label>
                         <select id="delDept" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
                             <option value="">-- All / 所有部门 --</option>
-                            <option value="CAD">CAD</option>
-                            <option value="CAM">CAM</option>
-                            <option value="CNC">CNC</option>
-                            <option value="EDM">EDM</option>
-                            <option value="PROJECT">PROJECT</option>
-                            <option value="POLISHING">POLISHING</option>
-                            <option value="PRODUCTION">PRODUCTION</option>
-                            <option value="INJECTION_TRIAL">INJECTION TRIAL</option>
-                            <option value="MOULD_MAKER">MOULD MAKER</option>
-                            <option value="QC">QC</option>
-                            <option value="ADMIN_HR">ADMIN & HR</option>
-                            <option value="PURCHASING">PURCHASING</option>
+                            <option value="CAD">CAD</option><option value="CAM">CAM</option><option value="CNC">CNC</option><option value="EDM">EDM</option>
+                            <option value="PROJECT">PROJECT</option><option value="POLISHING">POLISHING</option><option value="PRODUCTION">PRODUCTION</option>
+                            <option value="INJECTION_TRIAL">INJECTION TRIAL</option><option value="MOULD_MAKER">MOULD MAKER</option><option value="QC">QC</option>
+                            <option value="ADMIN_HR">ADMIN & HR</option><option value="PURCHASING">PURCHASING</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Name / ID / 名字工号</label>
                         <input type="text" id="delNameOrId" placeholder="Name or ID" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Year / 年份</label>
                         <input type="number" id="delYear" placeholder="e.g. 2026" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Month / 月份</label>
                         <select id="delMonth" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
@@ -236,23 +225,21 @@
                             <option value="09">09 月</option><option value="10">10 月</option><option value="11">11 月</option><option value="12">12 月</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Exact Date / 具体日期</label>
                         <input type="date" id="delSpecificDate" class="w-full bg-white border border-slate-300 rounded p-1.5 text-xs">
                     </div>
-
                     <div class="flex items-end">
                         <button onclick="deleteFilteredData()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2 px-3 rounded shadow transition flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-filter-circle-xmark"></i> Delete Match (条件删除)
+                            <i class="fa-solid fa-filter-circle-xmark"></i> Delete Match
                         </button>
                     </div>
                 </div>
 
                 <div class="pt-3 border-t border-rose-200 flex justify-between items-center flex-wrap gap-2">
-                    <span class="text-xs font-bold text-rose-800">⚠️ Danger Zone (危险区域):</span>
+                    <span class="text-xs font-bold text-rose-800">⚠️ Danger Zone:</span>
                     <button onclick="clearAllData()" class="bg-red-800 hover:bg-red-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1">
-                        <i class="fa-solid fa-skull-crossbones"></i> Delete All Records (一键彻底清空)
+                        <i class="fa-solid fa-skull-crossbones"></i> Delete All Records
                     </button>
                 </div>
             </div>
@@ -269,7 +256,7 @@
                     </button>
                 </div>
 
-                <!-- ENHANCED EXPORT FILTER CONTROLS BAR -->
+                <!-- EXPORT FILTER CONTROLS BAR -->
                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-end">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Dept / 筛选部门</label>
@@ -466,7 +453,7 @@
             "rec_21": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-18", time: "17:00 - 19:00", hours: "2.0", reason: "Hil 722", status: "APPROVED", timestamp: 1726650600000 }
         };
 
-        // 核心逻辑：新增的行中，开始时间默认自动设为下午 17:00 (5点)
+        // 核心修改：新增行或载入全员时，开始时间默认自动设为 17:00 (下午5点)
         function addNewRow(isDefaultToday = true) {
             const tbody = document.getElementById('otTableBody');
             const tr = document.createElement('tr');
@@ -475,30 +462,30 @@
             const todayStr = new Date().toISOString().split('T')[0];
 
             tr.innerHTML = `
-                <td class="p-2">
+                <td class="p-3">
                     <select class="row-name bg-white border border-slate-300 rounded p-1.5 w-full text-xs font-semibold" onchange="handleStaffSelect(this)">
                         <option value="">-- Select Staff / 选择员工 --</option>
                     </select>
                 </td>
-                <td class="p-2">
+                <td class="p-3">
                     <input type="text" class="row-id bg-slate-100 border border-slate-300 rounded p-1.5 w-full text-xs font-bold text-center" readonly placeholder="ID">
                 </td>
-                <td class="p-2">
+                <td class="p-3">
                     <input type="date" class="row-date bg-white border border-slate-300 rounded p-1.5 w-full text-xs" value="${todayStr}">
                 </td>
-                <td class="p-2">
-                    <input type="time" class="row-start bg-white border border-slate-300 rounded p-1.5 w-full text-xs" value="17:00" onchange="calcRowHours(this)">
+                <td class="p-3">
+                    <input type="time" class="row-start bg-white border border-slate-300 rounded p-1.5 w-full text-xs font-bold text-blue-700" value="17:00" onchange="calcRowHours(this)">
                 </td>
-                <td class="p-2">
+                <td class="p-3">
                     <input type="time" class="row-end bg-white border border-slate-300 rounded p-1.5 w-full text-xs" value="21:00" onchange="calcRowHours(this)">
                 </td>
-                <td class="p-2">
+                <td class="p-3">
                     <input type="text" class="row-hours bg-slate-100 border border-slate-300 rounded p-1.5 w-full text-xs font-extrabold text-center text-blue-800" readonly value="4.0">
                 </td>
-                <td class="p-2">
+                <td class="p-3">
                     <input type="text" class="row-reason bg-white border border-slate-300 rounded p-1.5 w-full text-xs" placeholder="Detail reason (工作原因)">
                 </td>
-                <td class="p-2 text-center">
+                <td class="p-3 text-center">
                     <button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1 rounded font-bold">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
@@ -541,7 +528,6 @@
             document.getElementById('currentDeptDisplay').textContent = `${dept} DEPARTMENT`;
             document.getElementById('currentHODDisplay').textContent = deptInfo ? deptInfo.hod : "-";
 
-            // 刷新表格员工选项
             document.querySelectorAll('#otTableBody tr').forEach(tr => {
                 populateRowStaffOptions(tr);
             });
@@ -551,7 +537,7 @@
             const currentDept = document.getElementById('departmentSelect').value;
             const staffList = deptMap[currentDept]?.staff || [];
             const tbody = document.getElementById('otTableBody');
-            tbody.innerHTML = ""; // 清空
+            tbody.innerHTML = "";
 
             staffList.forEach(s => {
                 addNewRow(true);
@@ -575,7 +561,7 @@
                 let endMins = eh * 60 + em;
                 
                 let diff = endMins - startMins;
-                if (diff < 0) diff += 24 * 60; // 跨天支持
+                if (diff < 0) diff += 24 * 60;
                 
                 hoursInput.value = (diff / 60).toFixed(1);
             }
@@ -593,7 +579,6 @@
                 document.getElementById('tabBtnMySubmissions').classList.add('tab-active');
                 fetchRecords();
             } else if (tabName === 'hrArchive') {
-                // 需要密码校验
                 const pwd = prompt("Enter HR Password (输入HR密码):");
                 if (pwd === "hr123" || pwd === "Kaizen2026") {
                     document.getElementById('tabHrArchive').classList.remove('hidden');
@@ -610,24 +595,47 @@
         }
 
         function fetchRecords() {
-            // 模拟刷新加载数据逻辑
             const tbody = document.getElementById('submissionsTableBody');
-            tbody.innerHTML = "";
+            const hrTbody = document.getElementById('hrRecordsTableBody');
+            if (tbody) tbody.innerHTML = "";
+            if (hrTbody) hrTbody.innerHTML = "";
+
             Object.keys(initialDefaultRecords).forEach(key => {
                 const rec = initialDefaultRecords[key];
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-2 font-semibold">${rec.dept}</td>
-                    <td class="p-2 font-bold">${rec.name}</td>
-                    <td class="p-2">${rec.id}</td>
-                    <td class="p-2">${rec.date}</td>
-                    <td class="p-2">${rec.time}</td>
-                    <td class="p-2 text-center font-bold text-blue-700">${rec.hours}</td>
-                    <td class="p-2">${rec.reason}</td>
-                    <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold">${rec.status}</span></td>
-                    <td class="p-2 text-center"><button class="text-blue-600 text-xs font-bold hover:underline">Edit</button></td>
-                `;
-                tbody.appendChild(tr);
+                
+                // My Submissions 列表
+                if (tbody) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-2 font-semibold">${rec.dept}</td>
+                        <td class="p-2 font-bold">${rec.name}</td>
+                        <td class="p-2">${rec.id}</td>
+                        <td class="p-2">${rec.date}</td>
+                        <td class="p-2">${rec.time}</td>
+                        <td class="p-2 text-center font-bold text-blue-700">${rec.hours}</td>
+                        <td class="p-2">${rec.reason}</td>
+                        <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold">${rec.status}</span></td>
+                        <td class="p-2 text-center"><button class="text-blue-600 text-xs font-bold hover:underline">Edit</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+                // HR Live Monitor 列表
+                if (hrTbody) {
+                    const tr2 = document.createElement('tr');
+                    tr2.innerHTML = `
+                        <td class="p-2 font-semibold">${rec.dept}</td>
+                        <td class="p-2 font-bold">${rec.name}</td>
+                        <td class="p-2">${rec.id}</td>
+                        <td class="p-2">${rec.date}</td>
+                        <td class="p-2">${rec.time}</td>
+                        <td class="p-2 text-center font-bold text-blue-700">${rec.hours}</td>
+                        <td class="p-2">${rec.reason}</td>
+                        <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold">${rec.status}</span></td>
+                        <td class="p-2 text-center"><button class="text-rose-600 font-bold hover:underline"><i class="fa-solid fa-trash"></i></button></td>
+                    `;
+                    hrTbody.appendChild(tr2);
+                }
             });
         }
 
@@ -651,7 +659,6 @@
             switchTab('hrArchive');
         }
 
-        // 初始化加载首行
         window.addEventListener('DOMContentLoaded', () => {
             addNewRow(true);
         });
