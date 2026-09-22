@@ -430,8 +430,8 @@
         };
 
         const initialDefaultRecords = {
-            "rec_01": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-20", time: "08:00 - 05:00", hours: "21.0", reason: "Lifter 721", status: "APPROVED", timestamp: 1726790000000 },
-            "rec_02": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-20", time: "17:00 - 17:00", hours: "4.0", reason: "HIL721", status: "APPROVED", timestamp: 1726790100000 },
+            "rec_01": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "Lifter 721", status: "APPROVED", timestamp: 1726790000000 },
+            "rec_02": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-20", time: "17:00 - 21:00", hours: "4.0", reason: "HIL721", status: "APPROVED", timestamp: 1726790100000 },
             "rec_03": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-19", time: "17:00 - 21:00", hours: "4.0", reason: "Hil722", status: "APPROVED", timestamp: 1726700000000 },
             "rec_04": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "HIL722", status: "APPROVED", timestamp: 1726790300000 },
             "rec_05": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "16:00 - 00:00", hours: "8.0", reason: "Repair mould mmr1927", status: "APPROVED", timestamp: 1726790400000 },
@@ -440,10 +440,10 @@
             "rec_08": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-20", time: "04:00 - 06:00", hours: "2.0", reason: "Repair mould mmr1927", status: "APPROVED", timestamp: 1726790700000 },
             "rec_09": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "04:00 - 06:00", hours: "2.0", reason: "Repair mould mmr1927", status: "APPROVED", timestamp: 1726790800000 },
             "rec_10": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "04:00 - 06:00", hours: "2.0", reason: "Repair mould mmr1927", status: "APPROVED", timestamp: 1726790900000 },
-            "rec_11": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-20", time: "08:00 - 05:00", hours: "21.0", reason: "718 core", status: "APPROVED", timestamp: 1726791000000 },
-            "rec_12": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-20", time: "08:00 - 05:00", hours: "21.0", reason: "718core&lifter721", status: "APPROVED", timestamp: 1726791100000 },
-            "rec_13": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-20", time: "08:00 - 05:00", hours: "21.0", reason: "229&722cav", status: "APPROVED", timestamp: 1726791200000 },
-            "rec_14": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-20", time: "08:00 - 05:00", hours: "21.0", reason: "722 cav", status: "APPROVED", timestamp: 1726791300000 },
+            "rec_11": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "718 core", status: "APPROVED", timestamp: 1726791000000 },
+            "rec_12": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "718core&lifter721", status: "APPROVED", timestamp: 1726791100000 },
+            "rec_13": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "229&722cav", status: "APPROVED", timestamp: 1726791200000 },
+            "rec_14": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "722 cav", status: "APPROVED", timestamp: 1726791300000 },
             "rec_15": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-18", time: "17:00 - 19:00", hours: "2.0", reason: "Pns635fp", status: "APPROVED", timestamp: 1726650000000 },
             "rec_16": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-18", time: "17:00 - 21:00", hours: "4.0", reason: "Kas 718", status: "APPROVED", timestamp: 1726650100000 },
             "rec_17": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-18", time: "17:00 - 21:00", hours: "4.0", reason: "721 cr01", status: "APPROVED", timestamp: 1726650200000 },
@@ -603,7 +603,6 @@
             Object.keys(initialDefaultRecords).forEach(key => {
                 const rec = initialDefaultRecords[key];
                 
-                // My Submissions 列表
                 if (tbody) {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -620,7 +619,6 @@
                     tbody.appendChild(tr);
                 }
 
-                // HR Live Monitor 列表
                 if (hrTbody) {
                     const tr2 = document.createElement('tr');
                     tr2.innerHTML = `
