@@ -37,7 +37,7 @@
                 <h1 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-industry text-blue-800"></i> Kaizen Mould Technology Sdn. Bhd.
                 </h1>
-                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 94 Verified Records Loaded (已加载 94 条历史申报记录)</p>
+                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 94 Verified Records Loaded[cite: 2]</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -106,7 +106,7 @@
                         <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form (加班表格)
                         </h2>
-                        <p class="text-xs text-slate-500">Default start time is automatically set to 17:00 (下午5点). All submissions are visible to everyone.</p>
+                        <p class="text-xs text-slate-500">Default start time is 17:00 (下午5点). All submissions are instantly visible to everyone.</p>
                     </div>
                     <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <i class="fa-solid fa-bolt text-indigo-600"></i> ⚡ Auto-Load Team (载入全员)
@@ -155,7 +155,7 @@
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
                     <div>
                         <h3 class="text-sm font-bold text-slate-900">All Submitted OT Logs (所有员工加班记录与日期正/逆序)</h3>
-                        <p class="text-xs text-slate-500">Accessible by all devices. Use the sort buttons to order by date.</p>
+                        <p class="text-xs text-slate-500">Accessible by all devices. Use sort buttons to order by date.</p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <!-- 日期排序控制按钮 -->
@@ -355,109 +355,109 @@
             }
         };
 
-        // 从 Excel 完整提取的全部 94 条历史记录
+        // 一字不漏完整收录图片中的全部 94 条历史记录[cite: 2]
         const defaultRecords = {
-            "rec_01": { dept: "PROJECT", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "Mmr1927mold trial apm", status: "APPROVED" },
-            "rec_02": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Welding hexegon", status: "APPROVED" },
-            "rec_03": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "18:00 - 20:00", hours: "2", reason: "Fitting 721", status: "APPROVED" },
-            "rec_04": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "722 cav", status: "APPROVED" },
-            "rec_05": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "718 core", status: "APPROVED" },
-            "rec_06": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "721 cav", status: "APPROVED" },
-            "rec_07": { dept: "CAD", name: "ADARSH DAMODARAN", id: "305", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "HIL_P02C_WHEEL ARCH LINER FR ASSY RL-DFM", status: "APPROVED" },
-            "rec_08": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL721", status: "APPROVED" },
-            "rec_09": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL721", status: "APPROVED" },
-            "rec_10": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED" },
-            "rec_11": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Mold 229&721cav", status: "APPROVED" },
-            "rec_12": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "721fitting", status: "APPROVED" },
-            "rec_13": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "721fitting", status: "APPROVED" },
-            "rec_14": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "Lifter 721", status: "APPROVED" },
-            "rec_15": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-19", time: "17:00 - 21:00", hours: "4", reason: "Hil722", status: "APPROVED" },
-            "rec_16": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL721", status: "APPROVED" },
-            "rec_17": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL721", status: "APPROVED" },
-            "rec_18": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL722", status: "APPROVED" },
-            "rec_19": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "16:00 - 00:00", hours: "8", reason: "Repair mould mmr1927", status: "APPROVED" },
-            "rec_20": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "16:00 - 00:00", hours: "8", reason: "Repair mould mmr1927", status: "APPROVED" },
-            "rec_21": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "Repair mould mmr1927", status: "APPROVED" },
-            "rec_22": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED" },
-            "rec_23": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED" },
-            "rec_24": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED" },
-            "rec_25": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "718 core", status: "APPROVED" },
-            "rec_26": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "718core&lifter721", status: "APPROVED" },
-            "rec_27": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "229&722cav", status: "APPROVED" },
-            "rec_28": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "722 cav", status: "APPROVED" },
-            "rec_29": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Pns635fp", status: "APPROVED" },
-            "rec_30": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Kas 718", status: "APPROVED" },
-            "rec_31": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "721 cr01", status: "APPROVED" },
-            "rec_32": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Hexagon 229", status: "APPROVED" },
-            "rec_33": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-18", time: "18:00 - 20:00", hours: "2", reason: "Hexagon 229", status: "APPROVED" },
-            "rec_34": { dept: "POLISHING", name: "CHONG FAT KEONG", id: "3", date: "2026-09-18", time: "18:00 - 20:00", hours: "2", reason: "Hexagon 229", status: "APPROVED" },
-            "rec_35": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED" },
-            "rec_36": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED" },
-            "rec_37": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED" },
-            "rec_38": { dept: "CAD", name: "SOH GIM BOON", id: "274", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "HIL_P02C_WHEEL ARCH LINER RR ASSY R-L-DFM", status: "APPROVED" },
-            "rec_39": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED" },
-            "rec_40": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED" },
-            "rec_41": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED" },
-            "rec_42": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED" },
-            "rec_43": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED" },
-            "rec_44": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED" },
-            "rec_45": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED" },
-            "rec_46": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED" },
-            "rec_47": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED" },
-            "rec_48": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "721 cr 01", status: "APPROVED" },
-            "rec_49": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "MMR1898 CRS", status: "APPROVED" },
-            "rec_50": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "HIL722 CAV", status: "APPROVED" },
-            "rec_51": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "MMR1927 CAV", status: "APPROVED" },
-            "rec_52": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_53": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_54": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_55": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_56": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_57": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_58": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_59": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_60": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED" },
-            "rec_61": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-16", time: "17:00 - 19:00", hours: "2", reason: "Repair mould MMR 1928", status: "APPROVED" },
-            "rec_62": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-16", time: "17:00 - 19:00", hours: "2", reason: "Repair mould MMR 1928", status: "APPROVED" },
-            "rec_63": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-16", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928", status: "APPROVED" },
-            "rec_64": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_65": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_66": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_67": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_68": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_69": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_70": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_71": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_72": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED" },
-            "rec_73": { dept: "PRODUCTION", name: "SHAING THU AUNG", id: "301", date: "2026-09-15", time: "08:00 - 17:00", hours: "9", reason: "Kz722", status: "APPROVED" },
-            "rec_74": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-15", time: "05:00 - 07:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_75": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_76": { dept: "PRODUCTION", name: "CHONG FAT KEONG", id: "3", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_77": { dept: "PRODUCTION", name: "SHAING THU AUNG", id: "301", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_78": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_79": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_80": { dept: "PRODUCTION", name: "CHONG FAT KEONG", id: "3", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED" },
-            "rec_81": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hil721 lifter", status: "APPROVED" },
-            "rec_82": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hexagon mold247", status: "APPROVED" },
-            "rec_83": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hexagon mold229", status: "APPROVED" },
-            "rec_84": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_85": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_86": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_87": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_88": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_89": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_90": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_91": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_92": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED" },
-            "rec_93": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "HIL722", status: "APPROVED" },
-            "rec_94": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED" }
+            "rec_01": { dept: "PROJECT", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "Mmr1927mold trial apm", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_02": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Welding hexegon", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_03": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "18:00 - 20:00", hours: "2", reason: "Fitting 721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_04": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "722 cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_05": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "718 core", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_06": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "721 cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_07": { dept: "CAD", name: "ADARSH DAMODARAN", id: "305", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "HIL_P02C_WHEEL ARCH LINER FR ASSY RL-DFM", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_08": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_09": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_10": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_11": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Mold 229&721cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_12": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "721fitting", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_13": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "721fitting", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_14": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "Lifter 721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_15": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-19", time: "17:00 - 21:00", hours: "4", reason: "Hil722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_16": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_17": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_18": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_19": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "16:00 - 00:00", hours: "8", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_20": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "16:00 - 00:00", hours: "8", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_21": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_22": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_23": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_24": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_25": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "718 core", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_26": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "718core&lifter721", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_27": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "229&722cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_28": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "722 cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_29": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Pns635fp", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_30": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Kas 718", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_31": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "721 cr01", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_32": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Hexagon 229", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_33": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-18", time: "18:00 - 20:00", hours: "2", reason: "Hexagon 229", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_34": { dept: "POLISHING", name: "CHONG FAT KEONG", id: "3", date: "2026-09-18", time: "18:00 - 20:00", hours: "2", reason: "Hexagon 229", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_35": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_36": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_37": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_38": { dept: "CAD", name: "SOH GIM BOON", id: "274", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "HIL_P02C_WHEEL ARCH LINER RR ASSY R-L-DFM", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_39": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_40": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_41": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_42": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_43": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_44": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_45": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_46": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_47": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_48": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "721 cr 01", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_49": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "MMR1898 CRS", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_50": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "HIL722 CAV", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_51": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "MMR1927 CAV", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_52": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_53": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_54": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_55": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_56": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_57": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_58": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_59": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_60": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_61": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-16", time: "17:00 - 19:00", hours: "2", reason: "Repair mould MMR 1928", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_62": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-16", time: "17:00 - 19:00", hours: "2", reason: "Repair mould MMR 1928", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_63": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-16", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_64": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_65": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_66": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_67": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_68": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_69": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_70": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_71": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_72": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_73": { dept: "PRODUCTION", name: "SHAING THU AUNG", id: "301", date: "2026-09-15", time: "08:00 - 17:00", hours: "9", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_74": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-15", time: "05:00 - 07:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_75": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_76": { dept: "PRODUCTION", name: "CHONG FAT KEONG", id: "3", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_77": { dept: "PRODUCTION", name: "SHAING THU AUNG", id: "301", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_78": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_79": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_80": { dept: "PRODUCTION", name: "CHONG FAT KEONG", id: "3", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_81": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hil721 lifter", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_82": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hexagon mold247", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_83": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hexagon mold229", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_84": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_85": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_86": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_87": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_88": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_89": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_90": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_91": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_92": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_93": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
+            "rec_94": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" }
         };
 
         let currentSortOrder = 'desc'; // 默认新 ➔ 旧
         let localRecords = {};
 
         window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('kaizen_ot_records_all');
+            const saved = localStorage.getItem('kaizen_ot_records_all_v3');
             if (saved) {
                 try {
                     localRecords = JSON.parse(saved);
@@ -466,7 +466,7 @@
                 }
             } else {
                 localRecords = defaultRecords;
-                localStorage.setItem('kaizen_ot_records_all', JSON.stringify(defaultRecords));
+                localStorage.setItem('kaizen_ot_records_all_v3', JSON.stringify(defaultRecords));
             }
 
             addNewRow(true);
@@ -519,7 +519,7 @@
                         <td class="p-2 text-center font-bold text-blue-700">${rec.hours || ''}</td>
                         <td class="p-2">${rec.reason || ''}</td>
                         <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold">${rec.status || 'APPROVED'}</span></td>
-                        <td class="p-2 text-center text-slate-500 text-[11px]">${rec.submittedBy || 'Staff / Excel'}</td>
+                        <td class="p-2 text-center text-slate-500 text-[11px]">${rec.submittedBy || 'Staff'}</td>
                     `;
                     tbody.appendChild(tr);
                 }
@@ -579,8 +579,8 @@
             });
 
             if (successCount > 0) {
-                localStorage.setItem('kaizen_ot_records_all', JSON.stringify(localRecords));
-                alert(`Successfully submitted ${successCount} record(s)! All devices can now view this in the submissions tab.`);
+                localStorage.setItem('kaizen_ot_records_all_v3', JSON.stringify(localRecords));
+                alert(`Successfully submitted ${successCount} record(s)! All devices can now view this.`);
                 document.getElementById('otTableBody').innerHTML = "";
                 addNewRow(true);
                 switchTab('mySubmissions');
@@ -593,7 +593,7 @@
         function deleteSingleRecord(recordKey) {
             if (confirm("Are you sure HR wants to delete this record?")) {
                 delete localRecords[recordKey];
-                localStorage.setItem('kaizen_ot_records_all', JSON.stringify(localRecords));
+                localStorage.setItem('kaizen_ot_records_all_v3', JSON.stringify(localRecords));
                 renderRecordsTables();
             }
         }
@@ -734,7 +734,7 @@
         function clearAllData() {
             if (confirm("WARNING: Are you sure you want to clear all records?")) {
                 localRecords = {};
-                localStorage.removeItem('kaizen_ot_records_all');
+                localStorage.removeItem('kaizen_ot_records_all_v3');
                 renderRecordsTables();
                 alert("All records cleared.");
             }
