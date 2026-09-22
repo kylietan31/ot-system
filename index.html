@@ -434,7 +434,7 @@
             }
         };
 
-        // 从 Excel 完美提取的全部 94 条历史记录
+        // 从 Excel 完整提取的 94 条历史记录
         const initialDefaultRecords = {
             "rec_01": { dept: "PROJECT", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "Mmr1927mold trial apm", status: "APPROVED", timestamp: 1726000000000 },
             "rec_02": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Welding hexegon", status: "APPROVED", timestamp: 1726000001000 },
@@ -532,7 +532,7 @@
             "rec_94": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", timestamp: 1726000093000 }
         };
 
-        let currentSortOrder = 'desc'; // 默认新到旧（逆序）
+        let currentSortOrder = 'desc'; // 默认逆序（新 ➔ 旧）
         let globalRecordsCache = {};
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -571,7 +571,6 @@
             });
         }
 
-        // 切换排序方式：asc (正序：旧 -> 新), desc (逆序：新 -> 旧)
         function setSortOrder(order) {
             currentSortOrder = order;
             if (order === 'asc') {
@@ -594,7 +593,7 @@
                 return { firebaseKey: key, ...globalRecordsCache[key] };
             });
 
-            // 执行日期排序逻辑
+            // 按日期排序逻辑
             recordsArray.sort((a, b) => {
                 let dateA = new Date(a.date || '2026-01-01');
                 let dateB = new Date(b.date || '2026-01-01');
@@ -828,8 +827,6 @@
         function exportToExcel() {
             alert("Exporting filtered records to Excel...");
         }
-
-        function deleteFilteredDay() {}
 
         function deleteFilteredData() {
             if (confirm("Are you sure to delete matching records?")) {
