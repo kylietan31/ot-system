@@ -429,6 +429,7 @@
             }
         };
 
+        // 完整包含全部 21 条历史记录
         const initialDefaultRecords = {
             "rec_01": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-20", time: "08:00 - 17:00", hours: "9.0", reason: "Lifter 721", status: "APPROVED", timestamp: 1726790000000 },
             "rec_02": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-20", time: "17:00 - 21:00", hours: "4.0", reason: "HIL721", status: "APPROVED", timestamp: 1726790100000 },
@@ -453,7 +454,7 @@
             "rec_21": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-18", time: "17:00 - 19:00", hours: "2.0", reason: "Hil 722", status: "APPROVED", timestamp: 1726650600000 }
         };
 
-        // 核心修改：新增行或载入全员时，开始时间默认自动设为 17:00 (下午5点)
+        // 新增行时自动将开始时间设为 17:00 (下午5点)
         function addNewRow(isDefaultToday = true) {
             const tbody = document.getElementById('otTableBody');
             const tr = document.createElement('tr');
