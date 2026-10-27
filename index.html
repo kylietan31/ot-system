@@ -3,50 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaizen Mould Technology - 全员电子请假与考勤系统</title>
+<title>Kaizen Mould Technology - 极简请假与病假申报系统</title>
 <style>
   :root {
-    --primary: #1e40af;
-    --primary-hover: #1e3a8a;
-    --bg: #f8fafc;
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --bg: #f0f9ff;
     --card-bg: #ffffff;
-    --text: #0f172a;
-    --border: #cbd5e1;
-    --danger: #dc2626;
-    --warning: #d97706;
+    --text: #0c4a6e;
+    --border: #bae6fd;
+    --mc-color: #dc2626;
+    --el-color: #d97706;
+    --al-color: #2563eb;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; }
-  .app-container { width: 100%; max-width: 550px; background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+  body { background-color: var(--bg); color: #1e293b; padding: 15px; display: flex; justify-content: center; }
+  .app-container { width: 100%; max-width: 520px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
   
-  .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
-  .header h1 { font-size: 20px; color: #1e3a8a; font-weight: 700; }
+  .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
+  .header h1 { font-size: 22px; color: var(--text); font-weight: 800; }
   .header p { font-size: 13px; color: #64748b; margin-top: 4px; }
 
-  /* Tab 切换 */
-  .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #e2e8f0; padding: 4px; border-radius: 10px; }
-  .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; font-size: 13px; font-weight: bold; color: #64748b; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  .form-group { margin-bottom: 16px; }
-  label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #334155; }
-  select, input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; background: #fff; }
+  .notice-banner { background: #fffaf0; border-left: 4px solid #f59e0b; padding: 12px; font-size: 13px; color: #78350f; border-radius: 6px; margin-bottom: 18px; line-height: 1.5; }
   
-  .code-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 6px; }
-  .code-btn { padding: 12px 5px; border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; color: #475569; user-select: none; }
-  .code-btn.active-mc { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
-  .code-btn.active-el { border-color: #f59e0b; background: #fffbeb; color: #d97706; }
-  .code-btn.active-al { border-color: #3b82f6; background: #eff6ff; color: #2563eb; }
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #334155; }
+  select, input, textarea { width: 100%; padding: 13px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; outline: none; background: #fff; }
+  select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
+  
+  /* 假别快捷选择按键 */
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .type-card {
+    padding: 14px 6px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; color: #64748b; user-select: none; transition: all 0.2s;
+  }
+  .type-card.active-mc { border-color: var(--mc-color); background: #fef2f2; color: var(--mc-color); }
+  .type-card.active-el { border-color: var(--el-color); background: #fffbeb; color: var(--el-color); }
+  .type-card.active-al { border-color: var(--al-color); background: #eff6ff; color: var(--al-color); }
 
-  .upload-box { border: 2px dashed #94a3b8; padding: 15px; border-radius: 8px; text-align: center; background: #f8fafc; cursor: pointer; }
+  .upload-box { border: 2px dashed #0284c7; padding: 18px; border-radius: 10px; text-align: center; background: #f0f9ff; cursor: pointer; transition: background 0.2s; }
+  .upload-box:hover { background: #e0f2fe; }
   .upload-box input { display: none; }
 
-  .submit-btn { width: 100%; padding: 15px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(30,64,175,0.3); }
+  .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
+  .submit-btn:hover { background: var(--primary-hover); }
 
-  .notice-banner { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px; font-size: 12px; color: #1e40af; border-radius: 4px; margin-bottom: 15px; }
+  .success-alert { display: none; background: #16a34a; color: white; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin-top: 15px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -54,105 +55,71 @@
 <div class="app-container">
   <div class="header">
     <h1>Kaizen Mould Technology</h1>
-    <p>全员一体化电子请假 & 加班申报系统</p>
+    <p>🏥 全员电子请假 & 病假 (MC) 快速申报系统</p>
   </div>
 
-  <!-- 顶部功能切换 -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('leaveTab')">📱 请假与 MC 申报</button>
-    <button class="tab-btn" onclick="switchTab('otTab')">⏱️ 事前加班申请</button>
+  <div class="notice-banner">
+    📢 <strong>请假新规定：</strong> 取消所有 WhatsApp/电话口头请假。选好工号与假别代码提交，如有病假必须拍照上传 MC。返回公司后须向 HR 提交纸质正本。
   </div>
 
-  <!-- 1. 请假/病假 MC 申报 -->
-  <div id="leaveTab" class="tab-content active">
-    <div class="notice-banner">
-      💡 提示：无需口头请假或找主管写批复信。选好工号并点选代码提交即可。
+  <form id="eLeaveForm">
+    <!-- 1. 按工号/名字快速查找 -->
+    <div class="form-group">
+      <label>🔍 1. 选择员工（按工号或名字）：</label>
+      <select id="empSelect" onchange="onEmployeeChange()" required>
+        <option value="">-- 请选择员工 / Select Employee --</option>
+      </select>
     </div>
-    <form id="leaveForm">
-      <div class="form-group">
-        <label>🔍 1. 选择员工（按工号或名字）：</label>
-        <select id="leaveEmpSelect" onchange="updateDept('leaveEmpSelect', 'leaveDeptInput')" required>
-          <option value="">-- 请选择员工 / Select Employee --</option>
-        </select>
-      </div>
 
-      <div class="form-group">
-        <label>🏢 部门 (Department)：</label>
-        <input type="text" id="leaveDeptInput" placeholder="自动带出部门" readonly style="background:#f1f5f9;">
-      </div>
-
-      <div class="form-group">
-        <label>📌 2. 选择假别代码按键：</label>
-        <div class="code-grid">
-          <div class="code-btn active-mc" id="btnMC" onclick="setLeaveType('MC')">代码 1<br>MC (病假)</div>
-          <div class="code-btn" id="btnEL" onclick="setLeaveType('EL')">代码 2<br>EL (紧急假)</div>
-          <div class="code-btn" id="btnAL" onclick="setLeaveType('AL')">代码 3<br>AL (年假)</div>
-        </div>
-        <input type="hidden" id="leaveType" value="MC">
-      </div>
-
-      <div class="form-group">
-        <label>📅 3. 请假日期：</label>
-        <input type="date" id="leaveDate" required>
-      </div>
-
-      <div class="form-group" id="mcGroup">
-        <label>📸 4. 拍摄上传 MC 病单照片：</label>
-        <div class="upload-box" onclick="document.getElementById('mcFile').click()">
-          <span id="mcLabel">📷 点击拍摄或上传诊所病单</span>
-          <input type="file" id="mcFile" accept="image/*" capture="environment" onchange="showFile(this)">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>📝 请假原因/备注：</label>
-        <input type="text" id="leaveReason" placeholder="例：身体不适 / 发烧看医生">
-      </div>
-
-      <button type="button" class="submit-btn" onclick="submitData('请假/MC')">🚀 提交请假申请</button>
-    </form>
-  </div>
-
-  <!-- 2. 加班事前审批 -->
-  <div id="otTab" class="tab-content">
-    <div class="notice-banner" style="background:#fffbe0; border-color:#d97706; color:#92400e;">
-      ⚠️ 注意：所有加班必须在当天 3:00 PM 前预先申请，未经审批不计加班费。
+    <!-- 2. 部门自动带出 -->
+    <div class="form-group">
+      <label>🏢 所属部门 (Department)：</label>
+      <input type="text" id="deptInput" placeholder="选择员工后自动填充" readonly style="background:#f1f5f9; color:#64748b;">
     </div>
-    <form id="otForm">
-      <div class="form-group">
-        <label>🔍 1. 选择员工（按工号或名字）：</label>
-        <select id="otEmpSelect" onchange="updateDept('otEmpSelect', 'otDeptInput')" required>
-          <option value="">-- 请选择员工 / Select Employee --</option>
-        </select>
-      </div>
 
-      <div class="form-group">
-        <label>🏢 部门 (Department)：</label>
-        <input type="text" id="otDeptInput" placeholder="自动带出部门" readonly style="background:#f1f5f9;">
+    <!-- 3. 极简假别代号选择 -->
+    <div class="form-group">
+      <label>📌 2. 选择假别代码按键：</label>
+      <div class="type-grid">
+        <div class="type-card active-mc" id="cardMC" onclick="chooseType('MC')">代码 1<br>MC (病假)</div>
+        <div class="type-card" id="cardEL" onclick="chooseType('EL')">代码 2<br>EL (紧急假)</div>
+        <div class="type-card" id="cardAL" onclick="chooseType('AL')">代码 3<br>AL/RL (普通假)</div>
       </div>
+      <input type="hidden" id="leaveType" value="MC">
+    </div>
 
-      <div class="form-group">
-        <label>⏱️ 预估加班时长：</label>
-        <select id="otHours">
-          <option>2 小时 (5:30 PM - 7:30 PM)</option>
-          <option>3 小时 (5:30 PM - 8:30 PM)</option>
-          <option>4 小时 (5:30 PM - 9:30 PM)</option>
-        </select>
+    <!-- 4. 请假日期 -->
+    <div class="form-group">
+      <label>📅 3. 请假日期 (Leave Date)：</label>
+      <input type="date" id="leaveDate" required>
+    </div>
+
+    <!-- 5. 拍照上传病单 (仅在选择 MC 时出现) -->
+    <div class="form-group" id="mcSection">
+      <label>📸 4. 拍摄/上传诊所病单 (MC Photo)：</label>
+      <div class="upload-box" onclick="document.getElementById('mcCamera').click()">
+        <span id="uploadLabel">📷 点击直接拍摄或上传 MC 照片</span>
+        <input type="file" id="mcCamera" accept="image/*" capture="environment" onchange="onFileSelected(this)">
       </div>
+    </div>
 
-      <div class="form-group">
-        <label>🛠️ 加班模具编号/项目事由：</label>
-        <input type="text" id="otReason" placeholder="例如: Project KZ-8801 试模支援">
-      </div>
+    <!-- 6. 备注/原因 -->
+    <div class="form-group">
+      <label>📝 请假事由 / 备注 (Reason)：</label>
+      <input type="text" id="leaveReason" placeholder="例：发烧看诊 / 紧急家事">
+    </div>
 
-      <button type="button" class="submit-btn" style="background:#0284c7;" onclick="submitData('加班')">🚀 提交加班申请 (3:00 PM 截止)</button>
-    </form>
+    <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 立即提交请假 (Submit Leave)</button>
+  </form>
+
+  <div id="successMessage" class="success-alert">
+    ✅ 请假申请提交成功！<br>系统已直接自动记录，回公司后请向 HR 提交 MC 正本。
   </div>
 </div>
 
 <script>
-// 41位员工完整名单
-const employees = [
+// 41位员工名册
+const employeeDatabase = [
   {id: "2", name: "CHAN KENG LEONG", dept: "Management / Head"},
   {id: "3", name: "CHONG FAT KEONG", dept: "Injection Trial"},
   {id: "19", name: "MD SHOPON", dept: "Production"},
@@ -197,49 +164,63 @@ const employees = [
   {id: "329", name: "MAHAJI", dept: "Injection Trial"}
 ];
 
+// 初始化
 window.onload = function() {
-  const selects = ['leaveEmpSelect', 'otEmpSelect'];
-  selects.forEach(sId => {
-    const sel = document.getElementById(sId);
-    employees.forEach(e => {
-      let opt = document.createElement("option");
-      opt.value = e.id;
-      opt.textContent = `[${e.id}] ${e.name}`;
-      sel.appendChild(opt);
-    });
+  const select = document.getElementById("empSelect");
+  employeeDatabase.forEach(emp => {
+    let opt = document.createElement("option");
+    opt.value = emp.id;
+    opt.textContent = `[工号 ${emp.id}] ${emp.name}`;
+    select.appendChild(opt);
   });
   document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
 };
 
-function switchTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  event.target.classList.add('active');
+// 搜工号带出部门
+function onEmployeeChange() {
+  const id = document.getElementById("empSelect").value;
+  const emp = employeeDatabase.find(e => e.id === id);
+  document.getElementById("deptInput").value = emp ? emp.dept : "";
 }
 
-function updateDept(selectId, inputId) {
-  const val = document.getElementById(selectId).value;
-  const emp = employees.find(e => e.id === val);
-  document.getElementById(inputId).value = emp ? emp.dept : "";
-}
-
-function setLeaveType(type) {
+// 切换假别代码
+function chooseType(type) {
   document.getElementById("leaveType").value = type;
-  document.getElementById("btnMC").className = "code-btn" + (type==='MC'?' active-mc':'');
-  document.getElementById("btnEL").className = "code-btn" + (type==='EL'?' active-el':'');
-  document.getElementById("btnAL").className = "code-btn" + (type==='AL'?' active-al':'');
-  document.getElementById("mcGroup").style.display = (type==='MC') ? 'block' : 'none';
+  document.getElementById("cardMC").className = "type-card" + (type==='MC'?' active-mc':'');
+  document.getElementById("cardEL").className = "type-card" + (type==='EL'?' active-el':'');
+  document.getElementById("cardAL").className = "type-card" + (type==='AL'?' active-al':'');
+  
+  // 选择 MC 时强制要求拍摄上传
+  document.getElementById("mcSection").style.display = (type === 'MC') ? 'block' : 'none';
 }
 
-function showFile(input) {
-  if (input.files[0]) {
-    document.getElementById("mcLabel").innerText = "✅ 已选择病单: " + input.files[0].name;
+function onFileSelected(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById("uploadLabel").innerHTML = "✅ 已成功选择病单: " + input.files[0].name;
   }
 }
 
-function submitData(type) {
-  alert("✅ " + type + "申请提交成功！已自动写入后台数据库。");
+function submitLeaveApp() {
+  const empId = document.getElementById("empSelect").value;
+  if (!empId) {
+    alert("请先选择您的姓名/工号！");
+    return;
+  }
+  
+  const leaveType = document.getElementById("leaveType").value;
+  const mcFile = document.getElementById("mcCamera").files;
+  
+  if (leaveType === 'MC' && mcFile.length === 0) {
+    alert("⚠️ 病假 (MC) 申请必须拍照上传诊所 MC 病单！");
+    return;
+  }
+
+  document.getElementById("successMessage").style.display = "block";
+  setTimeout(() => {
+    document.getElementById("successMessage").style.display = "none";
+    document.getElementById("eLeaveForm").reset();
+    chooseType('MC');
+  }, 4000);
 }
 </script>
 
