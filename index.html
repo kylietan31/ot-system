@@ -122,7 +122,7 @@
     <label>🌐 全网跨设备云端数据库连接设置 (JSONBin Cloud API)：</label>
     <div class="cloud-config-inputs">
       <input type="text" id="jsonbinBinId" placeholder="JSONBin Bin ID" value="671e1234abcd5678ef90">
-      <input type="text" id="jsonbinApiKey" placeholder="API Key" value="\$2a\$10\$defaultMasterKeyPublic">
+      <input type="text" id="jsonbinApiKey" placeholder="API Key" value="$2a$10$defaultMasterKeyPublic">
       <button type="button" class="btn-save-cloud" onclick="saveCloudSettings()">🔗 重新连接云服务器</button>
     </div>
     <div style="font-size:11px; color:#15803d; margin-top:4px;">
@@ -447,7 +447,7 @@ async function fetchCloudRecords() {
   const binId = document.getElementById("jsonbinBinId").value || "671e1234abcd5678ef90";
   try {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-      headers: { 'X-Master-Key': '\$2a\$10\$defaultMasterKeyPublic' }
+      headers: { 'X-Master-Key': '$2a$10$defaultMasterKeyPublic' }
     });
     if (response.ok) {
       const data = await response.json();
@@ -478,7 +478,7 @@ async function pushCloudRecords() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Master-Key': '\$2a\$10\$defaultMasterKeyPublic'
+        'X-Master-Key': '$2a$10$defaultMasterKeyPublic'
       },
       body: JSON.stringify(leaveHistoryRecords)
     });
@@ -505,4 +505,248 @@ function switchTab(tabId) {
 }
 
 function startDrawing(e) { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); }
-function draw(e) { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY
+function draw(e) { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } }
+function stopDrawing() { isDrawing = false; }
+
+function startDrawingTouch(e) { e.preventDefault(); isDrawing = true; const rect = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); }
+function drawTouch(e) { e.preventDefault(); if (isDrawing) { const rect = canvas.getBoundingClientRect(); ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); ctx.stroke(); } }
+
+function clearEmpCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function onEmployeeChange() {
+  const id = document.getElementById("empSelect").value;
+  const emp = employeeDatabase.find(e => e.id === id);
+  if (emp) {
+    let hodStr = emp.hod ? ` (${emp.hod} 主管)` : "";
+    document.getElementById("deptInput").value = `${emp.dept}${hodStr}`;
+  } else {
+    document.getElementById("deptInput").value = "";
+  }
+}
+
+function chooseType(type) {
+  document.getElementById("leaveType").value = type;
+  document.getElementById("cardMC").className = "type-card" + (type==='MC'?' active-mc':'');
+  document.getElementById("cardEL").className = "type-card" + (type==='EL'?' active-el':'');
+  document.getElementById("cardAL").className = "type-card" + (type==='AL'?' active-al':'');
+  document.getElementById("mcSection").style.display = (type === 'MC') ? 'block' : 'none';
+}
+
+function onFileSelected(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById("uploadLabel").innerHTML = "✅ 已成功选择病单: " + input.files[0].name;
+  }
+}
+
+function verifyAdminAuth() {
+  const pwd = document.getElementById("adminPasswordInput").value;
+  if (pwd === "1234") {
+    isAdminUnlocked = true;
+    document.getElementById("adminAuthBox").style.display = "none";
+    document.getElementById("adminContentBox").style.display = "block";
+    document.getElementById("authErrorMsg").style.display = "none";
+    document.getElementById("adminPasswordInput").value = "";
+    renderAdminTable();
+  } else {
+    document.getElementById("authErrorMsg").style.display = "block";
+  }
+}
+
+function lockAdminAuth() {
+  isAdminUnlocked = false;
+  document.getElementById("adminAuthBox").style.display = "block";
+  document.getElementById("adminContentBox").style.display = "none";
+}
+
+// 🌐 渲染【全员 MC 共享记录页 - 任何人打开都能看到全公司所有人提交的 MC】
+function renderHistoryTable() {
+  const kw = document.getElementById("userSearchKeyword").value.trim().toLowerCase();
+  const monthFilter = document.getElementById("userFilterMonth").value;
+  const tbody = document.getElementById("historyTbody");
+  
+  tbody.innerHTML = "";
+
+  let list = leaveHistoryRecords;
+
+  if (kw) {
+    list = list.filter(r => r.name.toLowerCase().includes(kw) || r.id.toLowerCase().includes(kw));
+  }
+  if (monthFilter) {
+    list = list.filter(r => r.date.startsWith(monthFilter));
+  }
+
+  if(list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">🔍 暂无符合条件的共享记录</td></tr>`;
+    return;
+  }
+
+  list.forEach(r => {
+    let tr = document.createElement("tr");
+    let statusClass = r.status.includes('待收') ? 'tag-pending' : (r.status.includes('驳回') || r.status.includes('拒绝') ? 'tag-rejected' : 'tag-approved');
+    let hodBadge = r.hod ? `<span class="badge-hod">${r.hod}</span>` : "";
+    tr.innerHTML = `
+      <td>${r.date}</td>
+      <td>[${r.id}] ${r.name}${hodBadge}</td>
+      <td><strong>${r.dept}</strong></td>
+      <td><strong>${r.type}</strong></td>
+      <td><span class="status-tag ${statusClass}">${r.status}</span></td>
+      <td>✍️ ${r.sig}</td>
+      <td><span class="btn-lock">🌐 全员共享只读 (无删除权)</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// 🔑 渲染【HR 部门后台 - 唯一可进行 Delete 删除与核销】
+function renderAdminTable() {
+  const empFilter = document.getElementById("adminFilterEmp").value;
+  const monthFilter = document.getElementById("adminFilterMonth").value;
+  const tbody = document.getElementById("adminTbody");
+  tbody.innerHTML = "";
+
+  let list = leaveHistoryRecords;
+
+  if (empFilter !== "ALL") {
+    list = list.filter(r => r.id === empFilter);
+  }
+  if (monthFilter) {
+    list = list.filter(r => r.date.startsWith(monthFilter));
+  }
+
+  if(list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">暂无筛选记录</td></tr>`;
+    return;
+  }
+
+  list.forEach(r => {
+    let tr = document.createElement("tr");
+    let statusClass = r.status.includes('待收') ? 'tag-pending' : (r.status.includes('驳回') || r.status.includes('拒绝') ? 'tag-rejected' : 'tag-approved');
+    let hodBadge = r.hod ? `<span class="badge-hod">${r.hod}</span>` : "";
+    tr.innerHTML = `
+      <td>${r.date}</td>
+      <td>[${r.id}] ${r.name}${hodBadge}</td>
+      <td><strong>${r.dept}</strong></td>
+      <td><strong>${r.type}</strong></td>
+      <td><span class="status-tag ${statusClass}">${r.status}</span></td>
+      <td>✍️ ${r.sig}</td>
+      <td>
+        <button class="btn-action-approve" onclick="updateRecordStatus(${r.recId}, '已核销 (Verified)')">✅ 批准</button>
+        <button class="btn-action-reject" onclick="updateRecordStatus(${r.recId}, '已驳回 (Rejected)')">❌ 驳回</button>
+        <button class="btn-action-delete" onclick="deleteRecord(${r.recId})">🗑️ Delete (删除)</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// HR 更改记录状态并全网保存
+function updateRecordStatus(recId, newStatus) {
+  const rec = leaveHistoryRecords.find(r => r.recId === recId);
+  if (rec) {
+    rec.status = newStatus;
+    pushCloudRecords();
+    renderAdminTable();
+    renderHistoryTable();
+    alert(`✅ 已成功更新并全网同步员工 ${rec.name} 的记录为：${newStatus}`);
+  }
+}
+
+// 🗑️ HR 专属 Delete 删除功能（删掉后全网同秒消除）
+function deleteRecord(recId) {
+  const rec = leaveHistoryRecords.find(r => r.recId === recId);
+  if (rec) {
+    if (confirm(`⚠️ 确定要彻底删除 (Delete) 员工 [工号 ${rec.id}] ${rec.name} 于 ${rec.date} 提交的 ${rec.type} 记录吗？`)) {
+      leaveHistoryRecords = leaveHistoryRecords.filter(r => r.recId !== recId);
+      pushCloudRecords();
+      renderAdminTable();
+      renderHistoryTable();
+      alert(`🗑️ 记录已成功删掉 (Deleted)，全网所有手机/电脑已同步删除！`);
+    }
+  }
+}
+
+// 员工在任何手机/电脑上交 MC：即刻全网推送到 HR 和全员共享看板！
+function submitLeaveApp() {
+  const empId = document.getElementById("empSelect").value;
+  if (!empId) {
+    alert("请先选择您的姓名/工号！");
+    return;
+  }
+  
+  const leaveType = document.getElementById("leaveType").value;
+  const mcFile = document.getElementById("mcCamera").files;
+  
+  if (leaveType === 'MC' && mcFile.length === 0) {
+    alert("⚠️ 病假 (MC) 申请必须拍照上传诊所 MC 病单！");
+    return;
+  }
+
+  const emp = employeeDatabase.find(e => e.id === empId);
+  const leaveDate = document.getElementById("leaveDate").value;
+
+  leaveHistoryRecords.unshift({
+    recId: Date.now(),
+    date: leaveDate,
+    id: emp.id,
+    name: emp.name,
+    dept: emp.dept,
+    hod: emp.hod,
+    type: leaveType === 'MC' ? 'MC (病假)' : (leaveType === 'EL' ? 'EL (紧急假)' : 'AL (年假)'),
+    status: leaveType === 'MC' ? '待收正本 (Pending)' : '已核实 (Approved)',
+    sig: '已在线签名'
+  });
+
+  pushCloudRecords();
+
+  document.getElementById("successMessage").style.display = "block";
+  setTimeout(() => {
+    document.getElementById("successMessage").style.display = "none";
+    document.getElementById("eLeaveForm").reset();
+    clearEmpCanvas();
+    chooseType('MC');
+    renderHistoryTable();
+    if(isAdminUnlocked) renderAdminTable();
+    switchTab('historyTab');
+  }, 2500);
+}
+
+// 📊 HR 专属导出 Excel 功能
+function exportToExcel() {
+  const empFilter = document.getElementById("adminFilterEmp").value;
+  const monthFilter = document.getElementById("adminFilterMonth").value;
+
+  let list = leaveHistoryRecords;
+  if (empFilter !== "ALL") {
+    list = list.filter(r => r.id === empFilter);
+  }
+  if (monthFilter) {
+    list = list.filter(r => r.date.startsWith(monthFilter));
+  }
+
+  if (list.length === 0) {
+    alert("⚠️ 当前筛选条件下没有任何记录可导出！");
+    return;
+  }
+
+  let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+  csvContent += "记录编号,请假日期,员工工号,员工姓名,所属部门,HOD职位,假别类型,最新状态,签名状态\n";
+
+  list.forEach(r => {
+    csvContent += `${r.recId},${r.date},${r.id},${r.name},${r.dept},${r.hod || "无"},${r.type},${r.status},${r.sig}\n`;
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  let fileNameExt = empFilter !== "ALL" ? `_Emp_${empFilter}` : "";
+  if (monthFilter) fileNameExt += `_${monthFilter}`;
+
+  link.setAttribute("download", `Kaizen_Leave_Report${fileNameExt}_${new Date().toISOString().substring(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>
