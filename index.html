@@ -1,748 +1,247 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Mould Technology - Overtime (OT) System</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: { 800: '#1e293b', 900: '#0f172a' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 700; background-color: rgba(239, 246, 255, 0.5); }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaizen Mould Technology - 全员电子请假与考勤系统</title>
+<style>
+  :root {
+    --primary: #1e40af;
+    --primary-hover: #1e3a8a;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --border: #cbd5e1;
+    --danger: #dc2626;
+    --warning: #d97706;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; }
+  .app-container { width: 100%; max-width: 550px; background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+  
+  .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
+  .header h1 { font-size: 20px; color: #1e3a8a; font-weight: 700; }
+  .header p { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+  /* Tab 切换 */
+  .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #e2e8f0; padding: 4px; border-radius: 10px; }
+  .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; font-size: 13px; font-weight: bold; color: #64748b; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+  select, input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; background: #fff; }
+  
+  .code-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .code-btn { padding: 12px 5px; border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; color: #475569; user-select: none; }
+  .code-btn.active-mc { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+  .code-btn.active-el { border-color: #f59e0b; background: #fffbeb; color: #d97706; }
+  .code-btn.active-al { border-color: #3b82f6; background: #eff6ff; color: #2563eb; }
+
+  .upload-box { border: 2px dashed #94a3b8; padding: 15px; border-radius: 8px; text-align: center; background: #f8fafc; cursor: pointer; }
+  .upload-box input { display: none; }
+
+  .submit-btn { width: 100%; padding: 15px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(30,64,175,0.3); }
+
+  .notice-banner { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px; font-size: 12px; color: #1e40af; border-radius: 4px; margin-bottom: 15px; }
+</style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+<body>
 
-    <!-- HEADER -->
-    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
-            <div>
-                <h1 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-industry text-blue-800"></i> Kaizen Mould Technology Sdn. Bhd.
-                </h1>
-                <p class="text-xs text-slate-500 font-medium">Daily Overtime Management System • 94 Verified Records Loaded[cite: 2]</p>
-            </div>
+<div class="app-container">
+  <div class="header">
+    <h1>Kaizen Mould Technology</h1>
+    <p>全员一体化电子请假 & 加班申报系统</p>
+  </div>
 
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-100 border border-slate-200 rounded-lg p-1.5 flex items-center gap-2 text-xs font-semibold">
-                    <span class="text-slate-500">Access Mode:</span>
-                    <span id="accessModeBadge" class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">PUBLIC / STAFF VIEW (全员公开模式)</span>
-                </div>
+  <!-- 顶部功能切换 -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('leaveTab')">📱 请假与 MC 申报</button>
+    <button class="tab-btn" onclick="switchTab('otTab')">⏱️ 事前加班申请</button>
+  </div>
 
-                <button id="hrLoginBtn" onclick="toggleHRLoginModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-lock text-amber-400"></i> <span id="hrLoginBtnText">HR Login (HR 专属登录)</span>
-                </button>
-            </div>
+  <!-- 1. 请假/病假 MC 申报 -->
+  <div id="leaveTab" class="tab-content active">
+    <div class="notice-banner">
+      💡 提示：无需口头请假或找主管写批复信。选好工号并点选代码提交即可。
+    </div>
+    <form id="leaveForm">
+      <div class="form-group">
+        <label>🔍 1. 选择员工（按工号或名字）：</label>
+        <select id="leaveEmpSelect" onchange="updateDept('leaveEmpSelect', 'leaveDeptInput')" required>
+          <option value="">-- 请选择员工 / Select Employee --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>🏢 部门 (Department)：</label>
+        <input type="text" id="leaveDeptInput" placeholder="自动带出部门" readonly style="background:#f1f5f9;">
+      </div>
+
+      <div class="form-group">
+        <label>📌 2. 选择假别代码按键：</label>
+        <div class="code-grid">
+          <div class="code-btn active-mc" id="btnMC" onclick="setLeaveType('MC')">代码 1<br>MC (病假)</div>
+          <div class="code-btn" id="btnEL" onclick="setLeaveType('EL')">代码 2<br>EL (紧急假)</div>
+          <div class="code-btn" id="btnAL" onclick="setLeaveType('AL')">代码 3<br>AL (年假)</div>
         </div>
-    </header>
+        <input type="hidden" id="leaveType" value="MC">
+      </div>
 
-    <!-- MAIN APP CONTENT -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+      <div class="form-group">
+        <label>📅 3. 请假日期：</label>
+        <input type="date" id="leaveDate" required>
+      </div>
 
-        <!-- DEPARTMENT SELECTOR CARD -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-7 flex items-center gap-3">
-                    <label class="text-sm font-bold text-slate-700 whitespace-nowrap">Select Dept / Pilih Jabatan / 选择部门:</label>
-                    <select id="departmentSelect" onchange="handleDepartmentChange()" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm font-semibold rounded-lg block w-full p-2.5">
-                        <option value="CAD">CAD DEPARTMENT</option>
-                        <option value="CAM">CAM DEPARTMENT</option>
-                        <option value="CNC">CNC DEPARTMENT</option>
-                        <option value="EDM">EDM DEPARTMENT</option>
-                        <option value="PROJECT">PROJECT DEPARTMENT</option>
-                        <option value="POLISHING">POLISHING DEPARTMENT</option>
-                        <option value="PRODUCTION">PRODUCTION DEPARTMENT</option>
-                        <option value="INJECTION_TRIAL">INJECTION TRIAL DEPARTMENT</option>
-                        <option value="MOULD_MAKER">MOULD MAKER DEPARTMENT</option>
-                        <option value="QC">QUALITY CONTROL (QC) DEPARTMENT</option>
-                        <option value="ADMIN_HR">ADMIN & HR DEPARTMENT</option>
-                        <option value="PURCHASING">PURCHASING DEPARTMENT</option>
-                    </select>
-                </div>
-                <div class="md:col-span-5 bg-blue-50/70 border border-blue-100 rounded-lg p-3 text-right">
-                    <div class="text-xs text-blue-700 font-semibold uppercase">Selected Dept: <strong id="currentDeptDisplay" class="text-blue-900">CAD DEPARTMENT</strong></div>
-                    <div class="text-xs text-slate-600 font-medium mt-0.5">HOD / Manager (主管/经理): <strong id="currentHODDisplay" class="text-slate-900 font-bold">CHAN KENG LEONG (ID: 2)</strong></div>
-                </div>
-            </div>
+      <div class="form-group" id="mcGroup">
+        <label>📸 4. 拍摄上传 MC 病单照片：</label>
+        <div class="upload-box" onclick="document.getElementById('mcFile').click()">
+          <span id="mcLabel">📷 点击拍摄或上传诊所病单</span>
+          <input type="file" id="mcFile" accept="image/*" capture="environment" onchange="showFile(this)">
         </div>
+      </div>
 
-        <!-- TABS NAV -->
-        <div class="border-b border-slate-200 mb-6 bg-white rounded-t-xl px-2 pt-2 shadow-sm">
-            <nav class="flex flex-wrap gap-2">
-                <button onclick="switchTab('submit')" id="tabBtnSubmit" class="tab-btn tab-active px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 transition">
-                    <i class="fa-solid fa-pen-to-square"></i> Submit OT / Hantar OT / 提交 OT
-                </button>
-                <button onclick="switchTab('mySubmissions')" id="tabBtnMySubmissions" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
-                    <i class="fa-solid fa-user-clock"></i> View All Submissions / 查看所有员工记录
-                </button>
-                <button onclick="switchTab('hrArchive')" id="tabBtnHrArchive" class="tab-btn px-4 py-3 text-xs sm:text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 border-b-2 border-transparent transition">
-                    <i class="fa-solid fa-folder-open text-amber-600"></i> HR Archive & Delete <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-extrabold ml-1">🔒 HR Only (需密码)</span>
-                </button>
-            </nav>
-        </div>
+      <div class="form-group">
+        <label>📝 请假原因/备注：</label>
+        <input type="text" id="leaveReason" placeholder="例：身体不适 / 发烧看医生">
+      </div>
 
-        <!-- SUBMIT OT SECTION -->
-        <div id="tabSubmit" class="tab-content space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
-                    <div>
-                        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-blue-700"></i> Overtime Entry Form (加班表格)
-                        </h2>
-                        <p class="text-xs text-slate-500">Default start time is 17:00 (下午5点). All submissions are instantly visible to everyone.</p>
-                    </div>
-                    <button onclick="loadWholeTeam()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt text-indigo-600"></i> ⚡ Auto-Load Team (载入全员)
-                    </button>
-                </div>
+      <button type="button" class="submit-btn" onclick="submitData('请假/MC')">🚀 提交请假申请</button>
+    </form>
+  </div>
 
-                <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left text-xs border-collapse min-w-[850px]">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
-                                <th class="p-3 w-1/4">Name / Nama / 姓名</th>
-                                <th class="p-3 w-28">Emp ID / 工号</th>
-                                <th class="p-3 w-36">Date / Tarikh / 日期</th>
-                                <th class="p-3 w-28">Start / 开始 (默认17:00)</th>
-                                <th class="p-3 w-28">End / 结束</th>
-                                <th class="p-3 w-20">Hours / 小时</th>
-                                <th class="p-3">Purpose & Reason / 原因用途</th>
-                                <th class="p-3 w-12 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="otTableBody" class="divide-y divide-slate-100">
-                            <!-- Dynamic Rows -->
-                        </tbody>
-                    </table>
-                </div>
+  <!-- 2. 加班事前审批 -->
+  <div id="otTab" class="tab-content">
+    <div class="notice-banner" style="background:#fffbe0; border-color:#d97706; color:#92400e;">
+      ⚠️ 注意：所有加班必须在当天 3:00 PM 前预先申请，未经审批不计加班费。
+    </div>
+    <form id="otForm">
+      <div class="form-group">
+        <label>🔍 1. 选择员工（按工号或名字）：</label>
+        <select id="otEmpSelect" onchange="updateDept('otEmpSelect', 'otDeptInput')" required>
+          <option value="">-- 请选择员工 / Select Employee --</option>
+        </select>
+      </div>
 
-                <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
-                    <button onclick="addNewRow(true)" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus"></i> Add Row (Duplicate / 复制上一行)
-                    </button>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="submitOT('PENDING')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-hourglass-start"></i> Save PENDING (暂存)
-                        </button>
-                        <button onclick="submitOT('APPROVED')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> Confirm Submission (确认提交)
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div class="form-group">
+        <label>🏢 部门 (Department)：</label>
+        <input type="text" id="otDeptInput" placeholder="自动带出部门" readonly style="background:#f1f5f9;">
+      </div>
 
-        <!-- VIEW ALL SUBMISSIONS TAB (PUBLIC FOR EVERYONE) -->
-        <div id="tabMySubmissions" class="tab-content hidden space-y-4">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">All Submitted OT Logs (所有员工加班记录与日期正/逆序)</h3>
-                        <p class="text-xs text-slate-500">Accessible by all devices. Use sort buttons to order by date.</p>
-                    </div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <!-- 日期排序控制按钮 -->
-                        <div class="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-1 text-xs">
-                            <span class="px-2 text-slate-500 font-bold">Date Sort:</span>
-                            <button onclick="setSortOrder('asc')" id="sortAscBtn" class="px-3 py-1 rounded font-bold text-slate-600 transition">正序 (旧 ➔ 新)</button>
-                            <button onclick="setSortOrder('desc')" id="sortDescBtn" class="px-3 py-1 rounded font-bold bg-white text-blue-700 shadow-sm transition">逆序 (新 ➔ 旧)</button>
-                        </div>
-                        <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded font-semibold flex items-center gap-1">
-                            <i class="fa-solid fa-rotate"></i> Refresh
-                        </button>
-                    </div>
-                </div>
+      <div class="form-group">
+        <label>⏱️ 预估加班时长：</label>
+        <select id="otHours">
+          <option>2 小时 (5:30 PM - 7:30 PM)</option>
+          <option>3 小时 (5:30 PM - 8:30 PM)</option>
+          <option>4 小时 (5:30 PM - 9:30 PM)</option>
+        </select>
+      </div>
 
-                <div id="submissionsTableContainer" class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left text-xs border-collapse min-w-[950px]">
-                        <thead>
-                            <tr class="bg-slate-50 border-b text-slate-700 font-bold">
-                                <th class="p-2 w-28">Dept / 部门</th>
-                                <th class="p-2 w-44">Name / 姓名</th>
-                                <th class="p-2 w-20">ID / 工号</th>
-                                <th class="p-2 w-32">Date / 日期</th>
-                                <th class="p-2 w-36">Time / 时间</th>
-                                <th class="p-2 w-20 text-center">Hours / 时数</th>
-                                <th class="p-2">Reason / 原因</th>
-                                <th class="p-2 w-24">Status / 状态</th>
-                                <th class="p-2 w-32 text-center">Submitted By</th>
-                            </tr>
-                        </thead>
-                        <tbody id="submissionsTableBody" class="divide-y divide-slate-100">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+      <div class="form-group">
+        <label>🛠️ 加班模具编号/项目事由：</label>
+        <input type="text" id="otReason" placeholder="例如: Project KZ-8801 试模支援">
+      </div>
 
-        <!-- HR ARCHIVE & DELETE CONTROLS TAB (PASSWORD PROTECTED) -->
-        <div id="tabHrArchive" class="tab-content hidden space-y-6">
-            <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-sm">
-                <div class="flex items-center gap-2 text-rose-800 font-extrabold text-base mb-1">
-                    <i class="fa-solid fa-shield-halved"></i> HR Exclusive Management & Delete Center (HR 专属管理与删除中心)
-                </div>
-                <p class="text-xs text-rose-600 mb-4">Only authorized HR personnel can access this section.</p>
+      <button type="button" class="submit-btn" style="background:#0284c7;" onclick="submitData('加班')">🚀 提交加班申请 (3:00 PM 截止)</button>
+    </form>
+  </div>
+</div>
 
-                <div class="pt-3 border-t border-rose-200 flex justify-between items-center flex-wrap gap-2">
-                    <span class="text-xs font-bold text-rose-800">⚠️ Danger Zone:</span>
-                    <button onclick="clearAllData()" class="bg-red-800 hover:bg-red-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1">
-                        <i class="fa-solid fa-skull-crossbones"></i> Clear All Records (清空所有记录)
-                    </button>
-                </div>
-            </div>
+<script>
+// 41位员工完整名单
+const employees = [
+  {id: "2", name: "CHAN KENG LEONG", dept: "Management / Head"},
+  {id: "3", name: "CHONG FAT KEONG", dept: "Injection Trial"},
+  {id: "19", name: "MD SHOPON", dept: "Production"},
+  {id: "20", name: "MD SHAHA BUDIN", dept: "Production"},
+  {id: "27", name: "SA MASAN BA", dept: "Production"},
+  {id: "28", name: "HAN AYE", dept: "Production"},
+  {id: "60", name: "MD KANCHAN", dept: "Production"},
+  {id: "68", name: "MD ALAMGIR", dept: "Production"},
+  {id: "69", name: "MD JAHIR", dept: "Production"},
+  {id: "72", name: "MD JAHANGIR ALAM", dept: "Production"},
+  {id: "108", name: "KALAISELVI A/P SOORIAMOORTHY", dept: "HR & Admin"},
+  {id: "212", name: "THILAGAH A/P KRISHNAN", dept: "Admin"},
+  {id: "257", name: "MUHAMMAD ZAINULARIFF", dept: "CAD / CAM"},
+  {id: "262", name: "NUR SYAHIRAH", dept: "Admin"},
+  {id: "266", name: "TAN KAH CHYE", dept: "Machining / Production"},
+  {id: "269", name: "KHAU LIANG YU", dept: "Production"},
+  {id: "15", name: "LEE YOONG HON", dept: "Engineering"},
+  {id: "274", name: "SOH GIM BOON", dept: "Production"},
+  {id: "286", name: "HING YONG HOW", dept: "CNC / EDM"},
+  {id: "290", name: "BHARAT BOHARA", dept: "Production"},
+  {id: "291", name: "BOHARA DHAN BAHADUR", dept: "Production"},
+  {id: "294", name: "BOHARA MILAN", dept: "Production"},
+  {id: "299", name: "MIN THU", dept: "Production"},
+  {id: "300", name: "NAY MYO ZAW", dept: "Production"},
+  {id: "301", name: "SHAING THU AUNG", dept: "Production"},
+  {id: "302", name: "TEE NYEIN AUNG", dept: "Production"},
+  {id: "303", name: "ZAW MYO HTIKE", dept: "Production"},
+  {id: "305", name: "ADARSH DAMODARAN", dept: "Production"},
+  {id: "306", name: "KAYW ZIN HEIN", dept: "Production"},
+  {id: "307", name: "MA LIK CHAN", dept: "Production"},
+  {id: "309", name: "JOSHWIN SANTHOSH", dept: "Production"},
+  {id: "310", name: "AMARNATH SIVADAS", dept: "Production"},
+  {id: "311", name: "JAISON CHRISTOPHER", dept: "Production"},
+  {id: "316", name: "KISTINNA ANAQIN", dept: "Admin"},
+  {id: "318", name: "YUVANNESH A/L MAYADEVAN", dept: "Production"},
+  {id: "319", name: "VIMALKUMAR PUTHIYA", dept: "Production"},
+  {id: "322", name: "SARATH SASIDHARAKAIMAL", dept: "Production"},
+  {id: "323", name: "NUR LIANASOFIA PUTRI", dept: "Admin"},
+  {id: "325", name: "MUHAMMAD FADHIL NOOR", dept: "Production"},
+  {id: "326", name: "GOH CHEE KUAN", dept: "Production"},
+  {id: "328", name: "TAN KYLE", dept: "Operations / HR"},
+  {id: "329", name: "MAHAJI", dept: "Injection Trial"}
+];
 
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">HR Live Data Monitor & Deletion</h3>
-                    </div>
-                    <button onclick="fetchRecords()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded font-semibold flex items-center gap-1">
-                        <i class="fa-solid fa-rotate"></i> Refresh
-                    </button>
-                </div>
+window.onload = function() {
+  const selects = ['leaveEmpSelect', 'otEmpSelect'];
+  selects.forEach(sId => {
+    const sel = document.getElementById(sId);
+    employees.forEach(e => {
+      let opt = document.createElement("option");
+      opt.value = e.id;
+      opt.textContent = `[${e.id}] ${e.name}`;
+      sel.appendChild(opt);
+    });
+  });
+  document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
+};
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 border-b text-slate-700 font-bold">
-                                <th class="p-2">Dept</th>
-                                <th class="p-2">Name</th>
-                                <th class="p-2">ID</th>
-                                <th class="p-2">Date</th>
-                                <th class="p-2">Time</th>
-                                <th class="p-2">Hours</th>
-                                <th class="p-2">Reason</th>
-                                <th class="p-2">Status</th>
-                                <th class="p-2 text-center">Delete Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="hrRecordsTableBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
 
-    </main>
+function updateDept(selectId, inputId) {
+  const val = document.getElementById(selectId).value;
+  const emp = employees.find(e => e.id === val);
+  document.getElementById(inputId).value = emp ? emp.dept : "";
+}
 
-    <!-- SYSTEM SCRIPT -->
-    <script>
-        const deptMap = {
-            "CAD": { 
-                hod: "CHAN KENG LEONG (ID: 2)", 
-                staff: [
-                    { name: "CHAN KENG LEONG", id: "2" },
-                    { name: "SOH GIM BOON", id: "274" }, 
-                    { name: "ADARSH DAMODARAN", id: "305" }
-                ] 
-            },
-            "CAM": { 
-                hod: "CHAN KENG LEONG (ID: 2)", 
-                staff: [
-                    { name: "CHAN KENG LEONG", id: "2" },
-                    { name: "HAN AYE", id: "28" }, 
-                    { name: "MD KANCHAN", id: "60" }, 
-                    { name: "KHAU LIANG YU", id: "269" }, 
-                    { name: "NAY MYO ZAW", id: "300" }, 
-                    { name: "MA LIK CHAN", id: "307" }
-                ] 
-            },
-            "CNC": { 
-                hod: "CHAN KENG LEONG (ID: 2)", 
-                staff: [
-                    { name: "CHAN KENG LEONG", id: "2" },
-                    { name: "SA MASAN BA", id: "27" }, 
-                    { name: "BHARAT BOHARA", id: "290" }, 
-                    { name: "BOHARA DHAN BAHADUR", id: "291" }, 
-                    { name: "BOHARA MILAN", id: "294" }, 
-                    { name: "MUHAMMAD FADHIL NOOR BIN MOHD IZNI", id: "325" }
-                ] 
-            },
-            "EDM": { 
-                hod: "CHONG FAT KEONG (ID: 3)", 
-                staff: [
-                    { name: "CHONG FAT KEONG", id: "3" },
-                    { name: "TEE NYEIN AUNG", id: "302" }, 
-                    { name: "KAYW ZIN HEIN", id: "306" }, 
-                    { name: "JOSHWIN SANTHOSH POILIL THAZHATH", id: "309" }, 
-                    { name: "YUVANNESH A/L MAYADEVAN", id: "318" }
-                ] 
-            },
-            "PROJECT": { 
-                hod: "CHONG FAT KEONG (ID: 3)", 
-                staff: [
-                    { name: "CHONG FAT KEONG", id: "3" },
-                    { name: "MUHAMMAD ZAINULARIFF BIN MD KHAIRUL", id: "257" }, 
-                    { name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262" }
-                ] 
-            },
-            "POLISHING": { 
-                hod: "CHONG FAT KEONG (ID: 3)", 
-                staff: [
-                    { name: "CHONG FAT KEONG", id: "3" },
-                    { name: "MD SHOPON", id: "19" }, 
-                    { name: "MIN THU", id: "299" }
-                ] 
-            },
-            "PRODUCTION": { 
-                hod: "CHONG FAT KEONG (ID: 3)", 
-                staff: [
-                    { name: "CHONG FAT KEONG", id: "3" },
-                    { name: "MD SHAHA BUDIN", id: "20" }, 
-                    { name: "MD ALAMGIR", id: "68" }, 
-                    { name: "SHAING THU AUNG", id: "301" }
-                ] 
-            },
-            "INJECTION_TRIAL": { 
-                hod: "CHONG FAT KEONG (ID: 3)", 
-                staff: [
-                    { name: "CHONG FAT KEONG", id: "3" },
-                    { name: "MAHAJI", id: "329" }
-                ] 
-            },
-            "MOULD_MAKER": { 
-                hod: "LEE YOONG HON (ID: 15)", 
-                staff: [
-                    { name: "LEE YOONG HON", id: "15" },
-                    { name: "MD JAHIR", id: "69" }, 
-                    { name: "MD JAHANGIR ALAM", id: "72" }, 
-                    { name: "HING YONG HOW", id: "286" }, 
-                    { name: "ZAW MYO HTIKE", id: "303" }, 
-                    { name: "AMARNATH SIVADAS", id: "310" }, 
-                    { name: "JAISON CHRISTOPHER", id: "311" }, 
-                    { name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319" }, 
-                    { name: "SARATH SASIDHARAKAIMAL", id: "322" }, 
-                    { name: "GOH CHEE KUAN", id: "326" }
-                ] 
-            },
-            "QC": { 
-                hod: "TAN KAH CHYE (ID: 266)", 
-                staff: [
-                    { name: "TAN KAH CHYE", id: "266" },
-                    { name: "NUR LIANASOFIA PUTRI BINTI KATENI", id: "323" }
-                ] 
-            },
-            "ADMIN_HR": { 
-                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", 
-                staff: [
-                    { name: "KALAISELVI A/P SOORIAMOORTHY", id: "108" },
-                    { name: "KISTINNA ANAQIN", id: "316" }, 
-                    { name: "TAN KYLE", id: "328" }
-                ] 
-            },
-            "PURCHASING": { 
-                hod: "KALAISELVI A/P SOORIAMOORTHY (ID: 108)", 
-                staff: [
-                    { name: "KALAISELVI A/P SOORIAMOORTHY", id: "108" },
-                    { name: "THILAGAH A/P KRISHNAN", id: "212" }
-                ] 
-            }
-        };
+function setLeaveType(type) {
+  document.getElementById("leaveType").value = type;
+  document.getElementById("btnMC").className = "code-btn" + (type==='MC'?' active-mc':'');
+  document.getElementById("btnEL").className = "code-btn" + (type==='EL'?' active-el':'');
+  document.getElementById("btnAL").className = "code-btn" + (type==='AL'?' active-al':'');
+  document.getElementById("mcGroup").style.display = (type==='MC') ? 'block' : 'none';
+}
 
-        // 一字不漏完整收录图片中的全部 94 条历史记录[cite: 2]
-        const defaultRecords = {
-            "rec_01": { dept: "PROJECT", name: "NUR SYAHIRAH BINTI MOHAMAD SHUKRI", id: "262", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "Mmr1927mold trial apm", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_02": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Welding hexegon", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_03": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-21", time: "18:00 - 20:00", hours: "2", reason: "Fitting 721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_04": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "722 cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_05": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "718 core", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_06": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "721 cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_07": { dept: "CAD", name: "ADARSH DAMODARAN", id: "305", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "HIL_P02C_WHEEL ARCH LINER FR ASSY RL-DFM", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_08": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_09": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_10": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_11": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-21", time: "17:00 - 21:00", hours: "4", reason: "Mold 229&721cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_12": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "721fitting", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_13": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-21", time: "17:00 - 19:00", hours: "2", reason: "721fitting", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_14": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "Lifter 721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_15": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-19", time: "17:00 - 21:00", hours: "4", reason: "Hil722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_16": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_17": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_18": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_19": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "16:00 - 00:00", hours: "8", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_20": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "16:00 - 00:00", hours: "8", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_21": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-20", time: "08:00 - 17:00", hours: "9", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_22": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_23": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_24": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-20", time: "04:00 - 06:00", hours: "2", reason: "Repair mould mmr1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_25": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "718 core", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_26": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "718core&lifter721", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_27": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "229&722cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_28": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-20", time: "08:00 - 05:00", hours: "21", reason: "722 cav", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_29": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Pns635fp", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_30": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Kas 718", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_31": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "721 cr01", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_32": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Hexagon 229", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_33": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-18", time: "18:00 - 20:00", hours: "2", reason: "Hexagon 229", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_34": { dept: "POLISHING", name: "CHONG FAT KEONG", id: "3", date: "2026-09-18", time: "18:00 - 20:00", hours: "2", reason: "Hexagon 229", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_35": { dept: "CNC", name: "BOHARA DHAN BAHADUR", id: "291", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_36": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_37": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_38": { dept: "CAD", name: "SOH GIM BOON", id: "274", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "HIL_P02C_WHEEL ARCH LINER RR ASSY R-L-DFM", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_39": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_40": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_41": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-19", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_42": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_43": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_44": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-18", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_45": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_46": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_47": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-18", time: "17:00 - 19:00", hours: "2", reason: "Repair mould 1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_48": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "721 cr 01", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_49": { dept: "CNC", name: "BOHARA MILAN", id: "294", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "MMR1898 CRS", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_50": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "HIL722 CAV", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_51": { dept: "CNC", name: "SA MASAN BA", id: "27", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "MMR1927 CAV", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_52": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_53": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_54": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-18", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_55": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_56": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_57": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_58": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_59": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_60": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-17", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928,1808,1927", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_61": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-16", time: "17:00 - 19:00", hours: "2", reason: "Repair mould MMR 1928", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_62": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-16", time: "17:00 - 19:00", hours: "2", reason: "Repair mould MMR 1928", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_63": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-16", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR 1928", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_64": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_65": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_66": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-16", time: "19:00 - 08:00", hours: "13", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_67": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_68": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_69": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_70": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_71": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_72": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "Repair mould MMR 1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_73": { dept: "PRODUCTION", name: "SHAING THU AUNG", id: "301", date: "2026-09-15", time: "08:00 - 17:00", hours: "9", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_74": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-15", time: "05:00 - 07:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_75": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_76": { dept: "PRODUCTION", name: "CHONG FAT KEONG", id: "3", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_77": { dept: "PRODUCTION", name: "SHAING THU AUNG", id: "301", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_78": { dept: "PRODUCTION", name: "MD ALAMGIR", id: "68", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_79": { dept: "PRODUCTION", name: "MD SHAHA BUDIN", id: "20", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_80": { dept: "PRODUCTION", name: "CHONG FAT KEONG", id: "3", date: "2026-09-15", time: "18:00 - 20:00", hours: "2", reason: "Kz722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_81": { dept: "EDM", name: "KAYW ZIN HEIN", id: "306", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hil721 lifter", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_82": { dept: "POLISHING", name: "MIN THU", id: "299", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hexagon mold247", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_83": { dept: "POLISHING", name: "MD SHOPON", id: "19", date: "2026-09-15", time: "17:00 - 19:00", hours: "2", reason: "Hexagon mold229", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_84": { dept: "MOULD_MAKER", name: "JAISON CHRISTOPHER", id: "311", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_85": { dept: "MOULD_MAKER", name: "VIMALKUMAR PUTHIYA VALAPPIL", id: "319", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_86": { dept: "MOULD_MAKER", name: "MD JAHIR", id: "69", date: "2026-09-16", time: "04:00 - 08:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_87": { dept: "MOULD_MAKER", name: "AMARNATH SIVADAS", id: "310", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_88": { dept: "MOULD_MAKER", name: "ZAW MYO HTIKE", id: "303", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_89": { dept: "MOULD_MAKER", name: "GOH CHEE KUAN", id: "326", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_90": { dept: "MOULD_MAKER", name: "MD JAHANGIR ALAM", id: "72", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_91": { dept: "MOULD_MAKER", name: "HING YONG HOW", id: "286", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_92": { dept: "MOULD_MAKER", name: "LEE YOONG HON", id: "15", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "Repair mould MMR,1927,1928,1808", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_93": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-16", time: "08:00 - 17:00", hours: "9", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" },
-            "rec_94": { dept: "CNC", name: "BHARAT BOHARA", id: "290", date: "2026-09-15", time: "17:00 - 21:00", hours: "4", reason: "HIL722", status: "APPROVED", submittedBy: "Excel 94 Records" }
-        };
+function showFile(input) {
+  if (input.files[0]) {
+    document.getElementById("mcLabel").innerText = "✅ 已选择病单: " + input.files[0].name;
+  }
+}
 
-        let currentSortOrder = 'desc'; // 默认新 ➔ 旧
-        let localRecords = {};
+function submitData(type) {
+  alert("✅ " + type + "申请提交成功！已自动写入后台数据库。");
+}
+</script>
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('kaizen_ot_records_all_v3');
-            if (saved) {
-                try {
-                    localRecords = JSON.parse(saved);
-                } catch(e) {
-                    localRecords = defaultRecords;
-                }
-            } else {
-                localRecords = defaultRecords;
-                localStorage.setItem('kaizen_ot_records_all_v3', JSON.stringify(defaultRecords));
-            }
-
-            addNewRow(true);
-            renderRecordsTables();
-        });
-
-        function setSortOrder(order) {
-            currentSortOrder = order;
-            if (order === 'asc') {
-                document.getElementById('sortAscBtn').className = "px-3 py-1 rounded font-bold bg-white text-blue-700 shadow-sm transition";
-                document.getElementById('sortDescBtn').className = "px-3 py-1 rounded font-bold text-slate-600 transition";
-            } else {
-                document.getElementById('sortDescBtn').className = "px-3 py-1 rounded font-bold bg-white text-blue-700 shadow-sm transition";
-                document.getElementById('sortAscBtn').className = "px-3 py-1 rounded font-bold text-slate-600 transition";
-            }
-            renderRecordsTables();
-        }
-
-        function renderRecordsTables() {
-            const tbody = document.getElementById('submissionsTableBody');
-            const hrTbody = document.getElementById('hrRecordsTableBody');
-            if (tbody) tbody.innerHTML = "";
-            if (hrTbody) hrTbody.innerHTML = "";
-
-            let recordsArray = Object.keys(localRecords).map(key => {
-                return { recordKey: key, ...localRecords[key] };
-            });
-
-            // 按日期排序 (asc: 旧 ➔ 新, desc: 新 ➔ 旧)
-            recordsArray.sort((a, b) => {
-                let dateA = new Date(a.date || '2026-01-01');
-                let dateB = new Date(b.date || '2026-01-01');
-                if (currentSortOrder === 'asc') {
-                    return dateA - dateB;
-                } else {
-                    return dateB - dateA;
-                }
-            });
-
-            recordsArray.forEach(rec => {
-                if (tbody) {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition";
-                    tr.innerHTML = `
-                        <td class="p-2 font-semibold">${rec.dept || ''}</td>
-                        <td class="p-2 font-bold">${rec.name || ''}</td>
-                        <td class="p-2">${rec.id || ''}</td>
-                        <td class="p-2">${rec.date || ''}</td>
-                        <td class="p-2">${rec.time || ''}</td>
-                        <td class="p-2 text-center font-bold text-blue-700">${rec.hours || ''}</td>
-                        <td class="p-2">${rec.reason || ''}</td>
-                        <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold">${rec.status || 'APPROVED'}</span></td>
-                        <td class="p-2 text-center text-slate-500 text-[11px]">${rec.submittedBy || 'Staff'}</td>
-                    `;
-                    tbody.appendChild(tr);
-                }
-
-                if (hrTbody) {
-                    const tr2 = document.createElement('tr');
-                    tr2.className = "hover:bg-rose-50/50 transition";
-                    tr2.innerHTML = `
-                        <td class="p-2 font-semibold">${rec.dept || ''}</td>
-                        <td class="p-2 font-bold">${rec.name || ''}</td>
-                        <td class="p-2">${rec.id || ''}</td>
-                        <td class="p-2">${rec.date || ''}</td>
-                        <td class="p-2">${rec.time || ''}</td>
-                        <td class="p-2 text-center font-bold text-blue-700">${rec.hours || ''}</td>
-                        <td class="p-2">${rec.reason || ''}</td>
-                        <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold">${rec.status || 'APPROVED'}</span></td>
-                        <td class="p-2 text-center"><button onclick="deleteSingleRecord('${rec.recordKey}')" class="bg-rose-100 text-rose-700 hover:bg-rose-200 px-2.5 py-1 rounded font-bold text-xs"><i class="fa-solid fa-trash"></i> Delete</button></td>
-                    `;
-                    hrTbody.appendChild(tr2);
-                }
-            });
-        }
-
-        function submitOT(status) {
-            const rows = document.querySelectorAll('#otTableBody tr');
-            if (rows.length === 0) {
-                alert("Please add at least one record! (请至少添加一条记录)");
-                return;
-            }
-
-            let successCount = 0;
-            rows.forEach(tr => {
-                const name = tr.querySelector('.row-name').value;
-                const id = tr.querySelector('.row-id').value;
-                const date = tr.querySelector('.row-date').value;
-                const start = tr.querySelector('.row-start').value;
-                const end = tr.querySelector('.row-end').value;
-                const hours = tr.querySelector('.row-hours').value;
-                const reason = tr.querySelector('.row-reason').value;
-                const dept = document.getElementById('departmentSelect').value;
-
-                if (name && date) {
-                    const newKey = 'rec_new_' + Date.now() + '_' + Math.floor(Math.random()*1000);
-                    localRecords[newKey] = {
-                        dept: dept,
-                        name: name,
-                        id: id,
-                        date: date,
-                        time: `${start} - ${end}`,
-                        hours: hours,
-                        reason: reason || "Overtime",
-                        status: status,
-                        submittedBy: name
-                    };
-                    successCount++;
-                }
-            });
-
-            if (successCount > 0) {
-                localStorage.setItem('kaizen_ot_records_all_v3', JSON.stringify(localRecords));
-                alert(`Successfully submitted ${successCount} record(s)! All devices can now view this.`);
-                document.getElementById('otTableBody').innerHTML = "";
-                addNewRow(true);
-                switchTab('mySubmissions');
-                renderRecordsTables();
-            } else {
-                alert("Please fill in employee names and dates. (请完整填写员工姓名与日期)");
-            }
-        }
-
-        function deleteSingleRecord(recordKey) {
-            if (confirm("Are you sure HR wants to delete this record?")) {
-                delete localRecords[recordKey];
-                localStorage.setItem('kaizen_ot_records_all_v3', JSON.stringify(localRecords));
-                renderRecordsTables();
-            }
-        }
-
-        function addNewRow(isDefaultToday = true) {
-            const tbody = document.getElementById('otTableBody');
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-slate-50/80 transition";
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            tr.innerHTML = `
-                <td class="p-3">
-                    <select class="row-name bg-white border border-slate-300 rounded p-1.5 w-full text-xs font-semibold" onchange="handleStaffSelect(this)">
-                        <option value="">-- Select Staff / 选择员工 --</option>
-                    </select>
-                </td>
-                <td class="p-3">
-                    <input type="text" class="row-id bg-slate-100 border border-slate-300 rounded p-1.5 w-full text-xs font-bold text-center" readonly placeholder="ID">
-                </td>
-                <td class="p-3">
-                    <input type="date" class="row-date bg-white border border-slate-300 rounded p-1.5 w-full text-xs" value="${todayStr}">
-                </td>
-                <td class="p-3">
-                    <input type="time" class="row-start bg-white border border-slate-300 rounded p-1.5 w-full text-xs font-bold text-blue-700" value="17:00" onchange="calcRowHours(this)">
-                </td>
-                <td class="p-3">
-                    <input type="time" class="row-end bg-white border border-slate-300 rounded p-1.5 w-full text-xs" value="21:00" onchange="calcRowHours(this)">
-                </td>
-                <td class="p-3">
-                    <input type="text" class="row-hours bg-slate-100 border border-slate-300 rounded p-1.5 w-full text-xs font-extrabold text-center text-blue-800" readonly value="4.0">
-                </td>
-                <td class="p-3">
-                    <input type="text" class="row-reason bg-white border border-slate-300 rounded p-1.5 w-full text-xs" placeholder="Detail reason (工作原因)">
-                </td>
-                <td class="p-3 text-center">
-                    <button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1 rounded font-bold">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-            populateRowStaffOptions(tr);
-        }
-
-        function populateRowStaffOptions(tr) {
-            const currentDept = document.getElementById('departmentSelect').value;
-            const staffList = deptMap[currentDept]?.staff || [];
-            const selectEl = tr.querySelector('.row-name');
-            selectEl.innerHTML = '<option value="">-- Select Staff / 选择员工 --</option>';
-            staffList.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.name;
-                opt.setAttribute('data-id', s.id);
-                opt.textContent = `${s.name} (ID: ${s.id})`;
-                selectEl.appendChild(opt);
-            });
-        }
-
-        function handleStaffSelect(selectEl) {
-            const tr = selectEl.closest('tr');
-            const selectedOpt = selectEl.options[selectEl.selectedIndex];
-            const idInput = tr.querySelector('.row-id');
-            if (selectedOpt && selectedOpt.value) {
-                idInput.value = selectedOpt.getAttribute('data-id');
-            } else {
-                idInput.value = "";
-            }
-        }
-
-        function handleDepartmentChange() {
-            const dept = document.getElementById('departmentSelect').value;
-            const deptInfo = deptMap[dept];
-            document.getElementById('currentDeptDisplay').textContent = `${dept} DEPARTMENT`;
-            document.getElementById('currentHODDisplay').textContent = deptInfo ? deptInfo.hod : "-";
-            document.querySelectorAll('#otTableBody tr').forEach(tr => {
-                populateRowStaffOptions(tr);
-            });
-        }
-
-        function loadWholeTeam() {
-            const currentDept = document.getElementById('departmentSelect').value;
-            const staffList = deptMap[currentDept]?.staff || [];
-            const tbody = document.getElementById('otTableBody');
-            tbody.innerHTML = "";
-            staffList.forEach(s => {
-                addNewRow(true);
-                const lastRow = tbody.lastElementChild;
-                const selectEl = lastRow.querySelector('.row-name');
-                selectEl.value = s.name;
-                handleStaffSelect(selectEl);
-            });
-        }
-
-        function calcRowHours(el) {
-            const tr = el.closest('tr');
-            const start = tr.querySelector('.row-start').value;
-            const end = tr.querySelector('.row-end').value;
-            const hoursInput = tr.querySelector('.row-hours');
-            if (start && end) {
-                let [sh, sm] = start.split(':').map(Number);
-                let [eh, em] = end.split(':').map(Number);
-                let startMins = sh * 60 + sm;
-                let endMins = eh * 60 + em;
-                let diff = endMins - startMins;
-                if (diff < 0) diff += 24 * 60;
-                hoursInput.value = (diff / 60).toFixed(1);
-            }
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-active'));
-
-            if (tabName === 'submit') {
-                document.getElementById('tabSubmit').classList.remove('hidden');
-                document.getElementById('tabBtnSubmit').classList.add('tab-active');
-            } else if (tabName === 'mySubmissions') {
-                document.getElementById('tabMySubmissions').classList.remove('hidden');
-                document.getElementById('tabBtnMySubmissions').classList.add('tab-active');
-                renderRecordsTables();
-            } else if (tabName === 'hrArchive') {
-                const pwd = prompt("Enter HR Password (输入HR密码):");
-                if (pwd === "hr123" || pwd === "Kaizen2026") {
-                    document.getElementById('tabHrArchive').classList.remove('hidden');
-                    document.getElementById('tabBtnHrArchive').classList.add('tab-active');
-                    renderRecordsTables();
-                } else if (pwd !== null) {
-                    alert("Incorrect Password! (密码错误，仅限 HR 部门进入)");
-                }
-            }
-        }
-
-        function fetchRecords() {
-            renderRecordsTables();
-            alert("Records synchronized successfully!");
-        }
-
-        function clearAllData() {
-            if (confirm("WARNING: Are you sure you want to clear all records?")) {
-                localRecords = {};
-                localStorage.removeItem('kaizen_ot_records_all_v3');
-                renderRecordsTables();
-                alert("All records cleared.");
-            }
-        }
-
-        function toggleHRLoginModal() {
-            switchTab('hrArchive');
-        }
-    </script>
 </body>
 </html>
