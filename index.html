@@ -18,11 +18,19 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background-color: var(--bg); color: #1e293b; padding: 15px; display: flex; justify-content: center; }
-  .app-container { width: 100%; max-width: 580px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
+  .app-container { width: 100%; max-width: 650px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
   
-  .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
+  .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
   .header h1 { font-size: 22px; color: var(--text); font-weight: 800; }
   .header p { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+  /* 顶部分页 Tab 导航 */
+  .nav-tabs { display: flex; gap: 8px; margin-bottom: 18px; background: #e0f2fe; padding: 4px; border-radius: 10px; }
+  .tab-btn { flex: 1; padding: 11px; border: none; border-radius: 8px; background: transparent; font-size: 13px; font-weight: bold; color: #0369a1; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
   .notice-banner { background: #fffaf0; border-left: 4px solid #f59e0b; padding: 12px; font-size: 13px; color: #78350f; border-radius: 6px; margin-bottom: 18px; line-height: 1.5; }
   
@@ -31,6 +39,7 @@
   select, input, textarea { width: 100%; padding: 13px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; outline: none; background: #fff; }
   select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
   
+  /* 假别快捷选择按键 */
   .type-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 6px; }
   .type-card {
     padding: 14px 6px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; color: #64748b; user-select: none; transition: all 0.2s;
@@ -58,9 +67,22 @@
   .status-signed { background: #dcfce7; color: #15803d; }
   .status-pending { background: #fef3c7; color: #b45309; }
 
+  /* 历史记录只读表格 */
+  .history-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+  .history-table th, .history-table td { border: 1px solid #cbd5e1; padding: 10px 8px; text-align: center; }
+  .history-table th { background: #e0f2fe; color: #0369a1; }
+  .badge-readonly { background: #f1f5f9; color: #475569; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
+  .status-tag { padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+  .tag-approved { background: #dcfce7; color: #15803d; }
+  .tag-pending { background: #fef3c7; color: #b45309; }
+
   .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
   .print-btn { width: 100%; padding: 12px; background: #475569; color: #fff; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+  .btn-export { background: #15803d; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-export:hover { background: #166534; }
+  .btn-lock { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: not-allowed; }
 
+  .admin-panel { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 15px; margin-top: 15px; }
   .success-alert { display: none; background: #16a34a; color: white; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin-top: 15px; line-height: 1.5; }
 </style>
 </head>
@@ -72,98 +94,155 @@
     <p>🏥 极简请假与 MC 快速申报系统（含 4 级电子/纸质签名）</p>
   </div>
 
-  <div class="notice-banner">
-    📢 <strong>多级签名核销机制：</strong> 本申请须包含：<strong>① 员工本人签名</strong> &rarr; 提交后自动流转至 <strong>② HOD 主管签名</strong> &rarr; <strong>③ HR 签名</strong> &rarr; <strong>④ 老板 (Management) 签名</strong>（支持线上 Digital Sign 或打印后 Hardcopy 签名核销）。
+  <!-- 3 大核心功能 Tab -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('applyTab')">📝 申请请假/MC</button>
+    <button class="tab-btn" onclick="switchTab('historyTab')">📋 个人记录(只读)</button>
+    <button class="tab-btn" onclick="switchTab('adminTab')">🔒 HOD/HR后台</button>
   </div>
 
-  <form id="eLeaveForm">
-    <!-- 1. 按工号/名字快速查找 -->
-    <div class="form-group">
-      <label>🔍 1. 选择员工（按工号或名字）：</label>
-      <select id="empSelect" onchange="onEmployeeChange()" required>
-        <option value="">-- 请选择员工 / Select Employee --</option>
+  <!-- 1. 申请请假/MC 表单页 -->
+  <div id="applyTab" class="tab-content active">
+    <div class="notice-banner">
+      📢 <strong>多级签名核销机制：</strong> 本申请须包含：<strong>① 员工本人签名</strong> &rarr; 提交后自动流转至 <strong>② HOD 主管签名</strong> &rarr; <strong>③ HR 签名</strong> &rarr; <strong>④ 老板 (Management) 签名</strong>（支持线上 Digital Sign 或打印后 Hardcopy 签名核销）。
+    </div>
+
+    <form id="eLeaveForm">
+      <!-- 1. 按工号/名字快速查找 -->
+      <div class="form-group">
+        <label>🔍 1. 选择员工（按工号或名字）：</label>
+        <select id="empSelect" onchange="onEmployeeChange()" required>
+          <option value="">-- 请选择员工 / Select Employee --</option>
+        </select>
+      </div>
+
+      <!-- 2. 部门自动带出 -->
+      <div class="form-group">
+        <label>🏢 所属部门 (Department)：</label>
+        <input type="text" id="deptInput" placeholder="选择员工后自动填充" readonly style="background:#f1f5f9; color:#64748b;">
+      </div>
+
+      <!-- 3. 极简假别代号选择 -->
+      <div class="form-group">
+        <label>📌 2. 选择假别代码按键：</label>
+        <div class="type-grid">
+          <div class="type-card active-mc" id="cardMC" onclick="chooseType('MC')">代码 1<br>MC (病假)</div>
+          <div class="type-card" id="cardEL" onclick="chooseType('EL')">代码 2<br>EL (紧急假)</div>
+          <div class="type-card" id="cardAL" onclick="chooseType('AL')">代码 3<br>AL/RL (普通假)</div>
+        </div>
+        <input type="hidden" id="leaveType" value="MC">
+      </div>
+
+      <!-- 4. 请假日期 -->
+      <div class="form-group">
+        <label>📅 3. 请假日期 (Leave Date)：</label>
+        <input type="date" id="leaveDate" required>
+      </div>
+
+      <!-- 5. 拍照上传病单 (仅在选择 MC 时出现) -->
+      <div class="form-group" id="mcSection">
+        <label>📸 4. 拍摄/上传诊所病单 (MC Photo)：</label>
+        <div class="upload-box" onclick="document.getElementById('mcCamera').click()">
+          <span id="uploadLabel">📷 点击直接拍摄或上传 MC 照片</span>
+          <input type="file" id="mcCamera" accept="image/*" capture="environment" onchange="onFileSelected(this)">
+        </div>
+      </div>
+
+      <!-- 6. 备注/原因 -->
+      <div class="form-group">
+        <label>📝 请假事由 / 备注 (Reason)：</label>
+        <input type="text" id="leaveReason" placeholder="例：发烧看诊 / 紧急家事">
+      </div>
+
+      <!-- 7. 员工本人电子手写签名 -->
+      <div class="form-group">
+        <label>✍️ 5. 员工本人手写签名 (Employee Signature / Digital Sign)：</label>
+        <div class="signature-block">
+          <canvas id="empSigCanvas"></canvas>
+          <div class="sig-tools">
+            <span style="font-size:11px; color:#94a3b8;">在上方空白处手写签名</span>
+            <button type="button" class="clear-btn" onclick="clearEmpCanvas()">清除重签</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. 四级审核流转与电子/纸质签名看板 -->
+      <div class="approval-workflow-box">
+        <div class="approval-title">🖊️ 四级多重签名与审批核销看板 (Digital / Hardcopy Signature)</div>
+        <div class="sig-grid">
+          <div class="sig-box">
+            <div>① 员工本人</div>
+            <div class="sig-status status-signed" id="sigStatusEmp">已在线签名</div>
+          </div>
+          <div class="sig-box">
+            <div>② HOD 主管</div>
+            <div class="sig-status status-pending" id="sigStatusHOD">待审批签名</div>
+          </div>
+          <div class="sig-box">
+            <div>③ HR 部门</div>
+            <div class="sig-status status-pending" id="sigStatusHR">待核销签名</div>
+          </div>
+          <div class="sig-box">
+            <div>④ 老板/管理层</div>
+            <div class="sig-status status-pending" id="sigStatusBoss">待批复签名</div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit with Signature)</button>
+      <button type="button" class="print-btn" onclick="window.print()">🖨️ 导出/打印纸质硬拷贝 (Print Hardcopy for Manual Sign)</button>
+    </form>
+
+    <div id="successMessage" class="success-alert">
+      ✅ 请假单已成功提交！<br>包含员工手写电子签名，已实时发送至 HOD、HR 及老板审批列表。
+    </div>
+  </div>
+
+  <!-- 2. 个人历史记录 (只读防篡改，任何设备可看) -->
+  <div id="historyTab" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 过去请假与 MC 记录 (ReadOnly View)</span>
+      <span class="badge-readonly">🔒 员工端：仅限查看 / 防篡改锁定</span>
+    </div>
+
+    <div class="form-group" style="margin-bottom:10px;">
+      <select id="historyFilterEmp" onchange="renderHistoryTable()">
+        <option value="ALL">-- 查看全部员工记录 / View All Records --</option>
       </select>
     </div>
 
-    <!-- 2. 部门自动带出 -->
-    <div class="form-group">
-      <label>🏢 所属部门 (Department)：</label>
-      <input type="text" id="deptInput" placeholder="选择员工后自动填充" readonly style="background:#f1f5f9; color:#64748b;">
-    </div>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>工号/姓名</th>
+          <th>假别</th>
+          <th>MC 病单状态</th>
+          <th>签名</th>
+          <th>审批/修改</th>
+        </tr>
+      </thead>
+      <tbody id="historyTbody">
+        <!-- 动态生成只读记录 -->
+      </tbody>
+    </table>
+  </div>
 
-    <!-- 3. 极简假别代号选择 -->
-    <div class="form-group">
-      <label>📌 2. 选择假别代码按键：</label>
-      <div class="type-grid">
-        <div class="type-card active-mc" id="cardMC" onclick="chooseType('MC')">代码 1<br>MC (病假)</div>
-        <div class="type-card" id="cardEL" onclick="chooseType('EL')">代码 2<br>EL (紧急假)</div>
-        <div class="type-card" id="cardAL" onclick="chooseType('AL')">代码 3<br>AL/RL (普通假)</div>
-      </div>
-      <input type="hidden" id="leaveType" value="MC">
-    </div>
+  <!-- 3. HOD / HR 管理员专属后台 (导出 Excel / 核销) -->
+  <div id="adminTab" class="tab-content">
+    <div class="admin-panel">
+      <h3 style="font-size:15px; color:#0f172a; margin-bottom:10px;">🔑 HOD / HR 管理员专属操作区</h3>
+      <p style="font-size:12px; color:#64748b; margin-bottom:15px;">（此处仅限授权 HR 与 HOD 进行数据导出与审核更改）</p>
+      
+      <!-- 导出 Excel 按钮 -->
+      <button type="button" class="btn-export" onclick="exportToExcel()">
+        📊 一键导出全部请假/MC记录到 Excel (.xlsx / .csv)
+      </button>
 
-    <!-- 4. 请假日期 -->
-    <div class="form-group">
-      <label>📅 3. 请假日期 (Leave Date)：</label>
-      <input type="date" id="leaveDate" required>
-    </div>
-
-    <!-- 5. 拍照上传病单 (仅在选择 MC 时出现) -->
-    <div class="form-group" id="mcSection">
-      <label>📸 4. 拍摄/上传诊所病单 (MC Photo)：</label>
-      <div class="upload-box" onclick="document.getElementById('mcCamera').click()">
-        <span id="uploadLabel">📷 点击直接拍摄或上传 MC 照片</span>
-        <input type="file" id="mcCamera" accept="image/*" capture="environment" onchange="onFileSelected(this)">
-      </div>
-    </div>
-
-    <!-- 6. 备注/原因 -->
-    <div class="form-group">
-      <label>📝 请假事由 / 备注 (Reason)：</label>
-      <input type="text" id="leaveReason" placeholder="例：发烧看诊 / 紧急家事">
-    </div>
-
-    <!-- 7. 员工本人电子手写签名 -->
-    <div class="form-group">
-      <label>✍️ 5. 员工本人手写签名 (Employee Signature / Digital Sign)：</label>
-      <div class="signature-block">
-        <canvas id="empSigCanvas"></canvas>
-        <div class="sig-tools">
-          <span style="font-size:11px; color:#94a3b8;">在上方空白处手写签名</span>
-          <button type="button" class="clear-btn" onclick="clearEmpCanvas()">清除重签</button>
-        </div>
+      <div style="margin-top:15px; font-size:13px; line-height: 1.6;">
+        <strong>核销说明：</strong> 收到员工纸质 MC 正本后，HR 请在后台看板中点击【核销正本】，系统状态将自动转换为 ✅ Verified。
       </div>
     </div>
-
-    <!-- 8. 四级审核流转与电子/纸质签名看板 -->
-    <div class="approval-workflow-box">
-      <div class="approval-title">🖊️ 四级多重签名与审批核销看板 (Digital / Hardcopy Signature)</div>
-      <div class="sig-grid">
-        <div class="sig-box">
-          <div>① 员工本人</div>
-          <div class="sig-status status-signed" id="sigStatusEmp">已在线签名</div>
-        </div>
-        <div class="sig-box">
-          <div>② HOD 主管</div>
-          <div class="sig-status status-pending" id="sigStatusHOD">待审批签名</div>
-        </div>
-        <div class="sig-box">
-          <div>③ HR 部门</div>
-          <div class="sig-status status-pending" id="sigStatusHR">待核销签名</div>
-        </div>
-        <div class="sig-box">
-          <div>④ 老板/管理层</div>
-          <div class="sig-status status-pending" id="sigStatusBoss">待批复签名</div>
-        </div>
-      </div>
-    </div>
-
-    <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit with Signature)</button>
-    <button type="button" class="print-btn" onclick="window.print()">🖨️ 导出/打印纸质硬拷贝 (Print Hardcopy for Manual Sign)</button>
-  </form>
-
-  <div id="successMessage" class="success-alert">
-    ✅ 请假单已成功提交！<br>包含员工手写电子签名，已实时发送至 HOD、HR 及老板审批列表。
   </div>
 </div>
 
@@ -214,16 +293,31 @@ const employeeDatabase = [
   {id: "329", name: "MAHAJI", dept: "Injection Trial"}
 ];
 
+// 历史提交记录数据库（只读，防篡改）
+let leaveHistoryRecords = [
+  { date: "2026-10-26", id: "329", name: "MAHAJI", dept: "Injection Trial", type: "MC (病假)", status: "待收正本 (Pending)", sig: "已签名", locked: true },
+  { date: "2026-10-20", id: "28", name: "HAN AYE", dept: "Production", type: "EL (紧急假)", status: "已核实", sig: "已签名", locked: true },
+  { date: "2026-10-15", id: "328", name: "TAN KYLE", dept: "Operations / HR", type: "AL (年假)", status: "已批准", sig: "已签名", locked: true }
+];
+
 let canvas, ctx, isDrawing = false;
 
 window.onload = function() {
   const select = document.getElementById("empSelect");
+  const filterSelect = document.getElementById("historyFilterEmp");
+
   employeeDatabase.forEach(emp => {
     let opt = document.createElement("option");
     opt.value = emp.id;
     opt.textContent = `[工号 ${emp.id}] ${emp.name}`;
     select.appendChild(opt);
+
+    let optFilter = document.createElement("option");
+    optFilter.value = emp.id;
+    optFilter.textContent = `[工号 ${emp.id}] ${emp.name}`;
+    filterSelect.appendChild(optFilter);
   });
+
   document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
   
   // 初始化手写签名板 Canvas
@@ -243,7 +337,16 @@ window.onload = function() {
   canvas.addEventListener("touchstart", startDrawingTouch);
   canvas.addEventListener("touchmove", drawTouch);
   canvas.addEventListener("touchend", stopDrawing);
+
+  renderHistoryTable();
 };
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
 
 function startDrawing(e) { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); }
 function draw(e) { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } }
@@ -274,6 +377,33 @@ function onFileSelected(input) {
   }
 }
 
+// 渲染只读历史记录表格
+function renderHistoryTable() {
+  const filterId = document.getElementById("historyFilterEmp").value;
+  const tbody = document.getElementById("historyTbody");
+  tbody.innerHTML = "";
+
+  const list = (filterId === "ALL") ? leaveHistoryRecords : leaveHistoryRecords.filter(r => r.id === filterId);
+
+  if(list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="color:#94a3b8;">暂无记录</td></tr>`;
+    return;
+  }
+
+  list.forEach(r => {
+    let tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.date}</td>
+      <td>[${r.id}] ${r.name}</td>
+      <td><strong>${r.type}</strong></td>
+      <td><span class="status-tag ${r.status.includes('待收')?'tag-pending':'tag-approved'}">${r.status}</span></td>
+      <td>✍️ ${r.sig}</td>
+      <td><button class="btn-lock" title="员工端无法更改">🔒 锁定 (无修改权)</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 function submitLeaveApp() {
   const empId = document.getElementById("empSelect").value;
   if (!empId) {
@@ -289,13 +419,47 @@ function submitLeaveApp() {
     return;
   }
 
+  const emp = employeeDatabase.find(e => e.id === empId);
+  const leaveDate = document.getElementById("leaveDate").value;
+
+  leaveHistoryRecords.unshift({
+    date: leaveDate,
+    id: emp.id,
+    name: emp.name,
+    dept: emp.dept,
+    type: leaveType === 'MC' ? 'MC (病假)' : (leaveType === 'EL' ? 'EL (紧急假)' : 'AL (年假)'),
+    status: leaveType === 'MC' ? '待收正本 (Pending)' : '已批准',
+    sig: '已在线签名',
+    locked: true
+  });
+
   document.getElementById("successMessage").style.display = "block";
   setTimeout(() => {
     document.getElementById("successMessage").style.display = "none";
     document.getElementById("eLeaveForm").reset();
     clearEmpCanvas();
     chooseType('MC');
-  }, 4000);
+    renderHistoryTable();
+    switchTab('historyTab');
+  }, 3000);
+}
+
+// 📊 导出 Excel 功能 (HOD / HR 专属)
+function exportToExcel() {
+  let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+  csvContent += "请假日期,员工工号,员工姓名,部门,假别类型,病单状态,签名状态\n";
+
+  leaveHistoryRecords.forEach(r => {
+    csvContent += `${r.date},${r.id},${r.name},${r.dept},${r.type},${r.status},${r.sig}\n`;
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Kaizen_Leave_MC_Report_${new Date().toISOString().substring(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
 
