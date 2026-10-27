@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaizen Mould Technology - 极简请假与 MC 快速申报系统（含密码锁与 4 级电子签名）</title>
+<title>Kaizen Mould Technology - 极简请假与 MC 申报系统（含 HR 记录删除、高级筛选与个人搜索）</title>
 <style>
   :root {
     --primary: #0284c7;
@@ -18,7 +18,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background-color: var(--bg); color: #1e293b; padding: 15px; display: flex; justify-content: center; }
-  .app-container { width: 100%; max-width: 800px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
+  .app-container { width: 100%; max-width: 900px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
   
   .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
   .header h1 { font-size: 22px; color: var(--text); font-weight: 800; }
@@ -36,7 +36,7 @@
   
   .form-group { margin-bottom: 18px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #334155; }
-  select, input, textarea { width: 100%; padding: 13px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; outline: none; background: #fff; }
+  select, input, textarea { width: 100%; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; background: #fff; }
   select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
   
   /* 假别快捷选择按键 */
@@ -54,41 +54,46 @@
 
   /* 手写签名板 */
   .signature-block { border: 2px dashed #94a3b8; border-radius: 10px; background: #fafafa; padding: 10px; text-align: center; }
-  canvas { width: 100%; height: 140px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; }
+  canvas { width: 100%; height: 130px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; }
   .sig-tools { display: flex; justify-content: space-between; margin-top: 6px; }
   .clear-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+  /* 搜索与筛选控制栏面板 */
+  .filter-panel { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; }
+  .filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }
 
   /* 多级签名审批看板 */
   .approval-workflow-box { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px; padding: 12px; margin-top: 15px; }
   .approval-title { font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
   .sig-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; text-align: center; font-size: 11px; }
-  .sig-box { border: 1px dashed #cbd5e1; padding: 8px 4px; border-radius: 6px; background: #fff; min-height: 60px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sig-box { border: 1px dashed #cbd5e1; padding: 8px 4px; border-radius: 6px; background: #fff; min-height: 55px; display: flex; flex-direction: column; justify-content: space-between; }
   .sig-status { font-size: 10px; font-weight: bold; padding: 2px 4px; border-radius: 4px; margin-top: 4px; }
   .status-signed { background: #dcfce7; color: #15803d; }
   .status-pending { background: #fef3c7; color: #b45309; }
 
   /* 历史记录与后台表格 */
-  .history-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-  .history-table th, .history-table td { border: 1px solid #cbd5e1; padding: 10px 8px; text-align: center; }
+  .history-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .history-table th, .history-table td { border: 1px solid #cbd5e1; padding: 8px 6px; text-align: center; }
   .history-table th { background: #e0f2fe; color: #0369a1; }
   .badge-readonly { background: #f1f5f9; color: #475569; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
-  .badge-hod { background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 4px; }
+  .badge-hod { background: #fef3c7; color: #92400e; padding: 2px 4px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 4px; }
   .status-tag { padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
   .tag-approved { background: #dcfce7; color: #15803d; }
   .tag-pending { background: #fef3c7; color: #b45309; }
   .tag-rejected { background: #fee2e2; color: #991b1b; }
 
-  .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
-  .print-btn { width: 100%; padding: 12px; background: #475569; color: #fff; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
-  .btn-export { background: #15803d; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .submit-btn { width: 100%; padding: 15px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
+  .print-btn { background: #475569; color: #fff; font-size: 13px; font-weight: bold; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+  .btn-export { background: #15803d; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
   .btn-export:hover { background: #166534; }
-  .btn-lock { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: not-allowed; }
+  .btn-lock { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: not-allowed; }
 
-  /* 按钮操作 */
-  .btn-action-approve { background: #16a34a; color: white; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-right: 2px; }
-  .btn-action-reject { background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+  /* HR后台操作按钮组 */
+  .btn-action-approve { background: #16a34a; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-right: 2px; }
+  .btn-action-reject { background: #d97706; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-right: 2px; }
+  .btn-action-delete { background: #dc2626; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
-  .admin-panel { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; margin-top: 10px; }
+  .admin-panel { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 15px; margin-top: 10px; }
   .success-alert { display: none; background: #16a34a; color: white; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin-top: 15px; line-height: 1.5; }
 
   /* 密码验证锁屏组件 */
@@ -103,14 +108,14 @@
 <div class="app-container">
   <div class="header">
     <h1>Kaizen Mould Technology</h1>
-    <p>🏥 极简请假与 MC 快速申报系统（含密码锁与 4 级电子签名）</p>
+    <p>🏥 极简请假与 MC 申报系统（含 HR 删除、独立筛选与高级导出）</p>
   </div>
 
   <!-- 3 大核心功能 Tab -->
   <div class="nav-tabs">
     <button class="tab-btn active" id="btnTabApply" onclick="switchTab('applyTab')">📝 申请请假/MC</button>
-    <button class="tab-btn" id="btnTabHistory" onclick="switchTab('historyTab')">📋 个人记录(只读)</button>
-    <button class="tab-btn" id="btnTabAdmin" onclick="switchTab('adminTab')">🔒 HOD/HR后台</button>
+    <button class="tab-btn" id="btnTabHistory" onclick="switchTab('historyTab')">📋 个人记录(搜索/只读)</button>
+    <button class="tab-btn" id="btnTabAdmin" onclick="switchTab('adminTab')">🔒 HOD/HR后台(删除/更改)</button>
   </div>
 
   <!-- 1. 申请请假/MC 表单页 -->
@@ -202,29 +207,35 @@
       </div>
 
       <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit with Signature)</button>
-      <button type="button" class="print-btn" onclick="window.print()">🖨️ 导出/打印纸质硬拷贝 (Print Hardcopy for Manual Sign)</button>
     </form>
 
     <div id="successMessage" class="success-alert">
-      ✅ 请假单已成功提交！<br>包含员工手写电子签名，已实时发送至 HOD、HR 及老板审批列表。
+      ✅ 请假单已成功提交！<br>包含员工手写电子签名，已实时保存并流转至 HOD 与 HR 审批列表。
     </div>
   </div>
 
-  <!-- 2. 个人历史记录 (纯只读防篡改，增加完整“所属部门”与“HOD主管”标识) -->
+  <!-- 2. 个人历史记录 (支持工号/姓名/月份实时搜索筛选与打印导出) -->
   <div id="historyTab" class="tab-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 过去请假与 MC 记录 (ReadOnly View)</span>
-      <span class="badge-readonly">🔒 员工端：仅限查看 / 防篡改</span>
+      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 过去请假与 MC 记录 (支持个人搜索)</span>
+      <span class="badge-readonly">🔒 员工端：仅限搜索/打印/只读</span>
     </div>
 
-    <div class="notice-banner" style="background:#f1f5f9; border-left-color:#64748b; color:#334155; margin-bottom:12px; font-size:12px;">
-      ℹ️ <strong>防篡改提示：</strong> 员工提交后的申请不可自行更改。如需审核或修改状态，请由 <strong>HOD / HR 管理员</strong> 点击顶部的【🔒 HOD/HR后台】输入密码进入操作。
-    </div>
-
-    <div class="form-group" style="margin-bottom:10px;">
-      <select id="historyFilterEmp" onchange="renderHistoryTable()">
-        <option value="ALL">-- 查看全部员工记录 / View All Records --</option>
-      </select>
+    <!-- 个人搜索栏组 -->
+    <div class="filter-panel">
+      <div class="filter-grid">
+        <div>
+          <label style="font-size:12px; margin-bottom:2px;">🔍 输入员工姓名或工号搜索：</label>
+          <input type="text" id="userSearchKeyword" placeholder="输入名字或工号 (例: 328 或 TAN)" onkeyup="renderHistoryTable()">
+        </div>
+        <div>
+          <label style="font-size:12px; margin-bottom:2px;">📅 按月份筛选：</label>
+          <input type="month" id="userFilterMonth" onchange="renderHistoryTable()">
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button type="button" class="print-btn" style="width:100%;" onclick="window.print()">🖨️ 打印所选记录</button>
+        </div>
+      </div>
     </div>
 
     <table class="history-table">
@@ -236,7 +247,7 @@
           <th>假别</th>
           <th>状态</th>
           <th>签名</th>
-          <th>审批/修改权限</th>
+          <th>权限</th>
         </tr>
       </thead>
       <tbody id="historyTbody">
@@ -245,14 +256,14 @@
     </table>
   </div>
 
-  <!-- 3. HOD / HR 管理员专属后台（密码验证保护 + 修改审批权限 + 导出 Excel） -->
+  <!-- 3. HOD / HR 管理员专属后台（密码验证 + 删除记录 + 个性化Excel筛选导出） -->
   <div id="adminTab" class="tab-content">
     
     <!-- 密码验证锁屏界面 -->
     <div id="adminAuthBox" class="auth-lock-box">
       <div style="font-size:36px; margin-bottom:10px;">🔐</div>
       <h3 style="color:#0c4a6e; font-size:16px;">HOD & HR 管理员身份受限区域</h3>
-      <p style="font-size:13px; color:#64748b; margin-top:5px;">请输入管理员访问密码以查看、审批和修改员工假单记录：</p>
+      <p style="font-size:13px; color:#64748b; margin-top:5px;">请输入管理员访问密码以查看、修改或<b>删除</b>员工假单记录：</p>
       <input type="password" id="adminPasswordInput" placeholder="输入密码" onkeydown="if(event.key==='Enter') verifyAdminAuth()">
       <button type="button" class="auth-btn" onclick="verifyAdminAuth()">🔓 解锁访问后台</button>
       <div id="authErrorMsg" style="color:#dc2626; font-size:12px; font-weight:bold; margin-top:8px; display:none;">⚠️ 密码错误！请输入正确的 HOD/HR 管理员密码。</div>
@@ -260,21 +271,33 @@
 
     <!-- 验证成功后展示的后台管理面板 -->
     <div id="adminContentBox" class="admin-panel" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="font-size:15px; color:#0f172a;">🔑 HOD / HR 审核与更改控制台</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 style="font-size:15px; color:#0f172a;">🔑 HOD / HR 控制台（管理、审核与直接删除）</h3>
         <button type="button" onclick="lockAdminAuth()" style="background:#ef4444; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">🔒 退出锁屏</button>
       </div>
       
-      <!-- 导出 Excel 按钮 -->
-      <button type="button" class="btn-export" onclick="exportToExcel()">
-        📊 一键导出全部请假/MC记录到 Excel (.xlsx / .csv)
-      </button>
-
-      <div style="margin-top:10px; margin-bottom:15px; font-size:12px; color:#475569; background:#e0f2fe; padding:10px; border-radius:6px;">
-        <strong>⚙️ HOD / HR 更改权限说明：</strong> 您在此控制台中可以为员工直接点击【✅ 批准核销】或【❌ 拒绝驳回】更改申请状态。
+      <!-- HR 专属高级筛选与 Excel 导出工具栏 -->
+      <div class="filter-panel" style="background:#e0f2fe; border-color:#bae6fd;">
+        <div style="font-size:12px; font-weight:bold; color:#0369a1; margin-bottom:6px;">📊 HR 导出一键筛选工具 (支持按个人 / 工号 / 年月筛选导出)：</div>
+        <div class="filter-grid" style="grid-template-columns: 1.5fr 1fr 1.5fr;">
+          <div>
+            <select id="adminFilterEmp" onchange="renderAdminTable()">
+              <option value="ALL">-- 全部员工 (All Employees) --</option>
+            </select>
+          </div>
+          <div>
+            <input type="month" id="adminFilterMonth" onchange="renderAdminTable()">
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn-export" style="flex:1;" onclick="exportToExcel()">
+              📊 导出已筛选到 Excel
+            </button>
+            <button type="button" class="print-btn" onclick="window.print()">🖨️ 打印</button>
+          </div>
+        </div>
       </div>
 
-      <!-- 管理员修改表格（包含准确的部门与 HOD 属性） -->
+      <!-- 管理员修改与删除表格 -->
       <table class="history-table">
         <thead>
           <tr>
@@ -284,11 +307,11 @@
             <th>假别</th>
             <th>当前状态</th>
             <th>签名</th>
-            <th>HOD/HR 更改状态</th>
+            <th>HOD/HR 更改/删除操作</th>
           </tr>
         </thead>
         <tbody id="adminTbody">
-          <!-- 动态生成可编辑控制行 -->
+          <!-- 动态生成可编辑/删除控制行 -->
         </tbody>
       </table>
     </div>
@@ -297,7 +320,7 @@
 </div>
 
 <script>
-// 41位员工完整最新数据库（对应完整图片的工号、姓名、部门与 Head of Department 职位）
+// 41位员工完整最新数据库
 const employeeDatabase = [
   {id: "2", name: "CHAN KENG LEONG", dept: "CAD, CAM & CNC", hod: "Manager"},
   {id: "3", name: "CHONG FAT KEONG", dept: "EDM, Project, Polishing, Production", hod: "Manager"},
@@ -342,19 +365,19 @@ const employeeDatabase = [
   {id: "328", name: "TAN KYLE", dept: "Admin", hod: ""}
 ];
 
-// 历史提交记录数据库（附带真实部门）
-let leaveHistoryRecords = [
+// 本地可持久保存的请假/MC数据库
+let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records')) || [
   { recId: 101, date: "2026-10-26", id: "3", name: "CHONG FAT KEONG", dept: "EDM, Project, Polishing, Production", hod: "Manager", type: "MC (病假)", status: "待收正本 (Pending)", sig: "已签名" },
   { recId: 102, date: "2026-10-20", id: "28", name: "HAN AYE", dept: "CAM", hod: "", type: "EL (紧急假)", status: "已核实 (Verified)", sig: "已签名" },
   { recId: 103, date: "2026-10-15", id: "328", name: "TAN KYLE", dept: "Admin", hod: "", type: "AL (年假)", status: "已批准 (Approved)", sig: "已签名" }
 ];
 
 let canvas, ctx, isDrawing = false;
-let isAdminUnlocked = false; // 管理员锁状态
+let isAdminUnlocked = false;
 
 window.onload = function() {
   const select = document.getElementById("empSelect");
-  const filterSelect = document.getElementById("historyFilterEmp");
+  const adminFilterEmp = document.getElementById("adminFilterEmp");
 
   employeeDatabase.forEach(emp => {
     let opt = document.createElement("option");
@@ -366,16 +389,15 @@ window.onload = function() {
     let optFilter = document.createElement("option");
     optFilter.value = emp.id;
     optFilter.textContent = `[工号 ${emp.id}] ${emp.name}`;
-    filterSelect.appendChild(optFilter);
+    adminFilterEmp.appendChild(optFilter);
   });
 
   document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
   
-  // 初始化手写签名板 Canvas
   canvas = document.getElementById("empSigCanvas");
   ctx = canvas.getContext("2d");
   canvas.width = canvas.parentElement.clientWidth - 20;
-  canvas.height = 140;
+  canvas.height = 130;
   
   ctx.strokeStyle = "#0f172a";
   ctx.lineWidth = 2.5;
@@ -390,6 +412,10 @@ window.onload = function() {
 
   renderHistoryTable();
 };
+
+function saveToLocalStorage() {
+  localStorage.setItem('kaizen_leave_records', JSON.stringify(leaveHistoryRecords));
+}
 
 function switchTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -436,7 +462,6 @@ function onFileSelected(input) {
   }
 }
 
-// 🔑 验证密码进入 HR / HOD 后台 (密码：1234)
 function verifyAdminAuth() {
   const pwd = document.getElementById("adminPasswordInput").value;
   if (pwd === "1234") {
@@ -457,16 +482,24 @@ function lockAdminAuth() {
   document.getElementById("adminContentBox").style.display = "none";
 }
 
-// 渲染【个人记录 - 只读防篡改】表格
+// 🔍 渲染【个人记录 - 支持实时打字搜索 & 月份筛选】
 function renderHistoryTable() {
-  const filterId = document.getElementById("historyFilterEmp").value;
+  const kw = document.getElementById("userSearchKeyword").value.trim().toLowerCase();
+  const monthFilter = document.getElementById("userFilterMonth").value;
   const tbody = document.getElementById("historyTbody");
   tbody.innerHTML = "";
 
-  const list = (filterId === "ALL") ? leaveHistoryRecords : leaveHistoryRecords.filter(r => r.id === filterId);
+  let list = leaveHistoryRecords;
+
+  if (kw) {
+    list = list.filter(r => r.name.toLowerCase().includes(kw) || r.id.toLowerCase().includes(kw));
+  }
+  if (monthFilter) {
+    list = list.filter(r => r.date.startsWith(monthFilter));
+  }
 
   if(list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8;">暂无记录</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">🔍 暂无符合条件的记录</td></tr>`;
     return;
   }
 
@@ -481,18 +514,34 @@ function renderHistoryTable() {
       <td><strong>${r.type}</strong></td>
       <td><span class="status-tag ${statusClass}">${r.status}</span></td>
       <td>✍️ ${r.sig}</td>
-      <td><span class="btn-lock" title="仅限 HR/HOD 密码解锁后更改">🔒 只读防篡改</span></td>
+      <td><span class="btn-lock">🔒 只读防篡改</span></td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// 渲染【HOD / HR 后台 - 具有更改与审核权限】表格
+// 🔑 渲染【HR / HOD 后台 - 支持任意员工/月份筛选、更改与直接删除】
 function renderAdminTable() {
+  const empFilter = document.getElementById("adminFilterEmp").value;
+  const monthFilter = document.getElementById("adminFilterMonth").value;
   const tbody = document.getElementById("adminTbody");
   tbody.innerHTML = "";
 
-  leaveHistoryRecords.forEach(r => {
+  let list = leaveHistoryRecords;
+
+  if (empFilter !== "ALL") {
+    list = list.filter(r => r.id === empFilter);
+  }
+  if (monthFilter) {
+    list = list.filter(r => r.date.startsWith(monthFilter));
+  }
+
+  if(list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">暂无筛选记录</td></tr>`;
+    return;
+  }
+
+  list.forEach(r => {
     let tr = document.createElement("tr");
     let statusClass = r.status.includes('待收') ? 'tag-pending' : (r.status.includes('驳回') || r.status.includes('拒绝') ? 'tag-rejected' : 'tag-approved');
     let hodBadge = r.hod ? `<span class="badge-hod">${r.hod}</span>` : "";
@@ -504,22 +553,38 @@ function renderAdminTable() {
       <td><span class="status-tag ${statusClass}">${r.status}</span></td>
       <td>✍️ ${r.sig}</td>
       <td>
-        <button class="btn-action-approve" onclick="updateRecordStatus(${r.recId}, '已核销 (Verified)')">✅ 批准核销</button>
-        <button class="btn-action-reject" onclick="updateRecordStatus(${r.recId}, '已驳回 (Rejected)')">❌ 拒绝驳回</button>
+        <button class="btn-action-approve" onclick="updateRecordStatus(${r.recId}, '已核销 (Verified)')">✅ 批准</button>
+        <button class="btn-action-reject" onclick="updateRecordStatus(${r.recId}, '已驳回 (Rejected)')">❌ 驳回</button>
+        <button class="btn-action-delete" onclick="deleteRecord(${r.recId})">🗑️ 删除</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// HOD / HR 管理员进行状态更改
+// HR/HOD 更改记录状态
 function updateRecordStatus(recId, newStatus) {
   const rec = leaveHistoryRecords.find(r => r.recId === recId);
   if (rec) {
     rec.status = newStatus;
+    saveToLocalStorage();
     renderAdminTable();
     renderHistoryTable();
     alert(`✅ 已成功将员工 ${rec.name} 的记录修改为：${newStatus}`);
+  }
+}
+
+// 🗑️ HR 专属：删除员工交上来的 MC/请假记录
+function deleteRecord(recId) {
+  const rec = leaveHistoryRecords.find(r => r.recId === recId);
+  if (rec) {
+    if (confirm(`⚠️ 确定要彻底删除员工 [工号 ${rec.id}] ${rec.name} 于 ${rec.date} 提交的 ${rec.type} 记录吗？`)) {
+      leaveHistoryRecords = leaveHistoryRecords.filter(r => r.recId !== recId);
+      saveToLocalStorage();
+      renderAdminTable();
+      renderHistoryTable();
+      alert(`🗑️ 已成功删除该条记录！`);
+    }
   }
 }
 
@@ -553,6 +618,8 @@ function submitLeaveApp() {
     sig: '已在线签名'
   });
 
+  saveToLocalStorage();
+
   document.getElementById("successMessage").style.display = "block";
   setTimeout(() => {
     document.getElementById("successMessage").style.display = "none";
@@ -565,19 +632,38 @@ function submitLeaveApp() {
   }, 3000);
 }
 
-// 📊 导出 Excel 功能 (HOD / HR 专属)
+// 📊 HR 高级导出 Excel 功能 (导出当前在 HR 控制台中筛选出来的资料)
 function exportToExcel() {
+  const empFilter = document.getElementById("adminFilterEmp").value;
+  const monthFilter = document.getElementById("adminFilterMonth").value;
+
+  let list = leaveHistoryRecords;
+  if (empFilter !== "ALL") {
+    list = list.filter(r => r.id === empFilter);
+  }
+  if (monthFilter) {
+    list = list.filter(r => r.date.startsWith(monthFilter));
+  }
+
+  if (list.length === 0) {
+    alert("⚠️ 当前筛选条件下没有任何记录可导出！");
+    return;
+  }
+
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent += "记录编号,请假日期,员工工号,员工姓名,所属部门,HOD职位,假别类型,最新状态,签名状态\n";
 
-  leaveHistoryRecords.forEach(r => {
+  list.forEach(r => {
     csvContent += `${r.recId},${r.date},${r.id},${r.name},${r.dept},${r.hod || "无"},${r.type},${r.status},${r.sig}\n`;
   });
 
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `Kaizen_Leave_MC_Report_${new Date().toISOString().substring(0,10)}.csv`);
+  let fileNameExt = empFilter !== "ALL" ? `_Emp_${empFilter}` : "";
+  if (monthFilter) fileNameExt += `_${monthFilter}`;
+
+  link.setAttribute("download", `Kaizen_Leave_Report${fileNameExt}_${new Date().toISOString().substring(0,10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
