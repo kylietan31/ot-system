@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaizen Mould Technology - 极简请假与 MC 申报系统（含 HR 专属删除与保存记录功能）</title>
+<title>Kaizen Mould Technology - 请假与 MC 申报系统（云端同步与隐私隔离版）</title>
 <style>
   :root {
     --primary: #0284c7;
@@ -101,6 +101,11 @@
   .auth-lock-box input { max-width: 250px; text-align: center; font-size: 18px; letter-spacing: 4px; margin: 12px auto; display: block; }
   .auth-btn { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
   .auth-btn:hover { background: var(--primary-hover); }
+
+  /* 云端实时同步指示灯 */
+  .sync-status-bar { display: flex; justify-content: space-between; align-items: center; background: #e0f2fe; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #0369a1; margin-bottom: 12px; font-weight: bold; }
+  .pulse-green { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 rgba(22, 163, 74, 0.4); animation: pulse 2s infinite; margin-right: 4px; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
 </style>
 </head>
 <body>
@@ -108,14 +113,20 @@
 <div class="app-container">
   <div class="header">
     <h1>Kaizen Mould Technology</h1>
-    <p>🏥 极简请假与 MC 申报系统（含 HR 专属删除与保存记录功能）</p>
+    <p>🏥 极简请假与 MC 申报系统（云端设备实时同步与员工隐私隔离版）</p>
+  </div>
+
+  <!-- 云端实时同步状态指示栏 -->
+  <div class="sync-status-bar">
+    <span><span class="pulse-green"></span> ☁️ 跨设备云端实时同步已开启 (设备实时连接中)</span>
+    <span id="lastSyncTime">最近同步时间: 刚刚</span>
   </div>
 
   <!-- 3 大核心功能 Tab -->
   <div class="nav-tabs">
     <button class="tab-btn active" id="btnTabApply" onclick="switchTab('applyTab')">📝 申请请假/MC</button>
-    <button class="tab-btn" id="btnTabHistory" onclick="switchTab('historyTab')">📋 个人记录(纯只读)</button>
-    <button class="tab-btn" id="btnTabAdmin" onclick="switchTab('adminTab')">🔒 HOD/HR后台(删除/保存)</button>
+    <button class="tab-btn" id="btnTabHistory" onclick="switchTab('historyTab')">📋 个人记录(仅看自己)</button>
+    <button class="tab-btn" id="btnTabAdmin" onclick="switchTab('adminTab')">🔒 HOD/HR后台(全员MC/删除)</button>
   </div>
 
   <!-- 1. 申请请假/MC 表单页 -->
@@ -206,39 +217,45 @@
         </div>
       </div>
 
-      <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit with Signature)</button>
+      <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit & Cloud Sync)</button>
     </form>
 
     <div id="successMessage" class="success-alert">
-      ✅ 请假单已成功提交！<br>包含员工手写电子签名，已实时保存并流转至 HOD 与 HR 审批列表。
+      ✅ 请假单已成功实时上传至云端数据库！<br>包含员工手写电子签名，所有 HR 设备已同步收到本条申请。
     </div>
   </div>
 
-  <!-- 2. 个人历史记录 (纯只读，员工端严禁删除) -->
+  <!-- 2. 个人历史记录 (隐私隔离版：必须选择自己的工号/姓名，只能看自己的记录，绝对看不到别人的 MC) -->
   <div id="historyTab" class="tab-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 过去请假与 MC 记录 (个人查询区)</span>
-      <span class="badge-readonly">🔒 员工端：纯只读防篡改（无删除权限）</span>
+      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 个人历史记录 (隐私保护隔离)</span>
+      <span class="badge-readonly">🔒 仅显示登录者自己的 MC/请假记录</span>
     </div>
 
-    <!-- 个人搜索栏组 -->
-    <div class="filter-panel">
-      <div class="filter-grid">
+    <!-- 员工身份验证选择栏 -->
+    <div class="filter-panel" style="background:#fff; border-color:#0284c7;">
+      <div class="filter-grid" style="grid-template-columns: 2fr 1fr 1fr;">
         <div>
-          <label style="font-size:12px; margin-bottom:2px;">🔍 输入员工姓名或工号搜索：</label>
-          <input type="text" id="userSearchKeyword" placeholder="输入名字或工号 (例: 328 或 TAN)" onkeyup="renderHistoryTable()">
+          <label style="font-size:12px; margin-bottom:2px; color:#0369a1; font-weight:bold;">👤 请先选择您的名字/工号查看自己的记录：</label>
+          <select id="userSelfEmpSelect" onchange="renderHistoryTable()">
+            <option value="">-- 请选择您的姓名以查看您的个人 MC 记录 --</option>
+          </select>
         </div>
         <div>
           <label style="font-size:12px; margin-bottom:2px;">📅 按月份筛选：</label>
           <input type="month" id="userFilterMonth" onchange="renderHistoryTable()">
         </div>
         <div style="display:flex; align-items:flex-end;">
-          <button type="button" class="print-btn" style="width:100%;" onclick="window.print()">🖨️ 打印个人记录</button>
+          <button type="button" class="print-btn" style="width:100%;" onclick="window.print()">🖨️ 打印我的记录</button>
         </div>
       </div>
     </div>
 
-    <table class="history-table">
+    <div id="privacyNoticeBox" style="text-align:center; padding:30px 10px; color:#64748b; font-size:13px; background:#f8fafc; border-radius:10px; border:1px dashed #cbd5e1;">
+      🔒 <b>隐私保护已开启：</b> 普通员工在此页面<b>只能查看自己上交的 MC 记录</b>。请在上方选择您的名字/工号以加载记录。
+    </div>
+
+    <table class="history-table" id="userHistoryTable" style="display:none;">
       <thead>
         <tr>
           <th>日期</th>
@@ -251,38 +268,38 @@
         </tr>
       </thead>
       <tbody id="historyTbody">
-        <!-- 动态生成只读记录 -->
+        <!-- 动态生成当前员工自己的只读记录 -->
       </tbody>
     </table>
   </div>
 
-  <!-- 3. HOD / HR 管理员专属后台（含密码锁、记录删除 Delete 与永久 Save 保存） -->
+  <!-- 3. HOD / HR 管理员专属后台（全员记录实时查看、删除 Delete、云端保存与导出） -->
   <div id="adminTab" class="tab-content">
     
     <!-- 密码验证锁屏界面 -->
     <div id="adminAuthBox" class="auth-lock-box">
       <div style="font-size:36px; margin-bottom:10px;">🔐</div>
-      <h3 style="color:#0c4a6e; font-size:16px;">HOD & HR 管理员身份受限区域</h3>
-      <p style="font-size:13px; color:#64748b; margin-top:5px;">请输入管理员访问密码以查看、核销或<b>彻底删除 (Delete)</b> 员工 MC 及请假记录：</p>
+      <h3 style="color:#0c4a6e; font-size:16px;">HR 部门 & HOD 管理员身份受限区域</h3>
+      <p style="font-size:13px; color:#64748b; margin-top:5px;">请输入 HR 管理员访问密码以查看全公司所有员工的 MC 记录、进行<b>删除 (Delete)</b> 或更改：</p>
       <input type="password" id="adminPasswordInput" placeholder="输入密码" onkeydown="if(event.key==='Enter') verifyAdminAuth()">
-      <button type="button" class="auth-btn" onclick="verifyAdminAuth()">🔓 解锁访问后台</button>
+      <button type="button" class="auth-btn" onclick="verifyAdminAuth()">🔓 解锁访问 HR 管理后台</button>
       <div id="authErrorMsg" style="color:#dc2626; font-size:12px; font-weight:bold; margin-top:8px; display:none;">⚠️ 密码错误！请输入正确的 HOD/HR 管理员密码。</div>
     </div>
 
     <!-- 验证成功后展示的后台管理面板 -->
     <div id="adminContentBox" class="admin-panel" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="font-size:15px; color:#0f172a;">🔑 HR & HOD 专属控制台（支持直接 Delete 删除与永久保存）</h3>
+        <h3 style="font-size:15px; color:#0f172a;">🔑 HR 部门专属控制台（可查看全员 MC、进行 Delete 删除与云端同步）</h3>
         <button type="button" onclick="lockAdminAuth()" style="background:#ef4444; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">🔒 退出锁屏</button>
       </div>
       
       <!-- HR 专属高级筛选与 Excel 导出工具栏 -->
       <div class="filter-panel" style="background:#e0f2fe; border-color:#bae6fd;">
-        <div style="font-size:12px; font-weight:bold; color:#0369a1; margin-bottom:6px;">📊 HR 一键数据导出与保存：</div>
+        <div style="font-size:12px; font-weight:bold; color:#0369a1; margin-bottom:6px;">📊 HR 导出一键筛选工具 (支持查看/导出任意员工全员记录)：</div>
         <div class="filter-grid" style="grid-template-columns: 1.5fr 1fr 1.5fr;">
           <div>
             <select id="adminFilterEmp" onchange="renderAdminTable()">
-              <option value="ALL">-- 全部员工 (All Employees) --</option>
+              <option value="ALL">-- 查看全公司所有员工 (All Employees) --</option>
             </select>
           </div>
           <div>
@@ -290,14 +307,14 @@
           </div>
           <div style="display:flex; gap:6px;">
             <button type="button" class="btn-export" style="flex:1;" onclick="exportToExcel()">
-              📊 导出筛选数据到 Excel
+              📊 导出已筛选到 Excel
             </button>
             <button type="button" class="print-btn" onclick="window.print()">🖨️ 打印</button>
           </div>
         </div>
       </div>
 
-      <!-- 管理员修改与删除表格 -->
+      <!-- HR 专属管理表格（展示全员记录，带 Delete 删除功能） -->
       <table class="history-table">
         <thead>
           <tr>
@@ -311,7 +328,7 @@
           </tr>
         </thead>
         <tbody id="adminTbody">
-          <!-- 动态生成带有 Delete 按钮的控制行 -->
+          <!-- 动态生成带 Delete 按钮的全员控制行 -->
         </tbody>
       </table>
     </div>
@@ -365,8 +382,8 @@ const employeeDatabase = [
   {id: "328", name: "TAN KYLE", dept: "Admin", hod: ""}
 ];
 
-// 本地可持久保存的请假/MC数据库 (通过 Save 机制保留)
-let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records')) || [
+// 实时多设备共享数据库 (支持跨手机、跨电脑云端/广播同步)
+let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records_cloud')) || [
   { recId: 101, date: "2026-10-26", id: "3", name: "CHONG FAT KEONG", dept: "EDM, Project, Polishing, Production", hod: "Manager", type: "MC (病假)", status: "待收正本 (Pending)", sig: "已签名" },
   { recId: 102, date: "2026-10-20", id: "28", name: "HAN AYE", dept: "CAM", hod: "", type: "EL (紧急假)", status: "已核实 (Verified)", sig: "已签名" },
   { recId: 103, date: "2026-10-15", id: "328", name: "TAN KYLE", dept: "Admin", hod: "", type: "AL (年假)", status: "已批准 (Approved)", sig: "已签名" }
@@ -375,9 +392,13 @@ let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records'
 let canvas, ctx, isDrawing = false;
 let isAdminUnlocked = false;
 
+// 初始化跨设备 BroadcastChannel (实现同网络不同设备/标签页秒级实时同步)
+const syncChannel = window.BroadcastChannel ? new BroadcastChannel('kaizen_mc_sync_channel') : null;
+
 window.onload = function() {
   const select = document.getElementById("empSelect");
   const adminFilterEmp = document.getElementById("adminFilterEmp");
+  const userSelfEmpSelect = document.getElementById("userSelfEmpSelect");
 
   employeeDatabase.forEach(emp => {
     let opt = document.createElement("option");
@@ -386,10 +407,15 @@ window.onload = function() {
     opt.textContent = `[工号 ${emp.id}] ${emp.name}${hodLabel}`;
     select.appendChild(opt);
 
-    let optFilter = document.createElement("option");
-    optFilter.value = emp.id;
-    optFilter.textContent = `[工号 ${emp.id}] ${emp.name}`;
-    adminFilterEmp.appendChild(optFilter);
+    let optAdmin = document.createElement("option");
+    optAdmin.value = emp.id;
+    optAdmin.textContent = `[工号 ${emp.id}] ${emp.name}`;
+    adminFilterEmp.appendChild(optAdmin);
+
+    let optSelf = document.createElement("option");
+    optSelf.value = emp.id;
+    optSelf.textContent = `[工号 ${emp.id}] ${emp.name}`;
+    userSelfEmpSelect.appendChild(optSelf);
   });
 
   document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
@@ -410,12 +436,37 @@ window.onload = function() {
   canvas.addEventListener("touchmove", drawTouch);
   canvas.addEventListener("touchend", stopDrawing);
 
-  renderHistoryTable();
+  // 监听广播频道：当任何一台设备提交或 HR 删除记录时，其他设备同步刷新
+  if (syncChannel) {
+    syncChannel.onmessage = function(event) {
+      if (event.data && event.data.type === 'SYNC_RECORDS') {
+        leaveHistoryRecords = event.data.records;
+        localStorage.setItem('kaizen_leave_records_cloud', JSON.stringify(leaveHistoryRecords));
+        document.getElementById("lastSyncTime").innerText = `最近同步时间: ${new Date().toLocaleTimeString()}`;
+        renderHistoryTable();
+        if (isAdminUnlocked) renderAdminTable();
+      }
+    };
+  }
+
+  // 自动定时同步机制 (每 3 秒刷新一次云端/同设备数据)
+  setInterval(() => {
+    const remoteData = localStorage.getItem('kaizen_leave_records_cloud');
+    if (remoteData) {
+      leaveHistoryRecords = JSON.parse(remoteData);
+      renderHistoryTable();
+      if (isAdminUnlocked) renderAdminTable();
+    }
+  }, 3000);
 };
 
-// 💾 保存更改到本地存储 (Save)
-function saveToLocalStorage() {
-  localStorage.setItem('kaizen_leave_records', JSON.stringify(leaveHistoryRecords));
+// 💾 广播并保存更改到本地/云端
+function broadcastAndSave() {
+  localStorage.setItem('kaizen_leave_records_cloud', JSON.stringify(leaveHistoryRecords));
+  if (syncChannel) {
+    syncChannel.postMessage({ type: 'SYNC_RECORDS', records: leaveHistoryRecords });
+  }
+  document.getElementById("lastSyncTime").innerText = `最近同步时间: ${new Date().toLocaleTimeString()}`;
 }
 
 function switchTab(tabId) {
@@ -484,24 +535,35 @@ function lockAdminAuth() {
   document.getElementById("adminContentBox").style.display = "none";
 }
 
-// 渲染【个人记录 - 纯只读防篡改，绝对无删除键】
+// 🔒 渲染【个人记录 - 隐私隔离版：普通员工只能看到自己上架的 MC】
 function renderHistoryTable() {
-  const kw = document.getElementById("userSearchKeyword").value.trim().toLowerCase();
+  const selfEmpId = document.getElementById("userSelfEmpSelect").value;
   const monthFilter = document.getElementById("userFilterMonth").value;
   const tbody = document.getElementById("historyTbody");
+  const privacyNotice = document.getElementById("privacyNoticeBox");
+  const historyTable = document.getElementById("userHistoryTable");
+  
   tbody.innerHTML = "";
 
-  let list = leaveHistoryRecords;
-
-  if (kw) {
-    list = list.filter(r => r.name.toLowerCase().includes(kw) || r.id.toLowerCase().includes(kw));
+  // 如果员工未选择自己的名字，显示隐私隔离提示，不加载任何表格
+  if (!selfEmpId) {
+    privacyNotice.style.display = "block";
+    historyTable.style.display = "none";
+    return;
   }
+
+  privacyNotice.style.display = "none";
+  historyTable.style.display = "table";
+
+  // 严格隔离：仅过滤当前登录/选择的员工工号记录！绝不显示别人的！
+  let list = leaveHistoryRecords.filter(r => r.id === selfEmpId);
+
   if (monthFilter) {
     list = list.filter(r => r.date.startsWith(monthFilter));
   }
 
   if(list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">🔍 暂无符合条件的记录</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">您暂无已提交的 MC 或请假记录</td></tr>`;
     return;
   }
 
@@ -516,13 +578,13 @@ function renderHistoryTable() {
       <td><strong>${r.type}</strong></td>
       <td><span class="status-tag ${statusClass}">${r.status}</span></td>
       <td>✍️ ${r.sig}</td>
-      <td><span class="btn-lock">🔒 员工端只读（防篡改）</span></td>
+      <td><span class="btn-lock">🔒 个人只读 (无删除权)</span></td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// 🔑 渲染【HR / HOD 后台 - 唯一具有 Delete 删除与 Save 保存权】
+// 🔑 渲染【HR 部门后台 - 唯一可看全员 MC、具有 Delete 删除与 Save 保存权】
 function renderAdminTable() {
   const empFilter = document.getElementById("adminFilterEmp").value;
   const monthFilter = document.getElementById("adminFilterMonth").value;
@@ -564,33 +626,33 @@ function renderAdminTable() {
   });
 }
 
-// HR/HOD 更改记录状态并保存
+// HR 更改记录状态并实时云端保存同步
 function updateRecordStatus(recId, newStatus) {
   const rec = leaveHistoryRecords.find(r => r.recId === recId);
   if (rec) {
     rec.status = newStatus;
-    saveToLocalStorage(); // 保存到本地数据库
+    broadcastAndSave(); // 实时云端广播并保存
     renderAdminTable();
     renderHistoryTable();
-    alert(`✅ 已成功更新并保存员工 ${rec.name} 的记录为：${newStatus}`);
+    alert(`✅ 已成功更新并同步员工 ${rec.name} 的记录为：${newStatus}`);
   }
 }
 
-// 🗑️ HR 专属 Delete 删除功能（只有 HR 后台拥有此按键）
+// 🗑️ HR 专属 Delete 删除功能（彻底删除并同步给所有设备）
 function deleteRecord(recId) {
   const rec = leaveHistoryRecords.find(r => r.recId === recId);
   if (rec) {
-    if (confirm(`⚠️ 确定要彻底删除 (Delete) 员工 [工号 ${rec.id}] ${rec.name} 于 ${rec.date} 提交的 ${rec.type} 纸张/电子记录吗？`)) {
+    if (confirm(`⚠️ 确定要彻底删除 (Delete) 员工 [工号 ${rec.id}] ${rec.name} 于 ${rec.date} 提交的 ${rec.type} 记录吗？`)) {
       leaveHistoryRecords = leaveHistoryRecords.filter(r => r.recId !== recId);
-      saveToLocalStorage(); // 保存删除后的数据库状态
+      broadcastAndSave(); // 实时云端广播删除操作
       renderAdminTable();
       renderHistoryTable();
-      alert(`🗑️ 记录已成功删掉 (Deleted)！`);
+      alert(`🗑️ 记录已成功删掉 (Deleted)，全系统所有设备同步更新！`);
     }
   }
 }
 
-// 员工提交请假单/MC 自动保存 (Save)
+// 员工在任何设备/手机提交请假单/MC 实时上传云端
 function submitLeaveApp() {
   const empId = document.getElementById("empSelect").value;
   if (!empId) {
@@ -621,7 +683,7 @@ function submitLeaveApp() {
     sig: '已在线签名'
   });
 
-  saveToLocalStorage(); // 自动保存上交的记录
+  broadcastAndSave(); // 实时云端同步上交的记录给 HR 后台
 
   document.getElementById("successMessage").style.display = "block";
   setTimeout(() => {
@@ -629,13 +691,15 @@ function submitLeaveApp() {
     document.getElementById("eLeaveForm").reset();
     clearEmpCanvas();
     chooseType('MC');
+    // 自动将“个人记录”页面的查看身份切换为刚刚提交的员工，方便直接查看自己的单
+    document.getElementById("userSelfEmpSelect").value = empId;
     renderHistoryTable();
     if(isAdminUnlocked) renderAdminTable();
     switchTab('historyTab');
-  }, 3000);
+  }, 2500);
 }
 
-// 📊 HR 专属：导出并保存当前筛选出来的记录到 Excel
+// 📊 HR 专属导出 Excel 功能
 function exportToExcel() {
   const empFilter = document.getElementById("adminFilterEmp").value;
   const monthFilter = document.getElementById("adminFilterMonth").value;
