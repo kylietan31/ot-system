@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaizen Mould Technology - 极简请假与病假申报系统</title>
+<title>Kaizen Mould Technology - 极简请假与 MC 快速申报系统（含 4 级电子/纸质签名）</title>
 <style>
   :root {
     --primary: #0284c7;
@@ -18,7 +18,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background-color: var(--bg); color: #1e293b; padding: 15px; display: flex; justify-content: center; }
-  .app-container { width: 100%; max-width: 520px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
+  .app-container { width: 100%; max-width: 580px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
   
   .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
   .header h1 { font-size: 22px; color: var(--text); font-weight: 800; }
@@ -31,7 +31,6 @@
   select, input, textarea { width: 100%; padding: 13px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; outline: none; background: #fff; }
   select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
   
-  /* 假别快捷选择按键 */
   .type-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 6px; }
   .type-card {
     padding: 14px 6px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; text-align: center; cursor: pointer; font-weight: bold; font-size: 13px; color: #64748b; user-select: none; transition: all 0.2s;
@@ -44,8 +43,23 @@
   .upload-box:hover { background: #e0f2fe; }
   .upload-box input { display: none; }
 
-  .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
-  .submit-btn:hover { background: var(--primary-hover); }
+  /* 手写签名板 */
+  .signature-block { border: 2px dashed #94a3b8; border-radius: 10px; background: #fafafa; padding: 10px; text-align: center; }
+  canvas { width: 100%; height: 140px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; touch-action: none; }
+  .sig-tools { display: flex; justify-content: space-between; margin-top: 6px; }
+  .clear-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+  /* 多级签名审批看板 */
+  .approval-workflow-box { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px; padding: 12px; margin-top: 15px; }
+  .approval-title { font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; text-align: center; font-size: 11px; }
+  .sig-box { border: 1px dashed #cbd5e1; padding: 8px 4px; border-radius: 6px; background: #fff; min-height: 60px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sig-status { font-size: 10px; font-weight: bold; padding: 2px 4px; border-radius: 4px; margin-top: 4px; }
+  .status-signed { background: #dcfce7; color: #15803d; }
+  .status-pending { background: #fef3c7; color: #b45309; }
+
+  .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
+  .print-btn { width: 100%; padding: 12px; background: #475569; color: #fff; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
 
   .success-alert { display: none; background: #16a34a; color: white; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin-top: 15px; line-height: 1.5; }
 </style>
@@ -55,11 +69,11 @@
 <div class="app-container">
   <div class="header">
     <h1>Kaizen Mould Technology</h1>
-    <p>🏥 全员电子请假 & 病假 (MC) 快速申报系统</p>
+    <p>🏥 极简请假与 MC 快速申报系统（含 4 级电子/纸质签名）</p>
   </div>
 
   <div class="notice-banner">
-    📢 <strong>请假新规定：</strong> 取消所有 WhatsApp/电话口头请假。选好工号与假别代码提交，如有病假必须拍照上传 MC。返回公司后须向 HR 提交纸质正本。
+    📢 <strong>多级签名核销机制：</strong> 本申请须包含：<strong>① 员工本人签名</strong> &rarr; 提交后自动流转至 <strong>② HOD 主管签名</strong> &rarr; <strong>③ HR 签名</strong> &rarr; <strong>④ 老板 (Management) 签名</strong>（支持线上 Digital Sign 或打印后 Hardcopy 签名核销）。
   </div>
 
   <form id="eLeaveForm">
@@ -109,16 +123,52 @@
       <input type="text" id="leaveReason" placeholder="例：发烧看诊 / 紧急家事">
     </div>
 
-    <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 立即提交请假 (Submit Leave)</button>
+    <!-- 7. 员工本人电子手写签名 -->
+    <div class="form-group">
+      <label>✍️ 5. 员工本人手写签名 (Employee Signature / Digital Sign)：</label>
+      <div class="signature-block">
+        <canvas id="empSigCanvas"></canvas>
+        <div class="sig-tools">
+          <span style="font-size:11px; color:#94a3b8;">在上方空白处手写签名</span>
+          <button type="button" class="clear-btn" onclick="clearEmpCanvas()">清除重签</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. 四级审核流转与电子/纸质签名看板 -->
+    <div class="approval-workflow-box">
+      <div class="approval-title">🖊️ 四级多重签名与审批核销看板 (Digital / Hardcopy Signature)</div>
+      <div class="sig-grid">
+        <div class="sig-box">
+          <div>① 员工本人</div>
+          <div class="sig-status status-signed" id="sigStatusEmp">已在线签名</div>
+        </div>
+        <div class="sig-box">
+          <div>② HOD 主管</div>
+          <div class="sig-status status-pending" id="sigStatusHOD">待审批签名</div>
+        </div>
+        <div class="sig-box">
+          <div>③ HR 部门</div>
+          <div class="sig-status status-pending" id="sigStatusHR">待核销签名</div>
+        </div>
+        <div class="sig-box">
+          <div>④ 老板/管理层</div>
+          <div class="sig-status status-pending" id="sigStatusBoss">待批复签名</div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit with Signature)</button>
+    <button type="button" class="print-btn" onclick="window.print()">🖨️ 导出/打印纸质硬拷贝 (Print Hardcopy for Manual Sign)</button>
   </form>
 
   <div id="successMessage" class="success-alert">
-    ✅ 请假申请提交成功！<br>系统已直接自动记录，回公司后请向 HR 提交 MC 正本。
+    ✅ 请假单已成功提交！<br>包含员工手写电子签名，已实时发送至 HOD、HR 及老板审批列表。
   </div>
 </div>
 
 <script>
-// 41位员工名册
+// 41位员工完整名册数据
 const employeeDatabase = [
   {id: "2", name: "CHAN KENG LEONG", dept: "Management / Head"},
   {id: "3", name: "CHONG FAT KEONG", dept: "Injection Trial"},
@@ -164,7 +214,8 @@ const employeeDatabase = [
   {id: "329", name: "MAHAJI", dept: "Injection Trial"}
 ];
 
-// 初始化
+let canvas, ctx, isDrawing = false;
+
 window.onload = function() {
   const select = document.getElementById("empSelect");
   employeeDatabase.forEach(emp => {
@@ -174,23 +225,46 @@ window.onload = function() {
     select.appendChild(opt);
   });
   document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
+  
+  // 初始化手写签名板 Canvas
+  canvas = document.getElementById("empSigCanvas");
+  ctx = canvas.getContext("2d");
+  canvas.width = canvas.parentElement.clientWidth - 20;
+  canvas.height = 140;
+  
+  ctx.strokeStyle = "#0f172a";
+  ctx.lineWidth = 2.5;
+
+  // 监听鼠标与触屏手写签名
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stopDrawing);
+  
+  canvas.addEventListener("touchstart", startDrawingTouch);
+  canvas.addEventListener("touchmove", drawTouch);
+  canvas.addEventListener("touchend", stopDrawing);
 };
 
-// 搜工号带出部门
+function startDrawing(e) { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); }
+function draw(e) { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } }
+function stopDrawing() { isDrawing = false; }
+
+function startDrawingTouch(e) { e.preventDefault(); isDrawing = true; const rect = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); }
+function drawTouch(e) { e.preventDefault(); if (isDrawing) { const rect = canvas.getBoundingClientRect(); ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); ctx.stroke(); } }
+
+function clearEmpCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
 function onEmployeeChange() {
   const id = document.getElementById("empSelect").value;
   const emp = employeeDatabase.find(e => e.id === id);
   document.getElementById("deptInput").value = emp ? emp.dept : "";
 }
 
-// 切换假别代码
 function chooseType(type) {
   document.getElementById("leaveType").value = type;
   document.getElementById("cardMC").className = "type-card" + (type==='MC'?' active-mc':'');
   document.getElementById("cardEL").className = "type-card" + (type==='EL'?' active-el':'');
   document.getElementById("cardAL").className = "type-card" + (type==='AL'?' active-al':'');
-  
-  // 选择 MC 时强制要求拍摄上传
   document.getElementById("mcSection").style.display = (type === 'MC') ? 'block' : 'none';
 }
 
@@ -219,6 +293,7 @@ function submitLeaveApp() {
   setTimeout(() => {
     document.getElementById("successMessage").style.display = "none";
     document.getElementById("eLeaveForm").reset();
+    clearEmpCanvas();
     chooseType('MC');
   }, 4000);
 }
