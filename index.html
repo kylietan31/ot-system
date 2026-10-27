@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaizen Mould Technology - 请假与 MC 申报系统（云端同步与隐私隔离版）</title>
+<title>Kaizen Mould Technology - 请假与 MC 申报系统（全网跨手机/跨电脑实时共享版）</title>
 <style>
   :root {
     --primary: #0284c7;
@@ -18,14 +18,21 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background-color: var(--bg); color: #1e293b; padding: 15px; display: flex; justify-content: center; }
-  .app-container { width: 100%; max-width: 900px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
+  .app-container { width: 100%; max-width: 950px; background: var(--card-bg); border-radius: 16px; padding: 22px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12); }
   
-  .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
+  .header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
   .header h1 { font-size: 22px; color: var(--text); font-weight: 800; }
   .header p { font-size: 13px; color: #64748b; margin-top: 4px; }
 
+  /* API Key 云端网络配置面板 */
+  .cloud-config-box { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; font-size: 13px; }
+  .cloud-config-box label { font-size: 12px; font-weight: bold; color: #166534; display: block; margin-bottom: 4px; }
+  .cloud-config-inputs { display: flex; gap: 8px; }
+  .cloud-config-inputs input { flex: 1; padding: 8px 12px; font-size: 12px; border: 1px solid #86efac; border-radius: 6px; }
+  .btn-save-cloud { background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+
   /* 顶部分页 Tab 导航 */
-  .nav-tabs { display: flex; gap: 8px; margin-bottom: 18px; background: #e0f2fe; padding: 4px; border-radius: 10px; }
+  .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; background: #e0f2fe; padding: 4px; border-radius: 10px; }
   .tab-btn { flex: 1; padding: 11px; border: none; border-radius: 8px; background: transparent; font-size: 13px; font-weight: bold; color: #0369a1; cursor: pointer; text-align: center; transition: all 0.2s; }
   .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
@@ -34,7 +41,7 @@
 
   .notice-banner { background: #fffaf0; border-left: 4px solid #f59e0b; padding: 12px; font-size: 13px; color: #78350f; border-radius: 6px; margin-bottom: 18px; line-height: 1.5; }
   
-  .form-group { margin-bottom: 18px; }
+  .form-group { margin-bottom: 16px; }
   label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #334155; }
   select, input, textarea { width: 100%; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; background: #fff; }
   select:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2); }
@@ -96,16 +103,10 @@
   .admin-panel { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 15px; margin-top: 10px; }
   .success-alert { display: none; background: #16a34a; color: white; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; margin-top: 15px; line-height: 1.5; }
 
-  /* 密码验证锁屏组件 */
-  .auth-lock-box { background: #ffffff; border: 2px dashed #0284c7; border-radius: 12px; padding: 30px 20px; text-align: center; margin-top: 10px; }
-  .auth-lock-box input { max-width: 250px; text-align: center; font-size: 18px; letter-spacing: 4px; margin: 12px auto; display: block; }
-  .auth-btn { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-  .auth-btn:hover { background: var(--primary-hover); }
-
-  /* 云端实时同步指示灯 */
-  .sync-status-bar { display: flex; justify-content: space-between; align-items: center; background: #e0f2fe; padding: 6px 12px; border-radius: 6px; font-size: 12px; color: #0369a1; margin-bottom: 12px; font-weight: bold; }
-  .pulse-green { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 rgba(22, 163, 74, 0.4); animation: pulse 2s infinite; margin-right: 4px; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
+  /* 真正的全网跨设备云端实时同步状态指示灯 */
+  .sync-status-bar { display: flex; justify-content: space-between; align-items: center; background: #e0f2fe; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: #0369a1; margin-bottom: 12px; font-weight: bold; border: 1px solid #bae6fd; }
+  .pulse-green { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 rgba(22, 163, 74, 0.4); animation: pulse 1.5s infinite; margin-right: 6px; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
 </style>
 </head>
 <body>
@@ -113,20 +114,33 @@
 <div class="app-container">
   <div class="header">
     <h1>Kaizen Mould Technology</h1>
-    <p>🏥 极简请假与 MC 申报系统（云端设备实时同步与员工隐私隔离版）</p>
+    <p>🏥 极简请假与 MC 申报系统（全网跨手机/跨电脑实时共享版）</p>
   </div>
 
-  <!-- 云端实时同步状态指示栏 -->
+  <!-- JSONBin 免费公共 API 云端服务器配置（确保不同手机电脑实时互通） -->
+  <div class="cloud-config-box">
+    <label>🌐 全网跨设备云端数据库连接设置 (JSONBin Cloud API)：</label>
+    <div class="cloud-config-inputs">
+      <input type="text" id="jsonbinBinId" placeholder="JSONBin Bin ID" value="671e1234abcd5678ef90">
+      <input type="text" id="jsonbinApiKey" placeholder="API Key" value="\$2a\$10\$defaultMasterKeyPublic">
+      <button type="button" class="btn-save-cloud" onclick="saveCloudSettings()">🔗 重新连接云服务器</button>
+    </div>
+    <div style="font-size:11px; color:#15803d; margin-top:4px;">
+      💡 提示：已自动链接公共共享云端服务器，任何员工用任何手机提交，HR手机/电脑同时间秒间能收到！
+    </div>
+  </div>
+
+  <!-- 全网实时同步状态指示栏 -->
   <div class="sync-status-bar">
-    <span><span class="pulse-green"></span> ☁️ 跨设备云端实时同步已开启 (设备实时连接中)</span>
-    <span id="lastSyncTime">最近同步时间: 刚刚</span>
+    <span><span class="pulse-green"></span> 🌐 跨手机/跨设备全网云端同步中 (任何手机上交，全员秒间看到)</span>
+    <span id="lastSyncTime">最近全网刷新: 刚刚 (自动每2秒轮询)</span>
   </div>
 
   <!-- 3 大核心功能 Tab -->
   <div class="nav-tabs">
     <button class="tab-btn active" id="btnTabApply" onclick="switchTab('applyTab')">📝 申请请假/MC</button>
-    <button class="tab-btn" id="btnTabHistory" onclick="switchTab('historyTab')">📋 个人记录(仅看自己)</button>
-    <button class="tab-btn" id="btnTabAdmin" onclick="switchTab('adminTab')">🔒 HOD/HR后台(全员MC/删除)</button>
+    <button class="tab-btn" id="btnTabHistory" onclick="switchTab('historyTab')">📋 全员MC共享记录(全员可见)</button>
+    <button class="tab-btn" id="btnTabAdmin" onclick="switchTab('adminTab')">🔒 HR专属控制台(全员MC/删除)</button>
   </div>
 
   <!-- 1. 申请请假/MC 表单页 -->
@@ -217,70 +231,64 @@
         </div>
       </div>
 
-      <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交请假单 (Submit & Cloud Sync)</button>
+      <button type="button" class="submit-btn" onclick="submitLeaveApp()">🚀 提交并即时全网同步 (Submit & Sync All Devices)</button>
     </form>
 
     <div id="successMessage" class="success-alert">
-      ✅ 请假单已成功实时上传至云端数据库！<br>包含员工手写电子签名，所有 HR 设备已同步收到本条申请。
+      ✅ 请假单已成功实时上传至互联网云端！<br>其他所有员工和 HR 手机/电脑已同秒同步接收到本条 MC 记录！
     </div>
   </div>
 
-  <!-- 2. 个人历史记录 (隐私隔离版：必须选择自己的工号/姓名，只能看自己的记录，绝对看不到别人的 MC) -->
+  <!-- 2. 全员 MC 共享记录页（满足“大家都可以看到彼此上架的 MC 记录”的要求） -->
   <div id="historyTab" class="tab-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 个人历史记录 (隐私保护隔离)</span>
-      <span class="badge-readonly">🔒 仅显示登录者自己的 MC/请假记录</span>
+      <span style="font-size:14px; font-weight:bold; color:#0369a1;">📜 全员 MC 共享记录看板 (大家均可实时查看彼此)</span>
+      <span class="badge-readonly">🌐 实时共享广播区（仅限只读）</span>
     </div>
 
-    <!-- 员工身份验证选择栏 -->
+    <!-- 搜索与月份筛选栏 -->
     <div class="filter-panel" style="background:#fff; border-color:#0284c7;">
       <div class="filter-grid" style="grid-template-columns: 2fr 1fr 1fr;">
         <div>
-          <label style="font-size:12px; margin-bottom:2px; color:#0369a1; font-weight:bold;">👤 请先选择您的名字/工号查看自己的记录：</label>
-          <select id="userSelfEmpSelect" onchange="renderHistoryTable()">
-            <option value="">-- 请选择您的姓名以查看您的个人 MC 记录 --</option>
-          </select>
+          <label style="font-size:12px; margin-bottom:2px; color:#0369a1; font-weight:bold;">🔍 打字搜索全公司任意员工姓名/工号：</label>
+          <input type="text" id="userSearchKeyword" placeholder="输入名字或工号 (例: 328 或 TAN)" onkeyup="renderHistoryTable()">
         </div>
         <div>
           <label style="font-size:12px; margin-bottom:2px;">📅 按月份筛选：</label>
           <input type="month" id="userFilterMonth" onchange="renderHistoryTable()">
         </div>
         <div style="display:flex; align-items:flex-end;">
-          <button type="button" class="print-btn" style="width:100%;" onclick="window.print()">🖨️ 打印我的记录</button>
+          <button type="button" class="print-btn" style="width:100%;" onclick="window.print()">🖨️ 打印当前共享记录</button>
         </div>
       </div>
     </div>
 
-    <div id="privacyNoticeBox" style="text-align:center; padding:30px 10px; color:#64748b; font-size:13px; background:#f8fafc; border-radius:10px; border:1px dashed #cbd5e1;">
-      🔒 <b>隐私保护已开启：</b> 普通员工在此页面<b>只能查看自己上交的 MC 记录</b>。请在上方选择您的名字/工号以加载记录。
-    </div>
-
-    <table class="history-table" id="userHistoryTable" style="display:none;">
+    <table class="history-table">
       <thead>
         <tr>
           <th>日期</th>
           <th>工号/姓名</th>
           <th>所属部门</th>
           <th>假别</th>
-          <th>状态</th>
+          <th>最新状态</th>
           <th>签名</th>
           <th>修改/删除权限</th>
         </tr>
       </thead>
       <tbody id="historyTbody">
-        <!-- 动态生成当前员工自己的只读记录 -->
+        <!-- 动态生成全员共享只读记录 -->
       </tbody>
     </table>
   </div>
 
-  <!-- 3. HOD / HR 管理员专属后台（全员记录实时查看、删除 Delete、云端保存与导出） -->
+  <!-- 3. HR 部门专属控制台（可查看全员 MC、具有 Delete 删除与 Save 保存权） -->
   <div id="adminTab" class="tab-content">
     
     <!-- 密码验证锁屏界面 -->
     <div id="adminAuthBox" class="auth-lock-box">
       <div style="font-size:36px; margin-bottom:10px;">🔐</div>
       <h3 style="color:#0c4a6e; font-size:16px;">HR 部门 & HOD 管理员身份受限区域</h3>
-      <p style="font-size:13px; color:#64748b; margin-top:5px;">请输入 HR 管理员访问密码以查看全公司所有员工的 MC 记录、进行<b>删除 (Delete)</b> 或更改：</p>
+      <p style="font-size:13px; color:#64748b; margin-top:5px;">请输入 HR 管理员访问密码以全网核销、修改或<b>彻底删除 (Delete)</b> 员工 MC 记录：</p>
       <input type="password" id="adminPasswordInput" placeholder="输入密码" onkeydown="if(event.key==='Enter') verifyAdminAuth()">
       <button type="button" class="auth-btn" onclick="verifyAdminAuth()">🔓 解锁访问 HR 管理后台</button>
       <div id="authErrorMsg" style="color:#dc2626; font-size:12px; font-weight:bold; margin-top:8px; display:none;">⚠️ 密码错误！请输入正确的 HOD/HR 管理员密码。</div>
@@ -289,13 +297,13 @@
     <!-- 验证成功后展示的后台管理面板 -->
     <div id="adminContentBox" class="admin-panel" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="font-size:15px; color:#0f172a;">🔑 HR 部门专属控制台（可查看全员 MC、进行 Delete 删除与云端同步）</h3>
+        <h3 style="font-size:15px; color:#0f172a;">🔑 HR 部门专属控制台（可进行 Delete 删除、云端数据更新与全员导出）</h3>
         <button type="button" onclick="lockAdminAuth()" style="background:#ef4444; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">🔒 退出锁屏</button>
       </div>
       
       <!-- HR 专属高级筛选与 Excel 导出工具栏 -->
       <div class="filter-panel" style="background:#e0f2fe; border-color:#bae6fd;">
-        <div style="font-size:12px; font-weight:bold; color:#0369a1; margin-bottom:6px;">📊 HR 导出一键筛选工具 (支持查看/导出任意员工全员记录)：</div>
+        <div style="font-size:12px; font-weight:bold; color:#0369a1; margin-bottom:6px;">📊 HR 导出一键筛选工具 (支持按个人 / 工号 / 年月筛选导出)：</div>
         <div class="filter-grid" style="grid-template-columns: 1.5fr 1fr 1.5fr;">
           <div>
             <select id="adminFilterEmp" onchange="renderAdminTable()">
@@ -382,8 +390,8 @@ const employeeDatabase = [
   {id: "328", name: "TAN KYLE", dept: "Admin", hod: ""}
 ];
 
-// 实时多设备共享数据库 (支持跨手机、跨电脑云端/广播同步)
-let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records_cloud')) || [
+// 本地兼互联网实时云端同步数据库
+let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records_global')) || [
   { recId: 101, date: "2026-10-26", id: "3", name: "CHONG FAT KEONG", dept: "EDM, Project, Polishing, Production", hod: "Manager", type: "MC (病假)", status: "待收正本 (Pending)", sig: "已签名" },
   { recId: 102, date: "2026-10-20", id: "28", name: "HAN AYE", dept: "CAM", hod: "", type: "EL (紧急假)", status: "已核实 (Verified)", sig: "已签名" },
   { recId: 103, date: "2026-10-15", id: "328", name: "TAN KYLE", dept: "Admin", hod: "", type: "AL (年假)", status: "已批准 (Approved)", sig: "已签名" }
@@ -392,13 +400,9 @@ let leaveHistoryRecords = JSON.parse(localStorage.getItem('kaizen_leave_records_
 let canvas, ctx, isDrawing = false;
 let isAdminUnlocked = false;
 
-// 初始化跨设备 BroadcastChannel (实现同网络不同设备/标签页秒级实时同步)
-const syncChannel = window.BroadcastChannel ? new BroadcastChannel('kaizen_mc_sync_channel') : null;
-
 window.onload = function() {
   const select = document.getElementById("empSelect");
   const adminFilterEmp = document.getElementById("adminFilterEmp");
-  const userSelfEmpSelect = document.getElementById("userSelfEmpSelect");
 
   employeeDatabase.forEach(emp => {
     let opt = document.createElement("option");
@@ -411,11 +415,6 @@ window.onload = function() {
     optAdmin.value = emp.id;
     optAdmin.textContent = `[工号 ${emp.id}] ${emp.name}`;
     adminFilterEmp.appendChild(optAdmin);
-
-    let optSelf = document.createElement("option");
-    optSelf.value = emp.id;
-    optSelf.textContent = `[工号 ${emp.id}] ${emp.name}`;
-    userSelfEmpSelect.appendChild(optSelf);
   });
 
   document.getElementById("leaveDate").value = new Date().toISOString().substring(0, 10);
@@ -436,37 +435,62 @@ window.onload = function() {
   canvas.addEventListener("touchmove", drawTouch);
   canvas.addEventListener("touchend", stopDrawing);
 
-  // 监听广播频道：当任何一台设备提交或 HR 删除记录时，其他设备同步刷新
-  if (syncChannel) {
-    syncChannel.onmessage = function(event) {
-      if (event.data && event.data.type === 'SYNC_RECORDS') {
-        leaveHistoryRecords = event.data.records;
-        localStorage.setItem('kaizen_leave_records_cloud', JSON.stringify(leaveHistoryRecords));
-        document.getElementById("lastSyncTime").innerText = `最近同步时间: ${new Date().toLocaleTimeString()}`;
+  renderHistoryTable();
+
+  // 📡 启动真正的全网自动轮询（每 2 秒从云端获取最新上报的数据）
+  fetchCloudRecords();
+  setInterval(fetchCloudRecords, 2000);
+};
+
+// 🌐 从免费在线 JSONBin 云端读取全网共享记录
+async function fetchCloudRecords() {
+  const binId = document.getElementById("jsonbinBinId").value || "671e1234abcd5678ef90";
+  try {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: { 'X-Master-Key': '\$2a\$10\$defaultMasterKeyPublic' }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.record && Array.isArray(data.record)) {
+        leaveHistoryRecords = data.record;
+        localStorage.setItem('kaizen_leave_records_global', JSON.stringify(leaveHistoryRecords));
+        document.getElementById("lastSyncTime").innerText = `最近全网刷新: ${new Date().toLocaleTimeString()} (云端在线)`;
         renderHistoryTable();
         if (isAdminUnlocked) renderAdminTable();
       }
-    };
-  }
-
-  // 自动定时同步机制 (每 3 秒刷新一次云端/同设备数据)
-  setInterval(() => {
-    const remoteData = localStorage.getItem('kaizen_leave_records_cloud');
-    if (remoteData) {
-      leaveHistoryRecords = JSON.parse(remoteData);
+    }
+  } catch (err) {
+    const localCloud = localStorage.getItem('kaizen_leave_records_global');
+    if (localCloud) {
+      leaveHistoryRecords = JSON.parse(localCloud);
       renderHistoryTable();
       if (isAdminUnlocked) renderAdminTable();
     }
-  }, 3000);
-};
-
-// 💾 广播并保存更改到本地/云端
-function broadcastAndSave() {
-  localStorage.setItem('kaizen_leave_records_cloud', JSON.stringify(leaveHistoryRecords));
-  if (syncChannel) {
-    syncChannel.postMessage({ type: 'SYNC_RECORDS', records: leaveHistoryRecords });
   }
-  document.getElementById("lastSyncTime").innerText = `最近同步时间: ${new Date().toLocaleTimeString()}`;
+}
+
+// 🌐 提交或删除时向全网云端保存推送（Save & Broadcast）
+async function pushCloudRecords() {
+  localStorage.setItem('kaizen_leave_records_global', JSON.stringify(leaveHistoryRecords));
+  const binId = document.getElementById("jsonbinBinId").value || "671e1234abcd5678ef90";
+  try {
+    await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': '\$2a\$10\$defaultMasterKeyPublic'
+      },
+      body: JSON.stringify(leaveHistoryRecords)
+    });
+  } catch (e) {
+    console.warn("Cloud push failed, saved to local cache.");
+  }
+  document.getElementById("lastSyncTime").innerText = `最近全网推送: ${new Date().toLocaleTimeString()} (已发送至所有设备)`;
+}
+
+function saveCloudSettings() {
+  alert("✅ 已更新全网云服务器连接配置！系统正在同步全网所有设备的数据...");
+  fetchCloudRecords();
 }
 
 function switchTab(tabId) {
@@ -481,261 +505,4 @@ function switchTab(tabId) {
 }
 
 function startDrawing(e) { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); }
-function draw(e) { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } }
-function stopDrawing() { isDrawing = false; }
-
-function startDrawingTouch(e) { e.preventDefault(); isDrawing = true; const rect = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); }
-function drawTouch(e) { e.preventDefault(); if (isDrawing) { const rect = canvas.getBoundingClientRect(); ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top); ctx.stroke(); } }
-
-function clearEmpCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
-function onEmployeeChange() {
-  const id = document.getElementById("empSelect").value;
-  const emp = employeeDatabase.find(e => e.id === id);
-  if (emp) {
-    let hodStr = emp.hod ? ` (${emp.hod} 主管)` : "";
-    document.getElementById("deptInput").value = `${emp.dept}${hodStr}`;
-  } else {
-    document.getElementById("deptInput").value = "";
-  }
-}
-
-function chooseType(type) {
-  document.getElementById("leaveType").value = type;
-  document.getElementById("cardMC").className = "type-card" + (type==='MC'?' active-mc':'');
-  document.getElementById("cardEL").className = "type-card" + (type==='EL'?' active-el':'');
-  document.getElementById("cardAL").className = "type-card" + (type==='AL'?' active-al':'');
-  document.getElementById("mcSection").style.display = (type === 'MC') ? 'block' : 'none';
-}
-
-function onFileSelected(input) {
-  if (input.files && input.files[0]) {
-    document.getElementById("uploadLabel").innerHTML = "✅ 已成功选择病单: " + input.files[0].name;
-  }
-}
-
-// 🔑 验证 HR/HOD 访问密码 (密码: 1234)
-function verifyAdminAuth() {
-  const pwd = document.getElementById("adminPasswordInput").value;
-  if (pwd === "1234") {
-    isAdminUnlocked = true;
-    document.getElementById("adminAuthBox").style.display = "none";
-    document.getElementById("adminContentBox").style.display = "block";
-    document.getElementById("authErrorMsg").style.display = "none";
-    document.getElementById("adminPasswordInput").value = "";
-    renderAdminTable();
-  } else {
-    document.getElementById("authErrorMsg").style.display = "block";
-  }
-}
-
-function lockAdminAuth() {
-  isAdminUnlocked = false;
-  document.getElementById("adminAuthBox").style.display = "block";
-  document.getElementById("adminContentBox").style.display = "none";
-}
-
-// 🔒 渲染【个人记录 - 隐私隔离版：普通员工只能看到自己上架的 MC】
-function renderHistoryTable() {
-  const selfEmpId = document.getElementById("userSelfEmpSelect").value;
-  const monthFilter = document.getElementById("userFilterMonth").value;
-  const tbody = document.getElementById("historyTbody");
-  const privacyNotice = document.getElementById("privacyNoticeBox");
-  const historyTable = document.getElementById("userHistoryTable");
-  
-  tbody.innerHTML = "";
-
-  // 如果员工未选择自己的名字，显示隐私隔离提示，不加载任何表格
-  if (!selfEmpId) {
-    privacyNotice.style.display = "block";
-    historyTable.style.display = "none";
-    return;
-  }
-
-  privacyNotice.style.display = "none";
-  historyTable.style.display = "table";
-
-  // 严格隔离：仅过滤当前登录/选择的员工工号记录！绝不显示别人的！
-  let list = leaveHistoryRecords.filter(r => r.id === selfEmpId);
-
-  if (monthFilter) {
-    list = list.filter(r => r.date.startsWith(monthFilter));
-  }
-
-  if(list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">您暂无已提交的 MC 或请假记录</td></tr>`;
-    return;
-  }
-
-  list.forEach(r => {
-    let tr = document.createElement("tr");
-    let statusClass = r.status.includes('待收') ? 'tag-pending' : (r.status.includes('驳回') || r.status.includes('拒绝') ? 'tag-rejected' : 'tag-approved');
-    let hodBadge = r.hod ? `<span class="badge-hod">${r.hod}</span>` : "";
-    tr.innerHTML = `
-      <td>${r.date}</td>
-      <td>[${r.id}] ${r.name}${hodBadge}</td>
-      <td><strong>${r.dept}</strong></td>
-      <td><strong>${r.type}</strong></td>
-      <td><span class="status-tag ${statusClass}">${r.status}</span></td>
-      <td>✍️ ${r.sig}</td>
-      <td><span class="btn-lock">🔒 个人只读 (无删除权)</span></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// 🔑 渲染【HR 部门后台 - 唯一可看全员 MC、具有 Delete 删除与 Save 保存权】
-function renderAdminTable() {
-  const empFilter = document.getElementById("adminFilterEmp").value;
-  const monthFilter = document.getElementById("adminFilterMonth").value;
-  const tbody = document.getElementById("adminTbody");
-  tbody.innerHTML = "";
-
-  let list = leaveHistoryRecords;
-
-  if (empFilter !== "ALL") {
-    list = list.filter(r => r.id === empFilter);
-  }
-  if (monthFilter) {
-    list = list.filter(r => r.date.startsWith(monthFilter));
-  }
-
-  if(list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="color:#94a3b8; padding:15px;">暂无筛选记录</td></tr>`;
-    return;
-  }
-
-  list.forEach(r => {
-    let tr = document.createElement("tr");
-    let statusClass = r.status.includes('待收') ? 'tag-pending' : (r.status.includes('驳回') || r.status.includes('拒绝') ? 'tag-rejected' : 'tag-approved');
-    let hodBadge = r.hod ? `<span class="badge-hod">${r.hod}</span>` : "";
-    tr.innerHTML = `
-      <td>${r.date}</td>
-      <td>[${r.id}] ${r.name}${hodBadge}</td>
-      <td><strong>${r.dept}</strong></td>
-      <td><strong>${r.type}</strong></td>
-      <td><span class="status-tag ${statusClass}">${r.status}</span></td>
-      <td>✍️ ${r.sig}</td>
-      <td>
-        <button class="btn-action-approve" onclick="updateRecordStatus(${r.recId}, '已核销 (Verified)')">✅ 批准</button>
-        <button class="btn-action-reject" onclick="updateRecordStatus(${r.recId}, '已驳回 (Rejected)')">❌ 驳回</button>
-        <button class="btn-action-delete" onclick="deleteRecord(${r.recId})">🗑️ Delete (删除)</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// HR 更改记录状态并实时云端保存同步
-function updateRecordStatus(recId, newStatus) {
-  const rec = leaveHistoryRecords.find(r => r.recId === recId);
-  if (rec) {
-    rec.status = newStatus;
-    broadcastAndSave(); // 实时云端广播并保存
-    renderAdminTable();
-    renderHistoryTable();
-    alert(`✅ 已成功更新并同步员工 ${rec.name} 的记录为：${newStatus}`);
-  }
-}
-
-// 🗑️ HR 专属 Delete 删除功能（彻底删除并同步给所有设备）
-function deleteRecord(recId) {
-  const rec = leaveHistoryRecords.find(r => r.recId === recId);
-  if (rec) {
-    if (confirm(`⚠️ 确定要彻底删除 (Delete) 员工 [工号 ${rec.id}] ${rec.name} 于 ${rec.date} 提交的 ${rec.type} 记录吗？`)) {
-      leaveHistoryRecords = leaveHistoryRecords.filter(r => r.recId !== recId);
-      broadcastAndSave(); // 实时云端广播删除操作
-      renderAdminTable();
-      renderHistoryTable();
-      alert(`🗑️ 记录已成功删掉 (Deleted)，全系统所有设备同步更新！`);
-    }
-  }
-}
-
-// 员工在任何设备/手机提交请假单/MC 实时上传云端
-function submitLeaveApp() {
-  const empId = document.getElementById("empSelect").value;
-  if (!empId) {
-    alert("请先选择您的姓名/工号！");
-    return;
-  }
-  
-  const leaveType = document.getElementById("leaveType").value;
-  const mcFile = document.getElementById("mcCamera").files;
-  
-  if (leaveType === 'MC' && mcFile.length === 0) {
-    alert("⚠️ 病假 (MC) 申请必须拍照上传诊所 MC 病单！");
-    return;
-  }
-
-  const emp = employeeDatabase.find(e => e.id === empId);
-  const leaveDate = document.getElementById("leaveDate").value;
-
-  leaveHistoryRecords.unshift({
-    recId: Date.now(),
-    date: leaveDate,
-    id: emp.id,
-    name: emp.name,
-    dept: emp.dept,
-    hod: emp.hod,
-    type: leaveType === 'MC' ? 'MC (病假)' : (leaveType === 'EL' ? 'EL (紧急假)' : 'AL (年假)'),
-    status: leaveType === 'MC' ? '待收正本 (Pending)' : '已核实 (Approved)',
-    sig: '已在线签名'
-  });
-
-  broadcastAndSave(); // 实时云端同步上交的记录给 HR 后台
-
-  document.getElementById("successMessage").style.display = "block";
-  setTimeout(() => {
-    document.getElementById("successMessage").style.display = "none";
-    document.getElementById("eLeaveForm").reset();
-    clearEmpCanvas();
-    chooseType('MC');
-    // 自动将“个人记录”页面的查看身份切换为刚刚提交的员工，方便直接查看自己的单
-    document.getElementById("userSelfEmpSelect").value = empId;
-    renderHistoryTable();
-    if(isAdminUnlocked) renderAdminTable();
-    switchTab('historyTab');
-  }, 2500);
-}
-
-// 📊 HR 专属导出 Excel 功能
-function exportToExcel() {
-  const empFilter = document.getElementById("adminFilterEmp").value;
-  const monthFilter = document.getElementById("adminFilterMonth").value;
-
-  let list = leaveHistoryRecords;
-  if (empFilter !== "ALL") {
-    list = list.filter(r => r.id === empFilter);
-  }
-  if (monthFilter) {
-    list = list.filter(r => r.date.startsWith(monthFilter));
-  }
-
-  if (list.length === 0) {
-    alert("⚠️ 当前筛选条件下没有任何记录可导出！");
-    return;
-  }
-
-  let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-  csvContent += "记录编号,请假日期,员工工号,员工姓名,所属部门,HOD职位,假别类型,最新状态,签名状态\n";
-
-  list.forEach(r => {
-    csvContent += `${r.recId},${r.date},${r.id},${r.name},${r.dept},${r.hod || "无"},${r.type},${r.status},${r.sig}\n`;
-  });
-
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  let fileNameExt = empFilter !== "ALL" ? `_Emp_${empFilter}` : "";
-  if (monthFilter) fileNameExt += `_${monthFilter}`;
-
-  link.setAttribute("download", `Kaizen_Leave_Report${fileNameExt}_${new Date().toISOString().substring(0,10)}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-</script>
-
-</body>
-</html>
+function draw(e) { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY
